@@ -1,0 +1,48 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity" >
+    <item android:id="@+id/action_aircraft"
+        android:icon="@drawable/ic_acft"
+        android:title="@string/action_aircraft"
+        android:background="@android:color/transparent"
+        android:layout_weight="1"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/action_logbook"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="@string/action_logbook"
+        android:layout_weight="1"
+        android:orderInCategory="2"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/action_facebook"
+        android:icon="@drawable/ic_facebook"
+        android:title="@string/action_facebook"
+        android:layout_weight="1"
+        android:orderInCategory="3"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/action_help"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="@string/action_help"
+        android:layout_weight="1"
+        android:orderInCategory="4"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/action_email"
+        android:icon="@drawable/ic_action_email_dark"
+        android:title="@string/action_email"
+        android:layout_weight="1"
+        android:orderInCategory="5"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/action_settings"
+        android:icon="@drawable/ic_action_settings"
+        android:title="@string/action_settings"
+        android:layout_weight="1"
+        android:orderInCategory="6"
+        app:showAsAction="never"
+        />
+</menu>

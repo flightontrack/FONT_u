@@ -1,0 +1,74 @@
+<p><b>Flight On Track</b> is Android app that tracks aircraft position, velocity and altitude based on the information received from a pilot's smartphone.
+    The route can be accessed later and analized, shared or exported via <a href="http://flightontrack.com">http://flightontrack.com</a> website.
+</p>
+<span style="font-weight: bold;">Current Requirements:</span></div>
+<ul>
+    <li>Android 4.1 or higher smartphone with gps</li>
+    <li>Data access over mobile network</li>
+    <li><b>FONT</b><span style="font-weight: bold;"> </span> app installed on Android phone</li>
+</ul>
+<b>Preflight:</b>
+<ul>
+    <li>In order to avoid distraction make sure all preparations and checks are done before engine start.</li>
+    <li>Launch <span style="font-weight: bold; font-style: italic;">Flight On Track</span> application on your phone.</li>
+    <li>Make sure the <span style="font-weight: bold; font-style: italic;">Pilot</span> field is populated with your phone number id or another pilot callsign. If it is not, edit the field manually.</li>
+    <li>Update <span style="font-weight: bold; font-style: italic;">Aircraft</span> field. Click on the airplane icon located on bottom left corner of the main screen. Update <span style="font-weight: bold; font-style: italic;">Aircraft Number</span> scanning the aircraft NFC tag if available. 
+    Alternatively, edit the <span style="font-weight: bold; font-style: italic;">Aircraft Number</span> field manually. Only this field is required to be populated. Press <span style="font-weight: bold; font-style: italic;">Save</span> button.
+</li>
+    <li>Set <span style="font-weight: bold; font-style: italic;">Update Frequency</span> interval ranging from 3 seconds for flying in pattern to 5 minutes for long
+        flights.</li>
+    <li>Check <span style="font-weight: bold; font-style: italic;">MultiLeg</span> box if you are flying pattern or on a flight with multiple legs and landings.</li>
+    <li>Check <span style="font-weight: bold; font-style: italic;">Min Speed</span> making sure it is set to desired speed. The default set is 40 mph meaning the
+        actual recording starts upon reaching this speed. If the setting reads 0 the recording starts right after getting a flight number.</li>
+    <li>Press the red button before you start taxiing. It is important to have a connection to your mobile network at this time.
+        The app starts communicating with cloud remote server, requesting a new <span style="font-weight: bold; font-style: italic;">Flight ID</span>.
+        If the communication went out successfully the button switches to yellow <span style="font-weight: bold; font-style: italic;">Cleared For Takeoff</span> state
+        with the new flight number received. If the application failed to connect to the cloud and get the flight number try again.
+    <li>Place the phone in your aircraft where the gps signal is not blocked though it may work absolutely fine in your pocket.</li>
+
+</ul>
+<b>Checklist:</b>
+<ul>
+    <li>Pilot callsign ID</li>
+    <li>Aircraft number</li>
+    <li>Update Frequency</li>
+    <li>MultiLeg</li>
+    <li>Min Speed set as desired</li>
+
+</ul>
+<b>In flight:</b>
+<ul>
+    <li>No action required from the pilot in flight.</li>
+    <li>Upon reaching 40 mph speed on takeoff the button automatically changes from yellow to green <span style="font-weight: bold; font-style: italic;">On
+Flight</span> state indicating the start of the tracking.
+        The tracking automatically stops when speed slows down below the <span style="font-weight: bold; font-style: italic;">Min Speed</span> on landing.
+        If <span style="font-weight: bold; font-style: italic;">MultiLeg</span> box is checked the application automatically allocates a new flight id and starts
+        another flight recording on the next takeoff.
+    <li>To stop tracking press the green button.</li>
+    <li>When the aircraft is taxing or stopped no trackpoints are recorded.</li>
+</ul>
+<b>Shareing a flight on Facebook:</b>
+<ul>
+    <li>Your flight Google Maps route can be shared on Facebook while you are in flight. </li>
+    <li>The flight needs to be started first and a flight number needs to be received.</li>
+    <li>Use <span style="font-weight: bold; font-style: italic;">Share on FB</span> icon on Action bar in <span style="font-weight: bold; font-style: italic;">Preflight</span> phase to share.</li>
+</ul>
+<b>My Pilot Logbook:</b>
+<ul>
+    <li>Your pilot logbook is stored on the cloud server. </li>
+    <li>Use <span style="font-weight: bold; font-style: italic;">Logbook</span> icon to reach your logbook records.</li>
+</ul>
+<b>Changing/resetting application preferences:</b>
+<ul>
+    <li>Use <span style="font-weight: bold; font-style: italic;">Settings</span> icon on the bottom of Action bar.</li>
+    <li>To revert all settings to default values press <span style="font-weight: bold; font-style: italic;">Reset</span> button.</li>
+    <li><span style="font-weight: bold; font-style: italic;">Site:</span>  shows the url where your routes can be accessed along with the user id and password to log into your data. To get your password press <span
+            style="font-weight: bold; font-style: italic;">Get Passw</span> button.</li> Resetting to defaults also changes your password.
+    <li><span style="font-weight: bold; font-style: italic;">Is Road</span> checkbox if checked records road driving track.</li>
+    <li><span style="font-weight: bold; font-style: italic;">Start on Reboot</span> automatically starts the application on the device reboot.</li>
+    <li><span style="font-weight: bold; font-style: italic;">Debug Log File</span> checkbox if checked creates an application log file in FONT_Logfiles directory.</li>
+</ul>
+<b>Reporting issues/bugs:</b>
+<ul>
+    <li>Use <span style="font-weight: bold; font-style: italic;">Report Problem</span> envelope icon  on the bottom of Action bar.
+</ul>
