@@ -54,8 +54,8 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_IS_CLOCK_ON);
         requestParams.put("isrestart", isRestart);
-        requestParams.put("phonenumber", MainActivity._myPhoneId);
-        requestParams.put("deviceid", MainActivity._myDeviceId);
+        requestParams.put("phonenumber", MyPhone._myPhoneId);
+        requestParams.put("deviceid", MyPhone._myDeviceId);
         requestParams.put("isClockOn", SvcLocationClock.isInstanceCreated());
         requestParams.put("flightid", Route.activeFlight==null?FLIGHT_NUMBER_DEFAULT :Route.activeFlight.flightNumber);
         //requestParams.put("isdebug", Util.getIsDebug());

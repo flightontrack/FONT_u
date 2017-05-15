@@ -105,7 +105,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-annotations-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appindexing-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="facebook-android-sdk-4.21.1" level="project" />
+    <orderEntry type="library" exported="" name="facebook-android-sdk-4.22.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="bolts-tasks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.0.0" level="project" />

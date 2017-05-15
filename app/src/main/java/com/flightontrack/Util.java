@@ -44,12 +44,11 @@ public class Util {
     private static Context ctx;
     static SharedPreferences sharedPreferences;
     static SharedPreferences.Editor editor;
-    static String trackingURL;
-    static int versionCode;
-    static String deviceMmnufacturer = "unknown";
-    static String deviceBrand = "unknown";
-    static String deviceProduct = "unknown";
-    static String deviceModel = "unknown";
+//    static int versionCode;
+//    static String deviceMmnufacturer = "unknown";
+//    static String deviceBrand = "unknown";
+//    static String deviceProduct = "unknown";
+//    static String deviceModel = "unknown";
 
 //    static boolean isEmptyAcftOk() {
 //        return sharedPreferences.getBoolean("a_isEmptyAcftOk", false);
@@ -84,13 +83,14 @@ public class Util {
     }
 
     static void setUserName(String un) {
-        editor.putString("userName", un.trim()).commit();
+        editor.putString("pUserName", un.trim()).commit();
+        //editor.putString("userName", un.trim()).commit();
         //MainActivity.txtUserName.setText(un);
         //AircraftActivity.txtUserName.setText(un);
     }
 
     static String getUserName() {
-        return sharedPreferences.getString("userName", MainActivity._myPhoneId.substring(0,3)+"...."+MainActivity._myPhoneId.substring(8));
+        return sharedPreferences.getString("pUserName", MainActivity._myPhoneId.substring(0,3)+"...."+MainActivity._myPhoneId.substring(8));
     }
 
     static void setAcftNum(String an) {
@@ -127,33 +127,33 @@ public class Util {
         return acft;
     }
 
-    static String getMyAndroidID() {
-        return Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
-    static String   getMyAndroidVersion() {
-        return  Build.VERSION.CODENAME +' ' +Build.VERSION.RELEASE+' ' +Build.VERSION.SDK_INT;
-    }
-    static int getVersionCode() {
-        try {
-            versionCode = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            versionCode = -1;
-        }
-        return versionCode;
-    }
-
-    static void getMyDevice() {
-        deviceMmnufacturer = Build.MANUFACTURER;
-        deviceBrand        = Build.BRAND;
-        deviceProduct      = Build.PRODUCT;
-        deviceModel        = Build.MODEL;
-    }
-
-    static String getMyPhoneID() {
-        String strId = (MainActivity._phoneNumber == null||MainActivity._phoneNumber.isEmpty()) ? MainActivity._myDeviceId : MainActivity._phoneNumber;
-        return strId.substring(strId.length() - 10);
-    }
+//    static String getMyAndroidID() {
+//        return Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.ANDROID_ID);
+//    }
+//
+//    static String   getMyAndroidVersion() {
+//        return  Build.VERSION.CODENAME +' ' +Build.VERSION.RELEASE+' ' +Build.VERSION.SDK_INT;
+//    }
+//    static int getVersionCode() {
+//        try {
+//            versionCode = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionCode;
+//        } catch (PackageManager.NameNotFoundException e) {
+//            versionCode = -1;
+//        }
+//        return versionCode;
+//    }
+//
+//    static void getMyDevice() {
+//        deviceMmnufacturer = Build.MANUFACTURER;
+//        deviceBrand        = Build.BRAND;
+//        deviceProduct      = Build.PRODUCT;
+//        deviceModel        = Build.MODEL;
+//    }
+//
+//    static String getMyPhoneID() {
+//        String strId = (MainActivity._phoneNumber == null||MainActivity._phoneNumber.isEmpty()) ? MainActivity._myDeviceId : MainActivity._phoneNumber;
+//        return strId.substring(strId.length() - 10);
+//    }
 
     static String getPsw() {
         return sharedPreferences.getString("cloudpsw",null);
@@ -200,16 +200,23 @@ public class Util {
 //        Route.setTrackingButtonState(Route.trackingButtonState);
 //    }
 
-    static void clearSettingPreferences() {
-        //Log.d.d(TAG, "clearPref()");
-        //editor.remove("trackingURL").commit();
-        editor.remove("spinnerUrlsPos").commit();
-        editor.remove("speed_thresh").commit();
-        editor.remove("spinnerSpeedPos").commit();
-        editor.remove("a_isEmptyAcftOk").commit();
-        editor.remove("cloudpsw").commit();
-        editor.remove("userName").commit();
-    }
+//    static void clearSettingPreferences() {
+//        //Log.d.d(TAG, "clearPref()");
+//
+//        //editor.remove("trackingURL").commit();
+//        editor.remove("speed_thresh").commit();
+//        editor.remove("spinnerSpeedPos").commit();
+//        editor.remove("pIsMultileg").commit();
+//        editor.remove("pIntervalLocationUpdateSec").commit();
+//        editor.remove("pIntervalSelectedItem").commit();
+//        editor.remove("pIsMultileg").commit();
+//        editor.remove("pIsEmptyAcftOk").commit();
+//        editor.remove("pSpinnerUrlsPos").commit();
+//        editor.remove("pUserName").commit();
+//        editor.remove("cloudpsw").commit();
+//        editor.remove("pIsDebug").commit();
+//        MainActivity.AppProp.get();
+//    }
 
     static void clearAcftPreferences() {
         //Log.d.d(TAG, "clearPref()");
@@ -370,9 +377,9 @@ public class Util {
         appendLog(TAG + "getCloudPsw Started", 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_PSW);
-        requestParams.put("userid", MainActivity._userId);
-        requestParams.put("phonenumber", MainActivity._myPhoneId);
-        requestParams.put("deviceid", MainActivity._myDeviceId);
+        requestParams.put("userid", MyPhone._userId);
+        requestParams.put("phonenumber", MyPhone._myPhoneId);
+        requestParams.put("deviceid", MyPhone._myDeviceId);
         new AsyncHttpClient().post(getTrackingURL() + ctx.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {

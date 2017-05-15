@@ -139,12 +139,12 @@ class FlightInstance {
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
-        requestParams.put("phonenumber", MainActivity._myPhoneId); // Util.getMyPhoneID());
+        requestParams.put("phonenumber", MyPhone._myPhoneId); // Util.getMyPhoneID());
         requestParams.put("username", Util.getUserName());
-        requestParams.put("userid", MainActivity._userId);
-        requestParams.put("deviceid", MainActivity._myDeviceId);
-        requestParams.put("aid", Util.getMyAndroidID());
-        requestParams.put("versioncode", String.valueOf(Util.getVersionCode()));
+        requestParams.put("userid", MyPhone._userId);
+        requestParams.put("deviceid", MyPhone._myDeviceId);
+        requestParams.put("aid", MyPhone.getMyAndroidID());
+        requestParams.put("versioncode", String.valueOf(MyPhone.versionCode));
         requestParams.put("AcftNum", Util.getAcftNum(4));
         requestParams.put("AcftTagId", Util.getAcftNum(5));
         requestParams.put("AcftName", Util.getAcftNum(6));

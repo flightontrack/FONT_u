@@ -54,10 +54,10 @@ public class MainActivity extends AppCompatActivity {
     //static boolean autostart = false;
     //static boolean dialogOn = false;
     public static boolean isToDestroy = true;
-    static String _myDeviceId = null;
-    static String _myPhoneId = null;
-    static String _userId = null;
-    static String _phoneNumber = null;
+//    static String _myDeviceId = null;
+//    static String _myPhoneId = null;
+//    static String _userId = null;
+//    static String _phoneNumber = null;
     static SharedPreferences sharedPreferences;
     static SharedPreferences.Editor editor;
     ReceiverHealthCheckAlarm alarmReceiver;
@@ -106,8 +106,24 @@ public class MainActivity extends AppCompatActivity {
             //MainActivity.ctxBase = getBaseContext();
             //MainActivity.ctxActv = this;
             isNFCcapable = isNFCcapable();
-            AppProp.get();
+
+            int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+            int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheckPhone == PackageManager.PERMISSION_GRANTED && permissionCheckLocation == PackageManager.PERMISSION_GRANTED) {
+                MyPhone myPhone =  new MyPhone(ctxApp);
+                AppProp.pUserName=myPhone.getMyUserName();
+//                if (_phoneNumber == null || _myDeviceId == null) {
+//                    _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+//                    _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+//                    _myPhoneId = Util.getMyPhoneID(); /// 10 digits number
+//                    _userId = _myPhoneId + "." + _myDeviceId.substring(_myDeviceId.length() - 4); //combination of phone num. 4 digits of deviceid
+//                }
+            } else {
+                startActivityForResult(new Intent(this, PermissionActivity.class), START_ACTIVITY_RESULT);
+            }
             Util.init(ctxApp, this);
+            Util.resetPreferencesAll();
+            AppProp.get();
             //Util.setIsDebug(!MyApplication.productionRelease);
             //Util.appendLog(TAG + "onCreate", 'd');
             //startService(new Intent(getApplicationContext(), SvcBackground.class));
@@ -148,18 +164,18 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         Util.appendLog(TAG + "onResume",'d');
         super.onResume();
-        int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-        int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheckPhone == PackageManager.PERMISSION_GRANTED && permissionCheckLocation == PackageManager.PERMISSION_GRANTED) {
-            if (_phoneNumber == null || _myDeviceId == null) {
-                _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-                _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-                _myPhoneId = Util.getMyPhoneID(); /// 10 digits number
-                _userId = _myPhoneId + "." + _myDeviceId.substring(_myDeviceId.length() - 4); //combination of phone num. 4 digits of deviceid
-            }
-        } else {
-            startActivityForResult(new Intent(this, PermissionActivity.class), START_ACTIVITY_RESULT);
-        }
+//        int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+//        int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+//        if (permissionCheckPhone == PackageManager.PERMISSION_GRANTED && permissionCheckLocation == PackageManager.PERMISSION_GRANTED) {
+//            if (_phoneNumber == null || _myDeviceId == null) {
+//                _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+//                _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+//                _myPhoneId = Util.getMyPhoneID(); /// 10 digits number
+//                _userId = _myPhoneId + "." + _myDeviceId.substring(_myDeviceId.length() - 4); //combination of phone num. 4 digits of deviceid
+//            }
+//        } else {
+//            startActivityForResult(new Intent(this, PermissionActivity.class), START_ACTIVITY_RESULT);
+//        }
         Intent nfcintent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
             ///TODO
@@ -174,10 +190,10 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.setIntervalSelectedItem(MainActivity.AppProp.pIntervalSelectedItem);
         Util.setSpinnerSpeedPos(Util.getSpinnerSpeedPos());
 
-        if (!(MainActivity._phoneNumber==null)&&!(MainActivity._myDeviceId==null)) {
+        //if (!(MainActivity._phoneNumber==null)&&!(MainActivity._myDeviceId==null)) {
             //Util.setUserName(Util.getUserName());
-            txtUserName.setText(Util.getUserName());
-        }
+            txtUserName.setText(AppProp.pUserName);
+        //}
         Route.setTrackingButtonState(Route.trackingButtonState);
 
         init_listeners();
@@ -198,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Util.setUserName(txtUserName.getText().toString());
+        //Util.setUserName(txtUserName.getText().toString());
         switch (item.getItemId()) {
             case R.id.action_help:
                 helpPage();
@@ -409,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
 
     void sendEmail() {
 
-        Util.getMyDevice();
+        MyPhone myPhone = new MyPhone(ctxApp);
         String[] TO = {getString(R.string.email_crash)};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setData(Uri.parse("mailto:"));
@@ -417,14 +433,14 @@ public class MainActivity extends AppCompatActivity {
 
         emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Flight On Track issue");
-        String emailText = "APP_BUILD : " + Util.getVersionCode() + '\n' +
-                "ANDROID_VERSION : " + Util.getMyAndroidVersion() + '\n' +
+        String emailText = "APP_BUILD : " + myPhone.getVersionCode(ctxApp) + '\n' +
+                "ANDROID_VERSION : " + myPhone.getMyAndroidVersion() + '\n' +
                 "PHONE_MODEL : " +
                 //Util.deviceMmnufacturer.toUpperCase()+'\n'+
                 //Util.deviceBrand.toUpperCase()+'\n'+
-                Util.deviceModel.toUpperCase() + ' ' +
-                Util.deviceProduct.toUpperCase() + '\n' +
-                "USER : " + _userId + '\n';
+                myPhone.deviceModel.toUpperCase() + ' ' +
+                myPhone.deviceProduct.toUpperCase() + '\n' +
+                "USER : " + myPhone._userId + '\n';
 
         emailIntent.putExtra(Intent.EXTRA_TEXT, emailText + '\n' + getString(R.string.email_commment) + '\n');
         try {
@@ -551,6 +567,7 @@ public class MainActivity extends AppCompatActivity {
         static boolean      pIsMultileg;
         static boolean      pIsEmptyAcftOk;
         static int          pSpinnerUrlsPos;
+        static String       pUserName;
 
         static void save(){
             //Util.appendLog(TAG + "Save Properties:pIntervalSelectedItem"+pIntervalSelectedItem , 'd');
@@ -559,7 +576,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("pIsMultileg", pIsMultileg);
             editor.putBoolean("pIsEmptyAcftOk", pIsEmptyAcftOk);
             editor.putInt("pSpinnerUrlsPos", pSpinnerUrlsPos);
-            editor.putBoolean("pIsDebug", pIsDebug);
+            editor.putString("pUserName", pUserName);
             editor.commit();
         }
         static void get(){
@@ -570,7 +587,26 @@ public class MainActivity extends AppCompatActivity {
             pIntervalSelectedItem=sharedPreferences.getInt("pIntervalSelectedItem", DEFAULT_INTERVAL_SELECTED_ITEM);
             pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
             pIsDebug=sharedPreferences.getBoolean("pIsDebug", false);
+            pUserName =  sharedPreferences.getString("pUserName", new MyPhone(ctxApp).getMyUserName());
+
             //pSpinnerUrlsPos=0;
+        }
+        static void resetAppProp() {
+            //Log.d.d(TAG, "clearPref()");
+
+            //editor.remove("trackingURL").commit();
+            editor.remove("speed_thresh").commit();
+            editor.remove("spinnerSpeedPos").commit();
+            editor.remove("pIsMultileg").commit();
+            editor.remove("pIntervalLocationUpdateSec").commit();
+            editor.remove("pIntervalSelectedItem").commit();
+            editor.remove("pIsMultileg").commit();
+            editor.remove("pIsEmptyAcftOk").commit();
+            editor.remove("pSpinnerUrlsPos").commit();
+            editor.remove("pUserName").commit();
+            editor.remove("cloudpsw").commit();
+            editor.remove("pIsDebug").commit();
+            MainActivity.AppProp.get();
         }
     }
 

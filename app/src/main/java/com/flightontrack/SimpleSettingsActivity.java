@@ -24,14 +24,14 @@ import static com.flightontrack.Const.MY_PERMISSIONS_RITE_EXTERNAL_STORAGE;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
-    protected static TextView txtUser;
-    protected static TextView txtPsw;
-    protected static Button resetButton;
-    protected static Button getPswButton;
-    protected static Spinner spinnerUrls;
-    protected static CheckBox chBoxIsDebug;
-    protected static CheckBox chBoxIsOnReboot;
-    protected static CheckBox chBoxIsRoad;
+    static TextView txtUser;
+    static TextView txtPsw;
+    static Button resetButton;
+    static Button getPswButton;
+    static Spinner spinnerUrls;
+    static CheckBox chBoxIsDebug;
+    static CheckBox chBoxIsOnReboot;
+    static CheckBox chBoxIsRoad;
     //public static int spinnerUrlsPos;
     //public static ProgressDialog progressBar;
 
@@ -43,7 +43,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Util.clearSettingPreferences();
+                MainActivity.AppProp.resetAppProp();
                 //spinnerUrls.setSelection(Util.getSpinnerUrlsPos());
                 spinnerUrls.setSelection(MainActivity.AppProp.pSpinnerUrlsPos);
                 Util.setPsw(null);
@@ -88,7 +88,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             }
         });
         txtUser= (TextView) findViewById((R.id.txtWebsiteUser));
-        txtUser.setText(MainActivity._userId);
+        txtUser.setText(MyPhone._userId);
         txtPsw= (TextView) findViewById((R.id.txtWebsitePsw));
         txtPsw.setText(Util.getPsw());
         //chBoxIsDebug.setChecked(Util.getIsDebug());
