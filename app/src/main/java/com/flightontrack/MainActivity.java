@@ -110,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
             int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
             int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
             if (permissionCheckPhone == PackageManager.PERMISSION_GRANTED && permissionCheckLocation == PackageManager.PERMISSION_GRANTED) {
-                MyPhone myPhone =  new MyPhone(ctxApp);
-                AppProp.pUserName=myPhone.getMyUserName();
+                //MyPhone myPhone =  new MyPhone(ctxApp);
+                //AppProp.pUserName=myPhone.getMyUserName();
 //                if (_phoneNumber == null || _myDeviceId == null) {
 //                    _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 //                    _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
         //if (!(MainActivity._phoneNumber==null)&&!(MainActivity._myDeviceId==null)) {
             //Util.setUserName(Util.getUserName());
-            txtUserName.setText(AppProp.pUserName);
+            txtUserName.setText(Pilot.getPilotUserName());
         //}
         Route.setTrackingButtonState(Route.trackingButtonState);
 
@@ -425,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
 
     void sendEmail() {
 
-        MyPhone myPhone = new MyPhone(ctxApp);
+        MyPhone myPhone = new MyPhone();
         String[] TO = {getString(R.string.email_crash)};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setData(Uri.parse("mailto:"));
@@ -433,14 +433,14 @@ public class MainActivity extends AppCompatActivity {
 
         emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Flight On Track issue");
-        String emailText = "APP_BUILD : " + myPhone.getVersionCode(ctxApp) + '\n' +
+        String emailText = "APP_BUILD : " + myPhone.getVersionCode() + '\n' +
                 "ANDROID_VERSION : " + myPhone.getMyAndroidVersion() + '\n' +
                 "PHONE_MODEL : " +
                 //Util.deviceMmnufacturer.toUpperCase()+'\n'+
                 //Util.deviceBrand.toUpperCase()+'\n'+
                 myPhone.deviceModel.toUpperCase() + ' ' +
                 myPhone.deviceProduct.toUpperCase() + '\n' +
-                "USER : " + myPhone._userId + '\n';
+                "USER : " + Pilot.getUserID() + '\n';
 
         emailIntent.putExtra(Intent.EXTRA_TEXT, emailText + '\n' + getString(R.string.email_commment) + '\n');
         try {
@@ -567,7 +567,7 @@ public class MainActivity extends AppCompatActivity {
         static boolean      pIsMultileg;
         static boolean      pIsEmptyAcftOk;
         static int          pSpinnerUrlsPos;
-        static String       pUserName;
+        //static String       pUserName;
 
         static void save(){
             //Util.appendLog(TAG + "Save Properties:pIntervalSelectedItem"+pIntervalSelectedItem , 'd');
@@ -576,7 +576,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("pIsMultileg", pIsMultileg);
             editor.putBoolean("pIsEmptyAcftOk", pIsEmptyAcftOk);
             editor.putInt("pSpinnerUrlsPos", pSpinnerUrlsPos);
-            editor.putString("pUserName", pUserName);
+            //editor.putString("pUserName", pUserName);
             editor.commit();
         }
         static void get(){
@@ -587,7 +587,7 @@ public class MainActivity extends AppCompatActivity {
             pIntervalSelectedItem=sharedPreferences.getInt("pIntervalSelectedItem", DEFAULT_INTERVAL_SELECTED_ITEM);
             pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
             pIsDebug=sharedPreferences.getBoolean("pIsDebug", false);
-            pUserName =  sharedPreferences.getString("pUserName", new MyPhone(ctxApp).getMyUserName());
+            //pUserName =  sharedPreferences.getString("pUserName", new Pilot().getMyUserName());
 
             //pSpinnerUrlsPos=0;
         }

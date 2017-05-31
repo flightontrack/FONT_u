@@ -82,17 +82,6 @@ public class Util {
         editor.putInt("wayPointLimit", WAY_POINT_HARD_LIMIT > wp_limit ? WAY_POINT_HARD_LIMIT : wp_limit).commit();
     }
 
-    static void setUserName(String un) {
-        editor.putString("pUserName", un.trim()).commit();
-        //editor.putString("userName", un.trim()).commit();
-        //MainActivity.txtUserName.setText(un);
-        //AircraftActivity.txtUserName.setText(un);
-    }
-
-    static String getUserName() {
-        return sharedPreferences.getString("pUserName", MainActivity._myPhoneId.substring(0,3)+"...."+MainActivity._myPhoneId.substring(8));
-    }
-
     static void setAcftNum(String an) {
         MainActivity.txtAcftNum.setText(an);
     }
@@ -377,7 +366,7 @@ public class Util {
         appendLog(TAG + "getCloudPsw Started", 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_PSW);
-        requestParams.put("userid", MyPhone._userId);
+        requestParams.put("userid", Pilot.getUserID());
         requestParams.put("phonenumber", MyPhone._myPhoneId);
         requestParams.put("deviceid", MyPhone._myDeviceId);
         new AsyncHttpClient().post(getTrackingURL() + ctx.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {

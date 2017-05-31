@@ -140,8 +140,8 @@ class FlightInstance {
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
         requestParams.put("phonenumber", MyPhone._myPhoneId); // Util.getMyPhoneID());
-        requestParams.put("username", Util.getUserName());
-        requestParams.put("userid", MyPhone._userId);
+        requestParams.put("username", Pilot.getPilotUserName());
+        requestParams.put("userid", Pilot.getUserID());
         requestParams.put("deviceid", MyPhone._myDeviceId);
         requestParams.put("aid", MyPhone.getMyAndroidID());
         requestParams.put("versioncode", String.valueOf(MyPhone.versionCode));

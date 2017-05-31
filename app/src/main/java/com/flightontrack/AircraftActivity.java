@@ -107,7 +107,7 @@ public class AircraftActivity extends Activity {
        //showAlertClass = new ShowAlertClass(this);
        //if (MainActivity.isNFCcapable) enableNfcForegroundMode();
        init_listeners();
-       txtUserName.setText(Util.getUserName());
+       txtUserName.setText(Pilot.getPilotUserName());
        setAcft(getAcft());
 
        super.onResume();
@@ -143,7 +143,7 @@ public class AircraftActivity extends Activity {
                     //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
                 }
                 setAcft(json);
-                Util.setUserName(txtUserName.getText().toString());
+                Pilot.setPilotUserName(txtUserName.getText().toString());
                 finish();
             }
         });
@@ -196,7 +196,7 @@ public class AircraftActivity extends Activity {
                 if (!hasFocus) {
                     editText = (EditText) v;
                     input = editText.getText().toString();
-                    Util.setUserName(input);
+                    Pilot.setPilotUserName(input);
                 }
             }
         });
@@ -207,9 +207,9 @@ public class AircraftActivity extends Activity {
             {
                 Util.appendLog(TAG+ json.toString(),'d');
                 String AcftMake = json.getString("AcftMake");
-                String AcftModel = json.getString("AcftModel");
-                String AcftSeries = json.getString("AcftSeries");
-                String AcftRegNum = json.getString("AcftRegNum");
+                String AcftModel = json.getString("AcftModel").replace(" ","");
+                String AcftSeries = json.getString("AcftSeries").replace(" ","");
+                String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
                 String AcftTagId = json.getString("AcftTagId");
                 String AcftName = json.getString("AcftName");
                 editor.putString("AcftMake", AcftMake.trim());

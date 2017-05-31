@@ -88,7 +88,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             }
         });
         txtUser= (TextView) findViewById((R.id.txtWebsiteUser));
-        txtUser.setText(MyPhone._userId);
+        txtUser.setText(Pilot.getUserID());
         txtPsw= (TextView) findViewById((R.id.txtWebsitePsw));
         txtPsw.setText(Util.getPsw());
         //chBoxIsDebug.setChecked(Util.getIsDebug());
