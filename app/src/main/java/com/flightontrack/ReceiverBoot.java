@@ -31,6 +31,7 @@ public class ReceiverBoot extends BroadcastReceiver {
             alarmManager.set(AlarmManager.RTC_WAKEUP, APPBOOT_DELAY_MILLISEC, pendingAlarmIntent);
         }
         else if (intent.getAction().equals(FONT_RECEIVER_FILTER)) {
+            Log.d(TAG, " FONT:ReceiverBoot FONT_RECEIVER_FILTER intend");
             Intent intentActivity = new Intent(context, MainActivity.class);
             intentActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             MainActivity.AppProp.autostart = true;

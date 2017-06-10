@@ -107,20 +107,6 @@ public class MainActivity extends AppCompatActivity {
             //MainActivity.ctxActv = this;
             isNFCcapable = isNFCcapable();
 
-            int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-            int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-            if (permissionCheckPhone == PackageManager.PERMISSION_GRANTED && permissionCheckLocation == PackageManager.PERMISSION_GRANTED) {
-                //MyPhone myPhone =  new MyPhone(ctxApp);
-                //AppProp.pUserName=myPhone.getMyUserName();
-//                if (_phoneNumber == null || _myDeviceId == null) {
-//                    _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-//                    _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-//                    _myPhoneId = Util.getMyPhoneID(); /// 10 digits number
-//                    _userId = _myPhoneId + "." + _myDeviceId.substring(_myDeviceId.length() - 4); //combination of phone num. 4 digits of deviceid
-//                }
-            } else {
-                startActivityForResult(new Intent(this, PermissionActivity.class), START_ACTIVITY_RESULT);
-            }
             Util.init(ctxApp, this);
             Util.resetPreferencesAll();
             AppProp.get();
@@ -164,18 +150,6 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         Util.appendLog(TAG + "onResume",'d');
         super.onResume();
-//        int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-//        int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-//        if (permissionCheckPhone == PackageManager.PERMISSION_GRANTED && permissionCheckLocation == PackageManager.PERMISSION_GRANTED) {
-//            if (_phoneNumber == null || _myDeviceId == null) {
-//                _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-//                _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-//                _myPhoneId = Util.getMyPhoneID(); /// 10 digits number
-//                _userId = _myPhoneId + "." + _myDeviceId.substring(_myDeviceId.length() - 4); //combination of phone num. 4 digits of deviceid
-//            }
-//        } else {
-//            startActivityForResult(new Intent(this, PermissionActivity.class), START_ACTIVITY_RESULT);
-//        }
         Intent nfcintent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
             ///TODO
@@ -192,12 +166,26 @@ public class MainActivity extends AppCompatActivity {
 
         //if (!(MainActivity._phoneNumber==null)&&!(MainActivity._myDeviceId==null)) {
             //Util.setUserName(Util.getUserName());
-            txtUserName.setText(Pilot.getPilotUserName());
+//            txtUserName.setText(Pilot.getPilotUserName());
         //}
         Route.setTrackingButtonState(Route.trackingButtonState);
 
         init_listeners();
         //Util.appendLog(TAG + "onResume: autostart: " + autostart, 'd');
+        int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+        int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheckLocation == PackageManager.PERMISSION_DENIED) {
+            Intent intent = new Intent(this, PermissionActivity.class);
+            intent.putExtra("PERMISSIONTYPE",Manifest.permission.ACCESS_FINE_LOCATION);
+            startActivityForResult(intent, START_ACTIVITY_RESULT);
+        }
+        else if (permissionCheckPhone == PackageManager.PERMISSION_DENIED) {
+            Intent intent = new Intent(this, PermissionActivity.class);
+            intent.putExtra("PERMISSIONTYPE",Manifest.permission.READ_PHONE_STATE);
+            startActivityForResult(intent, START_ACTIVITY_RESULT);
+        }
+        else txtUserName.setText(Pilot.getPilotUserName());
+
         if (AppProp.autostart) {
             trackingButton.performClick();
             AppProp.autostart = false;

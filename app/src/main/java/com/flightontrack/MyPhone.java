@@ -64,6 +64,4 @@ public class MyPhone {
     String   getMyAndroidVersion() {
         return  codeName +' ' +codeRelease+' ' +codeSDK;
     }
-
-
 }

@@ -36,6 +36,7 @@
 
     <application
         android:name=".MyApplication"
+        android:label="@string/app_label"
         android:icon="@drawable/ic_launcher"
         android:allowBackup="true"
         android:theme="@style/AppTheme"

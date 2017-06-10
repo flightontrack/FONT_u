@@ -112,9 +112,10 @@
     <string name="backpressed_dialog_neg">keep it running</string>
     <string name="backpressed_dialog_pos">Stop it</string>
 
-    <string name="permiss_ask">This application requires permissions that are not granted yet</string>
-    <string name="permiss_grantyes">Grant Permissions</string>
-    <string name="permiss_grantno">Close the App</string>
+    <string name="permiss_ask">FONT requires permission to read your phone number to uniquely identify a pilot. No phone calls will be made from your phone despite the next system message. </string>
+    <string name="permisslocation_ask">FONT needs permission to read your phone gps location. </string>
+    <string name="permiss_grantyes">Grant Permission</string>
+    <string name="permiss_grantno">Deny and Close the App</string>
 
     <!--array-->
     <string-array name="intervalname_array">

@@ -36,11 +36,13 @@ public class PermissionActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String permissionType = getIntent().getExtras().getString("PERMISSIONTYPE");
+
         super.onCreate(savedInstanceState);
         try {
             Util.appendLog(TAG + "onCreate", 'd');
             thisAct = this;
-            set_Permissions();
+            set_Permissions(permissionType);
         }
         catch (Exception e) {
             Util.appendLog(TAG + e.toString(), 'e');
@@ -52,18 +54,31 @@ public class PermissionActivity extends Activity {
         super.onResume();
     }
 
-    protected void set_Permissions() {
+    protected void set_Permissions(String permissionType) {
 
-        final int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-        final int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheckPhone == PackageManager.PERMISSION_DENIED || permissionCheckLocation == PackageManager.PERMISSION_DENIED) {
+        if (permissionType.equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            showMessageOKCancel(getString(R.string.permisslocation_ask), getString(R.string.permiss_grantyes), getString(R.string.permiss_grantno),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ActivityCompat.requestPermissions(thisAct, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_READ_LOCATION);
+                        }
+                    },
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            setResult(RESULT_CANCELED);
+                            finish();
+                        }
+                    }
+            );
+            return;
+        }
+
+        if (permissionType.equals(Manifest.permission.READ_PHONE_STATE)) {
             showMessageOKCancel(getString(R.string.permiss_ask), getString(R.string.permiss_grantyes), getString(R.string.permiss_grantno),
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            if (permissionCheckPhone == PackageManager.PERMISSION_DENIED)
                                 ActivityCompat.requestPermissions(thisAct, new String[]{Manifest.permission.READ_PHONE_STATE}, MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
-                            else if (permissionCheckLocation == PackageManager.PERMISSION_DENIED)
-                                ActivityCompat.requestPermissions(thisAct, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_READ_LOCATION);
                         }
                     },
                     new DialogInterface.OnClickListener() {
@@ -75,17 +90,6 @@ public class PermissionActivity extends Activity {
                     }
             );
         }
-        else  {
-            setResult(RESULT_OK);
-            finish();
-        }
-//        if (_phoneNumber == null) {
-//
-//            _phoneNumber = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-//            _myDeviceId = ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-//            setResult(RESULT_OK);
-//            finish();
-//        }
     }
 
 
