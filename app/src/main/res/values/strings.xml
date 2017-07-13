@@ -3,7 +3,7 @@
 
     <string name="app_name">Flight On Track</string>
     <string name="app_label">FONT</string>
-    <string name="app_ver">1.63u</string>
+    <string name="app_ver">1.71u</string>
 
     <string name="action_settings">Settings</string>
     <string name="action_email">Report Problem</string>
@@ -144,7 +144,7 @@
     <string-array name="url_array">
         <item>http://postnget.azurewebsites.net</item>
         <item>http://postnget-test.azurewebsites.net</item>
-        <item>http://192.168.1.3/postnget</item>
+        <item>http://192.168.1.5/postnget</item>
         <!--<item>http://192.168.1.3/PostngetWebApi/api/router</item>-->
         <item>http://96.230.122.177/postnget</item>
 

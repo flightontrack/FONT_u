@@ -1,0 +1,148 @@
+package com.flightontrack.shared;
+
+public abstract class Const {
+
+    public static final int APPBOOT_DELAY_MILLISEC = 30000;
+
+    public static final int REQUEST_LOCATION_UPDATE = 1;
+//    public static final int REQUEST_LAST_POINT = 3;
+    public static final int REQUEST_FLIGHT_NUMBER = 2;
+    public static final int REQUEST_STOP_FLIGHT = 4;
+//    public static final int REQUEST_STOP_FLIGHTON_LIMIT_REACHED = 5;
+    public static final int REQUEST_PSW = 6;
+    public static final int REQUEST_IS_CLOCK_ON = 7;
+
+//    public static final char RESPONSE_TYPE_COMMAND = '1';
+//    public static final char RESPONSE_TYPE_DATA = '0';
+//    public static final char RESPONSE_TYPE_NOTIF = '2';
+//    public static final char RESPONSE_TYPE_ACKN = '3';
+
+    public static final String RESPONSE_TYPE_DATA_WITHLOAD = "0";
+    public static final String RESPONSE_TYPE_NOTIF_WITHLOAD = "2";
+    public static final String RESPONSE_TYPE_DATA_PSW = "aP";
+
+    public static final int COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN = -10;
+    public static final int COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED = -9;
+    public static final int COMMAND_FLIGHT_STATE_PENDING = -7;
+    public static final int COMMAND_CANCELFLIGHT = -6;
+
+//    public static final int NOTIF_UNKNOWN_SERVER_ERROR = -1;
+//    public static final int NOTIF_UNKNOWN_REQUEST = 1;
+//    public static final int NOTIF_DB_ERROR = 2;
+
+    public static final int LOCATION_UPDATE_INTERVAL_SEC_DEFAULT = 3;
+    public static final int MINSPEED_UPDATE_INTERVAL_SEC_DEFAULT = 1; //sec
+    public static final int LOCATION_ACCURACY = 150;
+
+    public static final int FLIGHT_CALLS_NUM = 2;
+
+    public static final long DISTANCE_CHANGE_FOR_UPDATES_MIN = 0; //20; //  meters
+    public static final long DISTANCE_CHANGE_FOR_UPDATES_ZERO = 0; //  meters
+
+    public static final long ZERO_DISTANCE_CHANGE_FOR_UPDATES = 0;
+    public static final long MIN_TIME_BW_GPS_UPDATES = 3000;
+    public static final int  MIN_TIME_BW_GPS_UPDATES_SEC = (int)MIN_TIME_BW_GPS_UPDATES/1000;
+    public static final int  SPEEDLOW_TIME_BW_GPS_UPDATES_SEC = 5;
+    public static final int  ALARM_TIME_SEC = 10; //600;
+
+    public static final long DEFAULT_TIME_BW_GPS_UPDATES = 10000; //... sec
+    public static final long DEFAULT_DISTANCE_CHANGE_FOR_UPDATES = 10; //  meters
+
+    public static final int TIME_RESERVE =150;
+
+    public static final int DEFAULT_SPEED_SPINNER_POS = 0;
+    public static final int DEFAULT_URL_SPINNER_POS = 0;
+    public static final int DEFAULT_INTERVAL_SELECTED_ITEM = 6;
+
+    public static final String FLIGHT_NUMBER_DEFAULT = "00";
+    public static final String ROUTE_NUMBER_DEFAULT = "00";
+
+    public static final int COMM_BATCH_SIZE_MAX = 10;
+    public static final int COMM_BATCH_SIZE_MIN = 1;
+    public static final int START_TRACKPOINT_COUNTER = 0;
+    public static final String GLOBALTAG="FLIGHT_ON_TRACK";
+
+    public static final String SPACE=" ";
+    public static final String FLIGHT_TIME_ZERO ="00:00";
+
+    public static final int WAY_POINT_HARD_LIMIT = 1200;
+    public static final int LEG_COUNT_HARD_LIMIT = 15;
+    public static final int ELEVATIONCHECK_FLIGHT_TIME_SEC = 70; //20;
+
+    public static final String PACKAGE_NAME= "com.flightontrack";
+    //public static final String FONT_RECEIVER_FILTER= "com.flightontrack.START_FONT_ACTIVITY";
+    public static final String FONT_RECEIVER_FILTER= PACKAGE_NAME.concat(".START_FONT_ACTIVITY");
+    //public static final String HEALTHCHECK_BROADCAST_RECEIVER_FILTER = "com.flightontrack.BROADCAST_HEALTHCHECK";
+    public static final String HEALTHCHECK_BROADCAST_RECEIVER_FILTER = PACKAGE_NAME.concat(".BROADCAST_HEALTHCHECK");
+
+    public static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 1;
+    public static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 2;
+    public static final int MY_PERMISSIONS_RITE_EXTERNAL_STORAGE = 3;
+    public static final int START_ACTIVITY_RESULT = 1;
+    public static final int MAX_FAILURE_COUNT = 10;
+    public static final int MAX_JSON_ERROR = 10;
+
+    public enum ROUTEREQUEST{
+        OPEN_NEW_ROUTE,
+        SWITCH_TO_PENDING,
+        ON_FLIGHTTIME_CHANGED,
+        CLOSE_BUTTON_STOP_PRESSED,
+        CLOSEAPP_BUTTON_BACK_PRESSED,
+        CLOSE_RECEIVEFLIGHT_FAILED,
+        CLOSE_SPEED_BELOW_MIN,
+        CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST,
+        CLOSE_POINTS_LIMIT_REACHED,
+        CLOSE_FLIGHT_CANCELED,
+        START_COMMUNICATION,
+        ON_COMMUNICATION_SUCCESS,
+        ON_CLOSE_FLIGHT,
+//        ON_CLOSE_FLIGHT_SUCCESS,
+//        ON_CLOSE_FLIGHT_FAILURE,
+        CLOSE_FLIGHT_DELETE_ALL_POINTS
+    }
+
+    public enum RSTATUS {
+        PASSIVE,
+        ACTIVE}
+
+    public enum FSTATUS {
+        PASSIVE,
+        ACTIVE}
+
+    public enum MODE {
+        CLOCK_LOCATION,
+        CLOCK_ONLY}
+
+    public enum FLIGHTREQUEST {
+        CHANGESTATE_REQUEST_FLIGHT,
+        CHANGESTATE_STATUSACTIVE,
+        CHANGESTATE_STATUSPASSIVE,
+        CHANGESTATE_INFLIGHT,
+        CHANGESTATE_SPEED_BELOW_MIN,
+        GET_LOCATIONSERVICE,
+        CLOSE_FLIGHT,
+        CLOSED,
+        CLOSED_FAILURE,
+        FLIGHTTIME_UPDATE,
+        ON_FLIGHTGET_FINISH}
+
+    public enum BUTTONREQUEST{
+        BUTTON_STATE_RED,
+        BUTTON_STATE_GETFLIGHTID,
+        BUTTON_STATE_YELLOW,
+        BUTTON_STATE_GREEN,
+        BUTTON_STATE_STOPPING;
+
+        public static BUTTONREQUEST toMyEnum (String myEnumString) {
+                return valueOf(myEnumString);
+        }
+    }
+
+    public enum APPTYPE {
+        PUBLIC,
+        PRIVATE}
+
+    public enum COMMAND{
+        COMMAND_CANCELFLIGHT
+    }
+}

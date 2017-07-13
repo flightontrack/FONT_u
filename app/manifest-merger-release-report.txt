@@ -76,7 +76,7 @@ MERGED from com.android.support:support-v4:21.0.2:16:5
 		ADDED from AndroidManifest.xml:25:9
 	android:theme
 		ADDED from AndroidManifest.xml:27:9
-activity#com.flightontrack.MainActivity
+activity#com.flightontrack.activity.MainActivity
 ADDED from AndroidManifest.xml:29:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:32:13
@@ -102,7 +102,7 @@ ADDED from AndroidManifest.xml:38:13
 		ADDED from AndroidManifest.xml:39:17
 	android:name
 		ADDED from AndroidManifest.xml:38:24
-activity#com.flightontrack.HelpPageActivity
+activity#com.flightontrack.activity.HelpPageActivity
 ADDED from AndroidManifest.xml:41:9
 	android:label
 		ADDED from AndroidManifest.xml:43:13
@@ -116,7 +116,7 @@ ADDED from AndroidManifest.xml:45:13
 		ADDED from AndroidManifest.xml:47:17
 	android:name
 		ADDED from AndroidManifest.xml:46:17
-activity#com.flightontrack.SimpleSettingsActivity
+activity#com.flightontrack.activity.SimpleSettingsActivity
 ADDED from AndroidManifest.xml:49:9
 	android:label
 		ADDED from AndroidManifest.xml:51:13
@@ -124,7 +124,7 @@ ADDED from AndroidManifest.xml:49:9
 		ADDED from AndroidManifest.xml:52:13
 	android:name
 		ADDED from AndroidManifest.xml:50:13
-activity#com.flightontrack.AircraftActivity
+activity#com.flightontrack.activity.AircraftActivity
 ADDED from AndroidManifest.xml:57:9
 	android:label
 		ADDED from AndroidManifest.xml:59:13
