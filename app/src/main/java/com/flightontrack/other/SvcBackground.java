@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static com.flightontrack.flight.Session.*;
+
 public class SvcBackground extends Service {
     public SvcBackground() {
     }
@@ -79,7 +81,7 @@ public class SvcBackground extends Service {
                 break;
         }
         if (!MainActivity.AppProp.pIsDebug) return;
-        String timeStr = Route.activeFlight.flightNumber + getDateTime() + "*";
+        String timeStr = routeInstance.activeFlight.flightNumber + getDateTime() + "*";
         String LINE_SEPARATOR = System.getProperty("line.separator");
 
         File sdcard = Environment.getExternalStorageDirectory();

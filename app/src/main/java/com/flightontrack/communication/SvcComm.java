@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.flight.Route.currentFlights;
 
 public class SvcComm extends Service {
@@ -99,18 +99,18 @@ public class SvcComm extends Service {
                         Response response = new Response(new String(responseBody));
                         //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
                         if (response.jsonErrorCount>0) {
-                            if (response.jsonErrorCount>MAX_JSON_ERROR) Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                            if (response.jsonErrorCount>MAX_JSON_ERROR) routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                             return;
                         }
                         try {
                             if (response.responseAckn != null) {
                                 Util.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');
                                 Route.sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
-                                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.ON_COMMUNICATION_SUCCESS);
+                                routeInstance.set_RouteRequest(ROUTEREQUEST.ON_COMMUNICATION_SUCCESS);
                             }
                             if (response.responseNotif != null) {
                                 Util.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
-                                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
+                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
                             }
                             if (response.responseCommand != null) {
                                 Util.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
@@ -123,7 +123,7 @@ public class SvcComm extends Service {
                                             Util.appendLog(TAG + "COMMAND_CANCELFLIGHT request", 'd');
                                             Route.sqlHelper.flightLocationsDelete(response.responseFlightNum);
                                             MainActivity.set_isMultileg(false);
-                                            Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_CANCELED);
+                                            routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_CANCELED);
                                             break;
                                         }
                                     case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
@@ -131,7 +131,7 @@ public class SvcComm extends Service {
                                         //Route.sqlHelper.flightLocationsDelete(response.responseFlightId);
                                         for (FlightInstance f : currentFlights ) {
                                             if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
-                                                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST);
+                                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST);
                                             }
                                         }
                                         break;
@@ -139,7 +139,7 @@ public class SvcComm extends Service {
                                         Util.appendLog(TAG + "COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED request",'d');
                                         for (FlightInstance f : currentFlights ) {
                                             if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
-                                                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_POINTS_LIMIT_REACHED);
+                                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_POINTS_LIMIT_REACHED);
                                             }
                                         }
                                         break;

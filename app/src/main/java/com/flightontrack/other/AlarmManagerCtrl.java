@@ -10,7 +10,7 @@ import com.flightontrack.shared.Util;
 import java.util.Date;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class AlarmManagerCtrl {
     public AlarmManagerCtrl() {

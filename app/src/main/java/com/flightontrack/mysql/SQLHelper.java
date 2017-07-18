@@ -7,11 +7,9 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.flightontrack.flight.Route;
 import com.flightontrack.shared.Util;
 
-import static com.flightontrack.flight.Route.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class SQLHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLHelper:";
@@ -57,7 +55,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             Util.appendLog(TAG + e.getMessage(), 'e');
         }
-        Route.dbLocationRecCount = getLocationTableCount();
+        dbLocationRecCount = getLocationTableCount();
     }
     public void flightLocationsDelete(String flightId) {
         String selection = DBSchema.COLUMN_NAME_COL2+"= ?";

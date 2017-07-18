@@ -16,6 +16,7 @@ import com.flightontrack.communication.SvcComm;
 import com.flightontrack.flight.Route;
 
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.flight.Session.*;
 
 public class ShowAlertClass {
 
@@ -53,7 +54,7 @@ public class ShowAlertClass {
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
-    public void showNFCDisabledAlertToUser(Context ctx){
+    public void showNFCDisabledAlertToUser(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
         alertDialogBuilder.setMessage("NFC is disabled in your device")
                 .setCancelable(false)
@@ -153,9 +154,9 @@ public class ShowAlertClass {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                                 int MAX_count = 5;
-                                SvcComm.commBatchSize= Route.dbLocationRecCount;
+                                SvcComm.commBatchSize= dbLocationRecCount;
                                 int counter =0;
-                                while (Route.dbLocationRecCount>0){
+                                while (dbLocationRecCount>0){
                                     if (counter >MAX_count) break;
                                     try {
                                         Thread.sleep(1000);
@@ -163,12 +164,12 @@ public class ShowAlertClass {
                                         Thread.currentThread().interrupt();
                                     }
                                     counter++;
-                                    Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.START_COMMUNICATION);
+                                    routeInstance.set_RouteRequest(ROUTEREQUEST.START_COMMUNICATION);
                                 }
-                                if(Route.dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
+                                if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                                 int j = Route.sqlHelper.allLocationsDelete();
                                 Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
+                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.unsentrecords_dialog_neg),
@@ -177,7 +178,7 @@ public class ShowAlertClass {
                         //Util.setPointsUnsent(0);
                         int j = Route.sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                        Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
+                        routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                         ctxActivity.onBackPressed();
                         dialog.cancel();
                     }
@@ -196,7 +197,7 @@ public class ShowAlertClass {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
+                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.backpressed_dialog_neg),

@@ -13,7 +13,6 @@ import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.communication.ResponseP;
-import com.flightontrack.flight.Route;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.loopj.android.http.AsyncHttpClient;
@@ -29,7 +28,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class Util {
     public Util() {
@@ -273,7 +272,7 @@ public class Util {
             //if (getIsDebug()) return; //TODO disabled to check permissions
             //String timeStr= (new Flight(ctx).get_ActiveFlightID())+"*"+time.format("%H:%M:%S")+"*";
             //String timeStr = Flight.get_ActiveFlightID() + "*" + getDateTimeNow() + "*";
-            String timeStr = (Route.activeFlight !=null?Route.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + getDateTimeNow() + "*";
+            String timeStr = (routeInstance.activeFlight !=null?routeInstance.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + getDateTimeNow() + "*";
             String LINE_SEPARATOR = System.getProperty("line.separator");
             File sdcard=null;
             try {

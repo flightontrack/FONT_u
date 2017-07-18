@@ -6,7 +6,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class MyPhone {
 

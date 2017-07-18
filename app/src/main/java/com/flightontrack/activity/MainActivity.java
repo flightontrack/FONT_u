@@ -34,14 +34,14 @@ import com.flightontrack.flight.Route;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.receiver.ReceiverHealthCheckAlarm;
-import com.flightontrack.shared.Statics;
+import com.flightontrack.flight.Session;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity:";
@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
     static ActionMenuView amvMenu;
     static View cardLayout1;
     public static boolean isNFCcapable = false;
-    public static MainActivity instanceThis = null;
-    public Route route;
+    //public static MainActivity instanceThis = null;
+    //public Route route;
     public static boolean isToDestroy = true;
 //    public static SharedPreferences sharedPreferences;
 //    public static SharedPreferences.Editor editor;
@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         try {
             //Log.d(TAG, "MainActivityThread:" + Thread.currentThread().getId());
-            instanceThis = this;
-            Statics c = new Statics(getApplicationContext());
+            //instanceThis = this;
+            Session c = new Session(getApplicationContext(),this);
             //MainActivity.ctxApp = getApplicationContext();
 
             setContentView(R.layout.activity_main);
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             isNFCcapable = isNFCcapable();
 
             //Util.init(ctxApp, this);
-            Util.resetPreferencesAll();
+            //Util.resetPreferencesAll();
             AppProp.get();
             //Util.setIsDebug(!MyApplication.productionRelease);
             //Util.appendLog(TAG + "onCreate", 'd');
@@ -121,8 +121,9 @@ public class MainActivity extends AppCompatActivity {
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 Util.appendLog(TAG + "New App Context", 'd');
                 Util.setCurrAppContext(ctxApp.toString());
+                routeInstance = null;
                 //set_myPhoneId();
-                route = new Route();
+                //route = new Route();
             }
 
             //if (!AppProp.pPublicApp && AppProp.autostart) {
@@ -158,17 +159,16 @@ public class MainActivity extends AppCompatActivity {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
             ///TODO
         }
-        if (Route.isRouteExist()) route = Route.instanceRoute;
-        else route = new Route();
+        //if (!Route.isRouteExist()) routeInstance = new Route();
         //Util.uiResume();
 
         MainActivity.AppProp.get();
-        Route.SessionProp.get();
+        SessionProp.get();
         Util.setAcftNum(Util.getAcftNum(4));
         MainActivity.setIntervalSelectedItem(MainActivity.AppProp.pIntervalSelectedItem);
         Util.setSpinnerSpeedPos(Util.getSpinnerSpeedPos());
 
-        Route.setTrackingButtonState(Route.trackingButtonState);
+        setTrackingButtonState(trackingButtonState);
 
         init_listeners();
         //Util.appendLog(TAG + "onResume: autostart: " + autostart, 'd');
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 acftActivity();
                 return true;
             case R.id.action_facebook:
-                if (!(Route.activeFlight == null)) facebActivity();
+                if (!(routeInstance.activeFlight == null)) facebActivity();
                 else
                     Toast.makeText(MainActivity.this, getString(R.string.start_flight_first), Toast.LENGTH_LONG).show();
                 return true;
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Util.appendLog(TAG + "OnDestroy", 'd');
         AppProp.save();
-        Route.SessionProp.clear();
+        SessionProp.clear();
         if (isToDestroy && alarmReceiver!=null) {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Util.appendLog(TAG + "onStop", 'd');
         AppProp.save();
-        Route.SessionProp.save();
+        SessionProp.save();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
@@ -298,7 +298,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Util.appendLog(TAG + "trackingButton: onClick",'d');
-                if (Route._routeStatus == RSTATUS.PASSIVE) {
+                //if (Route._routeStatus == RSTATUS.PASSIVE) {
+                if (routeInstance == null) {
                     //Util.setUserName(txtUserName.getText().toString());
                     Util.setAcftNum(txtAcftNum.getText().toString());
                     setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
@@ -306,14 +307,15 @@ public class MainActivity extends AppCompatActivity {
                     //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
                     if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
 
-                        new ShowAlertClass(instanceThis).showAircraftIsEmptyAlert();
+                        new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
                         if (!AppProp.pIsEmptyAcftOk) return;
                     }
-                    route.set_RouteRequest(ROUTEREQUEST.OPEN_NEW_ROUTE);
+                    routeInstance = new Route();
+                    routeInstance.set_RouteRequest(ROUTEREQUEST.OPEN_NEW_ROUTE);
 
                 } else {
                     set_isMultileg(false);
-                    route.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                    routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                 }
 
             }
@@ -483,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static Boolean isMainActivityExist() {
-        return instanceThis != null;
+        return mainactivityInstance != null;
     }
 
     public void finishActivity() {
@@ -500,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
         spinnerMinSpeed = null;
         chBoxIsMultiLeg = null;
         trackingButton = null;
-        instanceThis = null;
+        mainactivityInstance = null;
         finish();
     }
 

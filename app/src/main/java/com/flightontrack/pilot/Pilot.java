@@ -1,6 +1,6 @@
 package com.flightontrack.pilot;
 
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 /**
  * Created by hotvk on 5/15/2017.
  */

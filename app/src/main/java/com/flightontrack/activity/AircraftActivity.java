@@ -27,7 +27,7 @@ import com.flightontrack.shared.Util;
 import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +49,7 @@ public class AircraftActivity extends Activity {
     static Button cancelButton;
     static Button clearButton;
     static Switch nfcSwitch;
-    ShowAlertClass showAlertClass;
+    //ShowAlertClass showAlertClass;
     protected static NfcAdapter nfcAdapter;
     IntentFilter tagDetected;
     IntentFilter ndefDetected;
@@ -314,7 +314,7 @@ public class AircraftActivity extends Activity {
     }
     public void setTagNFCState(Boolean tagstate){
     if(tagstate&&!nfcAdapter.isEnabled()) {
-        showAlertClass.showNFCDisabledAlertToUser(this);
+        new ShowAlertClass(this).showNFCDisabledAlertToUser();
         tagstate = false;
         nfcSwitch.setChecked(tagstate);
     }

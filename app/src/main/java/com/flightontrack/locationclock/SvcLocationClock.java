@@ -19,7 +19,7 @@ import com.flightontrack.activity.MainActivity;
 import com.flightontrack.flight.Route;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class SvcLocationClock extends Service implements LocationListener {
     private static final String TAG = "SvcLocationClock:";
@@ -87,7 +87,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     @Override
     public void onLocationChanged(final Location location) {
         counter++;
-        if(_mode==MODE.CLOCK_ONLY&& Route.dbLocationRecCount<1&&Route.currentFlights.size()==0){
+        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCount<1&&Route.currentFlights.size()==0){
             stopServiceSelf();
             return;
         }
@@ -100,11 +100,11 @@ public class SvcLocationClock extends Service implements LocationListener {
                 /// it is a protection
                 setClockNextTimeLocalMsec(_intervalClockSecCurrent);
                 if (_mode == MODE.CLOCK_LOCATION) {
-                    Route.activeFlight.onClock(location);
+                    routeInstance.activeFlight.onClock(location);
                 }
 
-                Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + Route.dbLocationRecCount + " Route._openFlightsCount:" + Route.currentFlights.size() + " _mode:" + _mode, 'd');
-                Route.instanceRoute.set_RouteRequest(ROUTEREQUEST.START_COMMUNICATION);
+                Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.currentFlights.size() + " _mode:" + _mode, 'd');
+                routeInstance.set_RouteRequest(ROUTEREQUEST.START_COMMUNICATION);
             }
         }
     }

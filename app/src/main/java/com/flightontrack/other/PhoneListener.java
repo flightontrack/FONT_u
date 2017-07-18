@@ -8,7 +8,7 @@ import android.telephony.TelephonyManager;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.shared.Util;
 
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class PhoneListener extends PhoneStateListener
 {

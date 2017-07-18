@@ -24,7 +24,7 @@ import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Statics.*;
+import static com.flightontrack.flight.Session.*;
 
 public class FlightInstance {
     private static final    String          TAG = "FlightInstance:";
@@ -121,14 +121,14 @@ public class FlightInstance {
         _speedCurrent = speed+(float)0.01;
     }
     boolean isDoubleSpeedAboveMin() {
-        double multiplier = Route.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT ?0.75:1.0;
+        double multiplier = routeInstance.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT ?0.75:1.0;
         double cutoffSpeed = Util.getTrackingSpeedIntMeterSec()*multiplier;
         boolean isCurrSpeedAboveMin = (_speedCurrent > cutoffSpeed);
         boolean isPrevSpeedAboveMin = (speedPrev > cutoffSpeed);
         //Util.appendLog(TAG + "cutoffSpeed:" + cutoffSpeed, 'd');
         Util.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin+" isPrevSpeedAboveMin:"+isPrevSpeedAboveMin, 'd');
         if(isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
-        else if(Route.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT && (isCurrSpeedAboveMin^isPrevSpeedAboveMin)) {
+        else if(routeInstance.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT && (isCurrSpeedAboveMin^isPrevSpeedAboveMin)) {
             if (isPrevSpeedAboveMin) SvcLocationClock.instance.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             else if (isCurrSpeedAboveMin) SvcLocationClock.instance.requestLocationUpdate(SvcLocationClock.intervalClockSecPrev, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             return true;
@@ -137,7 +137,7 @@ public class FlightInstance {
     }
 
     boolean isCurrentSpeedAboveMin() {
-        double multiplier = Route.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT ?0.75:1.0;
+        double multiplier = routeInstance.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT ?0.75:1.0;
         double cutoffSpeed = Util.getTrackingSpeedIntMeterSec()*multiplier;
         Util.appendLog(TAG + "isCurrSpeedAboveMin:" + (_speedCurrent > cutoffSpeed), 'd');
         return _speedCurrent > cutoffSpeed;
@@ -272,7 +272,7 @@ public class FlightInstance {
     private void saveLocation(Location location,boolean iselevecheck) {
         //Util.appendLog(TAG + "_____Timer 3 - saveLocation", 'd');
         try {
-            int p = Route.activeFlight._wayPointsCount+1;
+            int p = routeInstance.activeFlight._wayPointsCount+1;
             ContentValues values = new ContentValues();
             values.put(DBSchema.COLUMN_NAME_COL1, REQUEST_LOCATION_UPDATE); //rcode
             values.put(DBSchema.COLUMN_NAME_COL2, flightNumber); //flightid
@@ -291,7 +291,7 @@ public class FlightInstance {
             if (r>0) {
                 lastAltitudeFt=(int) (Math.round(location.getAltitude() * 3.281));
                 set_wayPointsCount(p);
-                Util.appendLog(TAG + "saveLocation: dbLocationRecCount: " + Route.dbLocationRecCount, 'd');
+                Util.appendLog(TAG + "saveLocation: dbLocationRecCount: " + dbLocationRecCount, 'd');
             }
         } catch (Exception e) {
             Util.appendLog(TAG + "SQLite Exception Placeholder", 'e');
