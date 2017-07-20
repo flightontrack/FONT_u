@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 Util.appendLog(TAG + "New App Context", 'd');
                 Util.setCurrAppContext(ctxApp.toString());
-                routeInstance = null;
+                activeRoute = null;
                 //set_myPhoneId();
                 //route = new Route();
             }
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
             ///TODO
         }
-        //if (!Route.isRouteExist()) routeInstance = new Route();
+        //if (!Route.isRouteExist()) activeRoute = new Route();
         //Util.uiResume();
 
         MainActivity.AppProp.get();
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 acftActivity();
                 return true;
             case R.id.action_facebook:
-                if (!(routeInstance.activeFlight == null)) facebActivity();
+                if (!(activeRoute.activeFlight == null)) facebActivity();
                 else
                     Toast.makeText(MainActivity.this, getString(R.string.start_flight_first), Toast.LENGTH_LONG).show();
                 return true;
@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Util.appendLog(TAG + "trackingButton: onClick",'d');
                 //if (Route._routeStatus == RSTATUS.PASSIVE) {
-                if (routeInstance == null) {
+                if (activeRoute == null) {
                     //Util.setUserName(txtUserName.getText().toString());
                     Util.setAcftNum(txtAcftNum.getText().toString());
                     setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
@@ -310,12 +310,12 @@ public class MainActivity extends AppCompatActivity {
                         new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
                         if (!AppProp.pIsEmptyAcftOk) return;
                     }
-                    routeInstance = new Route();
-                    routeInstance.set_RouteRequest(ROUTEREQUEST.OPEN_NEW_ROUTE);
+                    routeList.add(new Route());
+                    //activeRoute = new Route();
 
                 } else {
                     set_isMultileg(false);
-                    routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                    activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                 }
 
             }

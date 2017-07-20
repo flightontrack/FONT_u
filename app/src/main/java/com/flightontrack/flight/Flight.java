@@ -4,15 +4,15 @@ import android.content.ContentValues;
 import android.location.Location;
 import android.widget.Toast;
 
-import com.flightontrack.shared.Const;
+import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.communication.Response;
+import com.flightontrack.locationclock.SvcLocationClock;
+import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
-import com.flightontrack.R;
-import com.flightontrack.locationclock.SvcLocationClock;
+import com.flightontrack.shared.Const;
 import com.flightontrack.shared.Util;
-import com.flightontrack.communication.Response;
-import com.flightontrack.mysql.DBSchema;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -23,33 +23,33 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
-import static com.flightontrack.shared.Const.*;
+
 import static com.flightontrack.flight.Session.*;
+import static com.flightontrack.shared.Const.*;
 
-public class FlightInstance {
-    private static final    String          TAG = "FlightInstance:";
-    //private static          Context         ctx;
+public class Flight {
+    private static final String TAG = "Flight:";
+    public String flightNumber;
+    public FSTATUS fStatus = FSTATUS.PASSIVE;
+    FLIGHTREQUEST flightState;
+    boolean _isSpeedAboveMin;
+    String flightTimeString;
+    int lastAltitudeFt;
+    int _wayPointsCount;
     private Route route;
-    FLIGHTREQUEST                           flightState;
-    boolean                                 _isSpeedAboveMin;
-    private float                                   _speedCurrent;
-    private float                                   speedPrev;
-    private boolean                                 _isLimitReached;
-    public String                                  flightNumber;
-    private                 long            _flightStartTimeGMT;
-    private int                                     _flightTimeSec;
-    String                                  flightTimeString;
-    int                                     lastAltitudeFt;
-    int                                     _wayPointsCount;
-    public FSTATUS                                 fStatus = FSTATUS.PASSIVE;
-    private int                                     flightRequestCounter;
-    private boolean                                 isElevationCheckDone;
+    private float _speedCurrent=0;
+    private float speedPrev=0;
+    private boolean _isLimitReached;
+    private long _flightStartTimeGMT;
+    private int _flightTimeSec;
+    private int flightRequestCounter;
+    private boolean isElevationCheckDone;
 
-    public FlightInstance(Route r){
+    public Flight(Route r) {
         route = r;
-        //FlightInstance.ctx = ctx;
+        //Flight.ctx = ctx;
         flightTimeString = FLIGHT_TIME_ZERO;
-        isElevationCheckDone =false;
+        isElevationCheckDone = false;
         set_flightRequest(FLIGHTREQUEST.CHANGESTATE_REQUEST_FLIGHT);
     }
 
@@ -57,88 +57,95 @@ public class FlightInstance {
         Util.appendLog(TAG + "set_FLIGHTREQUEST:" + request, 'd');
         switch (fStatus) {
             case ACTIVE:
-            switch (request) {
-                case CHANGESTATE_INFLIGHT:
-                    /// reset Timer 1 to slower rate
-                    _flightStartTimeGMT = Util.getTimeGMT();
-                    SvcLocationClock.instance.requestLocationUpdate(MainActivity.AppProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
-                    route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
-                    flightState =request;
-                    break;
-                case FLIGHTTIME_UPDATE:
-                    set_flightTimeSec();
-                    route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
-                    break;
-                case CHANGESTATE_STATUSPASSIVE:
-                    fStatus = FSTATUS.PASSIVE;
-                    flightState =request;
-                    //setFlightClosed();
-                    ///rethrow and close flight if no locations left
-                    //set_flightRequest(FLIGHTREQUEST.CLOSE_FLIGHT);
-                    break;
-            }
+                switch (request) {
+                    case CHANGESTATE_INFLIGHT:
+                        /// reset Timer 1 to slower rate
+                        _flightStartTimeGMT = Util.getTimeGMT();
+                        SvcLocationClock.instance.requestLocationUpdate(MainActivity.AppProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+                        route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
+                        flightState = request;
+                        break;
+                    case FLIGHTTIME_UPDATE:
+                        set_flightTimeSec();
+                        route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
+                        break;
+                    case CHANGESTATE_STATUSPASSIVE:
+                        fStatus = FSTATUS.PASSIVE;
+                        flightState = request;
+                        //setFlightClosed();
+                        ///rethrow and close flight if no locations left
+                        set_flightRequest(FLIGHTREQUEST.CLOSE_FLIGHT);
+                        break;
+                }
                 break;
             case PASSIVE:
                 switch (request) {
                     case CHANGESTATE_REQUEST_FLIGHT:
                         getNewFlightID();
-                        flightState =request;
+                        flightState = request;
                         break;
                     case CHANGESTATE_STATUSACTIVE:
                         fStatus = FSTATUS.ACTIVE;
-                        flightState =request;
+                        flightState = request;
                         if (SvcLocationClock.isInstanceCreated()) {
                             SvcLocationClock.instance.set_mode(MODE.CLOCK_LOCATION);
                         }
                         break;
                     case CLOSE_FLIGHT:
-                        if (Route.sqlHelper.getLocationFlightCount(flightNumber)==0){
-                            flightState =request;
+                        if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
+                            flightState = request;
                             getCloseFlight();
                         }
                         //setFlightClosed(request);
                         break;
                     case CLOSED:
-                        flightState =request;
+                        flightState = request;
                         route.set_RouteRequest(ROUTEREQUEST.ON_CLOSE_FLIGHT);
                         break;
                 }
                 break;
         }
     }
-    void set_wayPointsCount(int pointsCount){
-        _wayPointsCount=pointsCount;
-        if (pointsCount>=Util.getWayPointLimit()){
+
+    void set_wayPointsCount(int pointsCount) {
+        _wayPointsCount = pointsCount;
+        if (pointsCount >= Util.getWayPointLimit()) {
             route.set_RouteRequest(ROUTEREQUEST.CLOSE_POINTS_LIMIT_REACHED);
         }
     }
 
-    void set_speedCurrent(float speed){
-        //Util.appendLog(TAG + "set_speedCurrent: speed:" + speed, 'd');
-        speedPrev = _speedCurrent;
-
-        //Util.appendLog(TAG + "set_speedCurrent: speedPrev:" + speedPrev+" _speedCurrent:"+_speedCurrent, 'd');
-        _speedCurrent = speed+(float)0.01;
+    void set_speedCurrent(float speed) {
+        /// gps can report speed equal 0 in flight  which should be ignored.
+        if (speed > 0 ) {
+            speedPrev = _speedCurrent;
+            _speedCurrent = speed + (float) 0.01;
+        }
+        else {
+            Util.appendLog(TAG + "set_speedCurrent: speed is ZERO", 'd');
+        }
     }
+
     boolean isDoubleSpeedAboveMin() {
-        double multiplier = routeInstance.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT ?0.75:1.0;
-        double cutoffSpeed = Util.getTrackingSpeedIntMeterSec()*multiplier;
+        double multiplier = activeRoute.activeFlight.flightState == FLIGHTREQUEST.CHANGESTATE_INFLIGHT ? 0.75 : 1.0;
+        double cutoffSpeed = Util.getTrackingSpeedIntMeterSec() * multiplier;
         boolean isCurrSpeedAboveMin = (_speedCurrent > cutoffSpeed);
         boolean isPrevSpeedAboveMin = (speedPrev > cutoffSpeed);
         //Util.appendLog(TAG + "cutoffSpeed:" + cutoffSpeed, 'd');
-        Util.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin+" isPrevSpeedAboveMin:"+isPrevSpeedAboveMin, 'd');
-        if(isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
-        else if(routeInstance.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT && (isCurrSpeedAboveMin^isPrevSpeedAboveMin)) {
-            if (isPrevSpeedAboveMin) SvcLocationClock.instance.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
-            else if (isCurrSpeedAboveMin) SvcLocationClock.instance.requestLocationUpdate(SvcLocationClock.intervalClockSecPrev, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+        Util.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
+        if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
+        else if (activeRoute.activeFlight.flightState == FLIGHTREQUEST.CHANGESTATE_INFLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
+            if (isPrevSpeedAboveMin)
+                SvcLocationClock.instance.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+            else if (isCurrSpeedAboveMin)
+                SvcLocationClock.instance.requestLocationUpdate(SvcLocationClock.intervalClockSecPrev, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             return true;
         }
         return false;
     }
 
     boolean isCurrentSpeedAboveMin() {
-        double multiplier = routeInstance.activeFlight.flightState== FLIGHTREQUEST.CHANGESTATE_INFLIGHT ?0.75:1.0;
-        double cutoffSpeed = Util.getTrackingSpeedIntMeterSec()*multiplier;
+        double multiplier = activeRoute.activeFlight.flightState == FLIGHTREQUEST.CHANGESTATE_INFLIGHT ? 0.75 : 1.0;
+        double cutoffSpeed = Util.getTrackingSpeedIntMeterSec() * multiplier;
         Util.appendLog(TAG + "isCurrSpeedAboveMin:" + (_speedCurrent > cutoffSpeed), 'd');
         return _speedCurrent > cutoffSpeed;
     }
@@ -163,7 +170,7 @@ public class FlightInstance {
         requestParams.put("speed_thresh", String.valueOf(speed_thresh));
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", MainActivity.AppProp.pIsDebug);
-        if (!(Route.routeNumber ==null)) requestParams.put("routeid", Route.routeNumber);
+        if (!(Route.routeNumber == null)) requestParams.put("routeid", Route.routeNumber);
 //        requestParams.setUseJsonStreamer(true);
         new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
@@ -174,7 +181,7 @@ public class FlightInstance {
                         //char responseType = response.responseType;
 
                         if (response.responseNotif != null) {
-                            Util.appendLog(TAG+"RESPONSE_TYPE_NOTIF: " +response.responseNotif,'d');
+                            Util.appendLog(TAG + "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd');
                             Toast.makeText(ctxApp, "Cant get flight number", Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -183,6 +190,7 @@ public class FlightInstance {
                             route._legCount++;
                         }
                     }
+
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                         flightRequestCounter++;
@@ -190,17 +198,21 @@ public class FlightInstance {
                         Toast.makeText(ctxApp, R.string.reachability_error, Toast.LENGTH_LONG).show();
                         //if(SvcLocationClock.isInstanceCreated()) ctxApp.stopService(new Intent(ctxApp, SvcLocationClock.class));
                     }
+
                     @Override
                     public void onFinish() {
-                        Util.appendLog(TAG + "onFinish: FlightNumber: "+flightNumber, 'd');
+                        Util.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
                         //set_FlightNumber(flightNumber);
-                        if(flightNumber==null) route.set_RouteRequest(ROUTEREQUEST.CLOSE_RECEIVEFLIGHT_FAILED);
-                        else route.set_RouteRequest(ROUTEREQUEST.SWITCH_TO_PENDING); //set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
+                        if (flightNumber == null)
+                            route.set_RouteRequest(ROUTEREQUEST.CLOSE_RECEIVEFLIGHT_FAILED);
+                        else
+                            route.set_RouteRequest(ROUTEREQUEST.SWITCH_TO_PENDING); //set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
                         //set_flightRequest(FLIGHTREQUEST.ON_FLIGHTGET_FINISH);
                     }
+
                     @Override
                     public void onRetry(int retryNo) {
-                        Util.appendLog(TAG + "getNewFlightID onRetry:"+retryNo, 'd');
+                        Util.appendLog(TAG + "getNewFlightID onRetry:" + retryNo, 'd');
                     }
                 }
         );
@@ -208,7 +220,7 @@ public class FlightInstance {
     }
 
     void getCloseFlight() {
-        Util.appendLog(TAG+ "getCloseFlight",'d');
+        Util.appendLog(TAG + "getCloseFlight", 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
         requestParams.put("speedlowflag", _isSpeedAboveMin);
@@ -225,18 +237,19 @@ public class FlightInstance {
                         Response response = new Response(new String(responseBody));
 
                         if (response.responseAckn != null) {
-                            Util.appendLog(TAG + "onSuccess|Flight closed: "+flightNumber,'d');
+                            Util.appendLog(TAG + "onSuccess|Flight closed: " + flightNumber, 'd');
                         }
                         if (response.responseNotif != null) {
-                            Util.appendLog(TAG + "onSuccess|RESPONSE_TYPE_NOTIF:" +response.responseNotif,'d');
+                            Util.appendLog(TAG + "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd');
                         }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        Util.appendLog(TAG + "getCloseFlight onFailure: " + flightNumber,'d');
+                        Util.appendLog(TAG + "getCloseFlight onFailure: " + flightNumber, 'd');
 
                     }
+
                     public void onFinish() {
                         set_flightRequest(FLIGHTREQUEST.CLOSED);
                     }
@@ -248,37 +261,38 @@ public class FlightInstance {
     public void onClock(final Location location) {
         Util.appendLog(TAG + "onClock:", 'd');
 
-                float speedCurrent = location.getSpeed();
-                set_speedCurrent(speedCurrent);
+        float speedCurrent = location.getSpeed();
+        set_speedCurrent(speedCurrent);
 
         _isSpeedAboveMin = isDoubleSpeedAboveMin();
-        switch(flightState) {
+        switch (flightState) {
             case CHANGESTATE_STATUSACTIVE:
                 if (_isSpeedAboveMin) set_flightRequest(FLIGHTREQUEST.CHANGESTATE_INFLIGHT);
                 break;
             case CHANGESTATE_INFLIGHT:
-                if (!isElevationCheckDone){
-                    if (_flightTimeSec >= ELEVATIONCHECK_FLIGHT_TIME_SEC) isElevationCheckDone = true;
+                if (!isElevationCheckDone) {
+                    if (_flightTimeSec >= ELEVATIONCHECK_FLIGHT_TIME_SEC)
+                        isElevationCheckDone = true;
                     saveLocation(location, isElevationCheckDone);
-                }
-                else saveLocation(location, false);
+                } else saveLocation(location, false);
 
                 set_flightRequest(FLIGHTREQUEST.FLIGHTTIME_UPDATE);
-                if(!_isSpeedAboveMin) route.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN);
+                if (!_isSpeedAboveMin) route.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN);
                 break;
         }
     }
 
-    private void saveLocation(Location location,boolean iselevecheck) {
+    private void saveLocation(Location location, boolean iselevecheck) {
         //Util.appendLog(TAG + "_____Timer 3 - saveLocation", 'd');
         try {
-            int p = routeInstance.activeFlight._wayPointsCount+1;
+            //int p = activeRoute.activeFlight._wayPointsCount+1;
+            int p = _wayPointsCount + 1;
             ContentValues values = new ContentValues();
             values.put(DBSchema.COLUMN_NAME_COL1, REQUEST_LOCATION_UPDATE); //rcode
             values.put(DBSchema.COLUMN_NAME_COL2, flightNumber); //flightid
             values.put(DBSchema.COLUMN_NAME_COL3, !isCurrentSpeedAboveMin()); /// speed low
             //values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString(speedCurrentInt)); //speed
-            values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString((int)location.getSpeed())); //speed
+            values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString((int) location.getSpeed())); //speed
             values.put(DBSchema.COLUMN_NAME_COL6, Double.toString(location.getLatitude())); //latitude
             values.put(DBSchema.COLUMN_NAME_COL7, Double.toString(location.getLongitude())); //latitude
             values.put(DBSchema.COLUMN_NAME_COL8, Float.toString(location.getAccuracy())); //accuracy
@@ -287,9 +301,9 @@ public class FlightInstance {
             values.put(DBSchema.COLUMN_NAME_COL11, Integer.toString(Util.getSignalStregth())); //gsmsignal
             values.put(DBSchema.COLUMN_NAME_COL12, URLEncoder.encode(Util.getDateTimeNow(), "UTF-8")); //date
             values.put(DBSchema.COLUMN_NAME_COL13, iselevecheck);
-            long  r = Route.sqlHelper.rowLocationInsert(values);
-            if (r>0) {
-                lastAltitudeFt=(int) (Math.round(location.getAltitude() * 3.281));
+            long r = sqlHelper.rowLocationInsert(values);
+            if (r > 0) {
+                lastAltitudeFt = (int) (Math.round(location.getAltitude() * 3.281));
                 set_wayPointsCount(p);
                 Util.appendLog(TAG + "saveLocation: dbLocationRecCount: " + dbLocationRecCount, 'd');
             }
@@ -300,7 +314,7 @@ public class FlightInstance {
 
     public void set_flightTimeSec() {
         long elapsedTime = Util.getTimeGMT() - _flightStartTimeGMT;
-        _flightTimeSec = (int) elapsedTime/1000;
+        _flightTimeSec = (int) elapsedTime / 1000;
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         flightTimeString = dateFormat.format(elapsedTime);

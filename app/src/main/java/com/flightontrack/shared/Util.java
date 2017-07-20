@@ -272,7 +272,7 @@ public class Util {
             //if (getIsDebug()) return; //TODO disabled to check permissions
             //String timeStr= (new Flight(ctx).get_ActiveFlightID())+"*"+time.format("%H:%M:%S")+"*";
             //String timeStr = Flight.get_ActiveFlightID() + "*" + getDateTimeNow() + "*";
-            String timeStr = (routeInstance.activeFlight !=null?routeInstance.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + getDateTimeNow() + "*";
+            String timeStr = (activeRoute.activeFlight !=null? activeRoute.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + getDateTimeNow() + "*";
             String LINE_SEPARATOR = System.getProperty("line.separator");
             File sdcard=null;
             try {

@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.shared.Const;
-import com.flightontrack.flight.Route;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,9 +50,9 @@ public class SvcBackground extends Service {
     {
         //appendLog(TAG + "onTaskRemoved", 'd');
         //unregisterReceiver(flightRouterReceiver);
-        if (Route.sqlHelper != null) {
-            if(!(Route.sqlHelper.dbw==null))Route.sqlHelper.dbw.close();
-            Route.sqlHelper = null;
+        if (sqlHelper != null) {
+            if(!(sqlHelper.dbw==null))sqlHelper.dbw.close();
+            sqlHelper = null;
         }
         super.onTaskRemoved(rootIntent);
     }
@@ -66,9 +65,9 @@ public class SvcBackground extends Service {
         catch(IllegalArgumentException e){
             //appendLog(TAG + "IllegalArgumentException: there is no registered receivers", 'd');
         }
-        if (Route.sqlHelper != null) {
-            Route.sqlHelper.dbw.close();
-            Route.sqlHelper = null;
+        if (sqlHelper != null) {
+            sqlHelper.dbw.close();
+            sqlHelper = null;
         }
         super.onDestroy();
     }
@@ -81,7 +80,7 @@ public class SvcBackground extends Service {
                 break;
         }
         if (!MainActivity.AppProp.pIsDebug) return;
-        String timeStr = routeInstance.activeFlight.flightNumber + getDateTime() + "*";
+        String timeStr = activeRoute.activeFlight.flightNumber + getDateTime() + "*";
         String LINE_SEPARATOR = System.getProperty("line.separator");
 
         File sdcard = Environment.getExternalStorageDirectory();

@@ -164,21 +164,21 @@ public class ShowAlertClass {
                                         Thread.currentThread().interrupt();
                                     }
                                     counter++;
-                                    routeInstance.set_RouteRequest(ROUTEREQUEST.START_COMMUNICATION);
+                                    set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
                                 }
                                 if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
-                                int j = Route.sqlHelper.allLocationsDelete();
+                                int j = sqlHelper.allLocationsDelete();
                                 Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
+                                set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.unsentrecords_dialog_neg),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Util.setPointsUnsent(0);
-                        int j = Route.sqlHelper.allLocationsDelete();
+                        int j = sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                        routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
+                        set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                         ctxActivity.onBackPressed();
                         dialog.cancel();
                     }
@@ -197,7 +197,7 @@ public class ShowAlertClass {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                routeInstance.set_RouteRequest(ROUTEREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
+                                set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.backpressed_dialog_neg),

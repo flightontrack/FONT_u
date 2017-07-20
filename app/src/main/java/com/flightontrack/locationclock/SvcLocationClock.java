@@ -32,7 +32,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     static MODE _mode;
     static int _intervalClockSecCurrent = MIN_TIME_BW_GPS_UPDATES_SEC;
     public static int intervalClockSecPrev = _intervalClockSecCurrent;
-    static long  alarmNextTimeUTCmsec;
+    public static long  alarmNextTimeUTCmsec;
 
     public SvcLocationClock() {
     }
@@ -87,7 +87,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     @Override
     public void onLocationChanged(final Location location) {
         counter++;
-        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCount<1&&Route.currentFlights.size()==0){
+        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCount<1&&Route.flightList.size()==0){
             stopServiceSelf();
             return;
         }
@@ -100,11 +100,12 @@ public class SvcLocationClock extends Service implements LocationListener {
                 /// it is a protection
                 setClockNextTimeLocalMsec(_intervalClockSecCurrent);
                 if (_mode == MODE.CLOCK_LOCATION) {
-                    routeInstance.activeFlight.onClock(location);
+                    activeRoute.activeFlight.onClock(location);
                 }
 
-                Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.currentFlights.size() + " _mode:" + _mode, 'd');
-                routeInstance.set_RouteRequest(ROUTEREQUEST.START_COMMUNICATION);
+                Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.flightList.size() + " _mode:" + _mode, 'd');
+                //if (!(activeRoute==null)) activeRoute.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
+                set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
             }
         }
     }

@@ -21,7 +21,7 @@ import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.flight.Session.routeInstance;
+import static com.flightontrack.flight.Session.activeRoute;
 
 public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
     private static final String TAG = "ReceiverHealthCheckAlarm:";
@@ -66,7 +66,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
         requestParams.put("phonenumber", MyPhone._myPhoneId);
         requestParams.put("deviceid", MyPhone._myDeviceId);
         requestParams.put("isClockOn", SvcLocationClock.isInstanceCreated());
-        requestParams.put("flightid", routeInstance.activeFlight==null?FLIGHT_NUMBER_DEFAULT :routeInstance.activeFlight.flightNumber);
+        requestParams.put("flightid", activeRoute.activeFlight==null?FLIGHT_NUMBER_DEFAULT : activeRoute.activeFlight.flightNumber);
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", MainActivity.AppProp.pIsDebug);
 
