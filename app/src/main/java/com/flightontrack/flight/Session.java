@@ -110,13 +110,17 @@ public class Session {
     private static String setTextRed() {
         String fid = SessionProp.pTextRed;
         String fTime = "";
+        String flightId;
 
         if (activeRoute == null) {
             Util.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
         } else {
-            String flightId = activeRoute.activeFlight.flightNumber;
+            if (activeRoute!=null && activeRoute.activeFlight!=null) {
+                flightId = activeRoute.activeFlight.flightNumber;
+                fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
+            }
+            else {flightId = FLIGHT_NUMBER_DEFAULT;}
             fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
-            fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
         }
         SessionProp.pTextRed = fid + fTime;
         return SessionProp.pTextRed;

@@ -42,6 +42,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
+import static com.flightontrack.shared.Const.BUTTONREQUEST.BUTTON_STATE_GREEN;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity:";
@@ -299,24 +300,44 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Util.appendLog(TAG + "trackingButton: onClick",'d');
                 //if (Route._routeStatus == RSTATUS.PASSIVE) {
-                if (activeRoute == null) {
-                    //Util.setUserName(txtUserName.getText().toString());
-                    Util.setAcftNum(txtAcftNum.getText().toString());
-                    setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
-                    if (!AppProp.autostart && !is_services_available()) return;
-                    //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
-                    if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
+                switch (trackingButtonState) {
+                    case BUTTON_STATE_RED:
+                        //Util.setUserName(txtUserName.getText().toString());
+                        Util.setAcftNum(txtAcftNum.getText().toString());
+                        setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
+                        if (!AppProp.autostart && !is_services_available()) return;
+                        //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
+                        if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
 
-                        new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
-                        if (!AppProp.pIsEmptyAcftOk) return;
-                    }
-                    routeList.add(new Route());
-                    //activeRoute = new Route();
-
-                } else {
-                    set_isMultileg(false);
-                    activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                            new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
+                            if (!AppProp.pIsEmptyAcftOk) return;
+                        }
+                        routeList.add(new Route());
+                        //activeRoute = new Route();
+                        break;
+                    default:
+                        set_isMultileg(false);
+                        activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                        break;
                 }
+//                if (activeRoute == null) {
+//                    //Util.setUserName(txtUserName.getText().toString());
+//                    Util.setAcftNum(txtAcftNum.getText().toString());
+//                    setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
+//                    if (!AppProp.autostart && !is_services_available()) return;
+//                    //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
+//                    if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
+//
+//                        new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
+//                        if (!AppProp.pIsEmptyAcftOk) return;
+//                    }
+//                    routeList.add(new Route());
+//                    //activeRoute = new Route();
+//
+//                } else {
+//                    set_isMultileg(false);
+//                    activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+//                }
 
             }
         });

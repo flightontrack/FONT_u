@@ -107,11 +107,11 @@ public class Route{
                 break;
             case CLOSE_FLIGHT_DELETE_ALL_POINTS:
                 closeFlightDeleteAllPoints();
-                activeRoute =null;
+                //activeRoute =null;
                 break;
             case CLOSE_BUTTON_STOP_PRESSED:
                 closeFlightDeleteAllPoints();
-                activeRoute =null;
+                //activeRoute =null;
                 break;
 //            case CLOSEAPP_BUTTON_BACK_PRESSED:
 //                if (dbLocationRecCount > 0) {
@@ -131,17 +131,19 @@ public class Route{
                     SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
                     //set_routeStatus(RSTATUS.PASSIVE);
                     setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
-                    activeRoute =null;
+                    //activeRoute =null;
                 break;
             case ON_CLOSE_FLIGHT:
                 /// to avoid ConcurrentModificationException making copy of the flightList
                 Util.appendLog(TAG + "ON_CLOSE_FLIGHT: flightList: size before: " + flightList.size(), 'd');
                 for (Flight f : new ArrayList<>(flightList)) {
                     if (f.flightState == FLIGHTREQUEST.CLOSED) {
-                        flightList.remove(f);
+
                         if (activeFlight == f) activeFlight = null;
+                        flightList.remove(f);
                     }
                     if (flightList.isEmpty()) {
+                        if (activeRoute == this) activeRoute = null;
                         routeList.remove(this);
                     }
                 }
