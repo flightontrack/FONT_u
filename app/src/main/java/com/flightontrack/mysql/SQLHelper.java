@@ -7,7 +7,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.flightontrack.shared.Util;
+import com.flightontrack.log.FontLog;
 
 import static com.flightontrack.flight.Session.*;
 
@@ -20,7 +20,7 @@ public class SQLHelper extends SQLiteOpenHelper {
 
     public SQLHelper() {
         super(ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
-        Util.appendLog(TAG + "SQLHelper:SQLHelper", 'd');
+        FontLog.appendLog(TAG + "SQLHelper:SQLHelper", 'd');
         dbw = getWritableDatabase();
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
@@ -31,7 +31,7 @@ public class SQLHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Util.appendLog(TAG + "SQLHelper:onCreate", 'd');
+        FontLog.appendLog(TAG + "SQLHelper:onCreate", 'd');
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         );
         dbw.close();
         } catch (Exception e) {
-            Util.appendLog(TAG + e.getMessage(), 'e');
+            FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
         dbLocationRecCount = getLocationTableCount();
     }
@@ -70,7 +70,7 @@ public class SQLHelper extends SQLiteOpenHelper {
             );
             dbw.close();
         } catch (Exception e) {
-            Util.appendLog(TAG + e.getMessage(), 'e');
+            FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
         dbLocationRecCount = getLocationTableCount();
     }
@@ -83,7 +83,7 @@ public class SQLHelper extends SQLiteOpenHelper {
             );
             dbw.close();
         } catch (Exception e) {
-            Util.appendLog(TAG + e.getMessage(), 'e');
+            FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
         dbLocationRecCount = 0;
         return i;
@@ -98,7 +98,7 @@ public class SQLHelper extends SQLiteOpenHelper {
             dbw.close();
             //if (r>0)Route.isDbRecord=true;
         } catch (Exception e) {
-            Util.appendLog(TAG + e.getMessage(), 'e');
+            FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
         dbLocationRecCount = getLocationTableCount();
         return r;

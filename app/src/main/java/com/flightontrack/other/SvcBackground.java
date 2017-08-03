@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.shared.Const;
+import com.flightontrack.shared.Props;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -79,7 +80,7 @@ public class SvcBackground extends Service {
             case 'e': Log.e(Const.GLOBALTAG,text);
                 break;
         }
-        if (!MainActivity.AppProp.pIsDebug) return;
+        if (!Props.SessionProp.pIsDebug) return;
         String timeStr = activeRoute.activeFlight.flightNumber + getDateTime() + "*";
         String LINE_SEPARATOR = System.getProperty("line.separator");
 

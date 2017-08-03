@@ -19,24 +19,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
+import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
 import com.flightontrack.flight.Route;
 import com.flightontrack.pilot.Pilot;
 
-import static com.flightontrack.shared.Const.MY_PERMISSIONS_RITE_EXTERNAL_STORAGE;
+import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.*;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
-    static TextView txtUser;
+    TextView txtUser;
     public static TextView txtPsw;
-    static Button resetButton;
-    static Button getPswButton;
-    static Spinner spinnerUrls;
-    static CheckBox chBoxIsDebug;
-    static CheckBox chBoxIsOnReboot;
-    static CheckBox chBoxIsRoad;
-    //public static int spinnerUrlsPos;
-    //public static ProgressDialog progressBar;
+    Button resetButton;
+    Button getPswButton;
+    Spinner spinnerUrls;
+    CheckBox chBoxIsDebug;
+    CheckBox chBoxIsOnReboot;
+    CheckBox chBoxIsRoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +46,12 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity.AppProp.resetAppProp();
+                SessionProp.resetSessionProp();
                 //spinnerUrls.setSelection(Util.getSpinnerUrlsPos());
-                spinnerUrls.setSelection(MainActivity.AppProp.pSpinnerUrlsPos);
+                spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
                 Util.setPsw(null);
                 getPswButton.setText(R.string.label_btnpsw_get);
-                MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
+                //MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
             }
         });
         getPswButton = (Button) findViewById(R.id.btnGetPsw);
@@ -79,15 +79,16 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                                                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                                                         if(b) set_writePermissions();
                                                         //Util.setIsDebug(b);
-                                                        MainActivity.AppProp.pIsDebug=b;
+                                                        SessionProp.pIsDebug=b;
                                                     }
                                                 });
         chBoxIsRoad = (CheckBox) findViewById(R.id.isRoadCheckBox);
-        chBoxIsRoad.setChecked(Route._isRoad);
+        chBoxIsRoad.setChecked(SessionProp.pIsRoad);
         chBoxIsRoad.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Route.set_isRoad(b);
+                SessionProp.pIsRoad=b;
+                //Route.set_isRoad(b);
             }
         });
         txtUser= (TextView) findViewById((R.id.txtWebsiteUser));
@@ -95,14 +96,14 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         txtPsw= (TextView) findViewById((R.id.txtWebsitePsw));
         txtPsw.setText(Util.getPsw());
         //chBoxIsDebug.setChecked(Util.getIsDebug());
-        chBoxIsDebug.setChecked(MainActivity.AppProp.pIsDebug);
+        chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         spinnerUrls = (Spinner) findViewById(R.id.spinnerUrlId);
         ArrayAdapter<CharSequence> adapterUrl = ArrayAdapter.createFromResource(this,R.array.url_array, android.R.layout.simple_spinner_item);
         adapterUrl.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrls.setAdapter(adapterUrl);
         spinnerUrls.setOnItemSelectedListener(this);
         //spinnerUrls.setSelection(Util.getSpinnerUrlsPos());
-        spinnerUrls.setSelection(MainActivity.AppProp.pSpinnerUrlsPos);
+        spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
     }
     @Override
     public void onResume() {
@@ -133,8 +134,8 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         if (parent.getId()==R.id.spinnerUrlId) {
             //spinnerUrlsPos=pos;
             //Util.setSpinnerUrlsPos(pos);
-            MainActivity.AppProp.pSpinnerUrlsPos=pos;
-            //MainActivity.AppProp.save();
+            SessionProp.pSpinnerUrlsPos=pos;
+            //SessionProp.save();
             }
     }
 
@@ -156,7 +157,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //Util.setIsDebug(true);
-                    MainActivity.AppProp.pIsDebug=true;
+                    SessionProp.pIsDebug=true;
                     chBoxIsDebug.setChecked(true);
                 } else {
                     //Util.setIsDebug(false);
@@ -169,16 +170,16 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MainActivity.AppProp.save();
+        Props.AppProp.save();
     }
     @Override
     public void onStop() {
         super.onStop();
-        MainActivity.AppProp.save();
+        Props.AppProp.save();
     }
     @Override
     public void onPause() {
         super.onPause();
-        MainActivity.AppProp.save();
+        Props.AppProp.save();
     }
 }

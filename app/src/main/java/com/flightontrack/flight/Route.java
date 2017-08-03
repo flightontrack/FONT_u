@@ -2,11 +2,12 @@ package com.flightontrack.flight;
 
 import android.content.Intent;
 import java.util.ArrayList;
-import com.flightontrack.activity.MainActivity;
+
 import com.flightontrack.locationclock.SvcLocationClock;
-import com.flightontrack.shared.Util;
+import com.flightontrack.log.FontLog;
 
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.flight.Session.*;
 
 public class Route{
@@ -14,14 +15,14 @@ public class Route{
 
     public Flight activeFlight;
     public static boolean _isRoad = false; //change isRoad() too in two places
-    public static ArrayList<Flight> flightList = new ArrayList<>();
-    static String routeNumber = null;
+    public ArrayList<Flight> flightList = new ArrayList<>();
+    String routeNumber = null;
     int _legCount = 0;
 
     public Route() {
         activeRoute = this;
         //sqlHelper = new SQLHelper();
-        SessionProp.clear();
+        //SessionProp.clear();
         set_RouteRequest(ROUTEREQUEST.OPEN_NEW_ROUTE);
     }
 
@@ -29,11 +30,11 @@ public class Route{
         return activeRoute != null;
     }
 
-    public static void set_isRoad(boolean b) {
-        _isRoad = b;
-        ///hard code true
-        //_isRoad =true;
-    }
+//    public static void set_isRoad(boolean b) {
+//        _isRoad = b;
+//        ///hard code true
+//        //_isRoad =true;
+//    }
 
 //    private String setTextRed() {
 //        String fid = SessionProp.pTextRed;
@@ -59,7 +60,7 @@ public class Route{
 //    }
 
     public void set_RouteRequest(ROUTEREQUEST request) {
-        Util.appendLog(TAG + "set_ROUTEREQUEST:" + request, 'd');
+        FontLog.appendLog(TAG + "set_ROUTEREQUEST:" + request, 'd');
         switch (request) {
             case OPEN_NEW_ROUTE:
                 //set_routeStatus(RSTATUS.ACTIVE);
@@ -76,35 +77,35 @@ public class Route{
             case ON_FLIGHTTIME_CHANGED:
                 setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
                 break;
-            case CLOSE_SPEED_BELOW_MIN:
-                activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
-                if (MainActivity.AppProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
+            case CHECK_IF_ROUTE_MULTILEG:
+                //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
+                if (SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
                     /// ignore request to close route
-                    flightList.add(new Flight(activeRoute));
+                    flightList.add(new Flight(this));
                     setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
                 } else {
                     SvcLocationClock.stopLocationUpdates();
-                    routeNumber = null;
-                    _legCount = 0;
+//                    routeNumber = null;
+//                    _legCount = 0;
                     //set_routeStatus(RSTATUS.PASSIVE);
                     setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
                     SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
                 }
                 break;
-            case CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST:
-                ///rethrow
-                //activeFlight.set_ChangeFlightState_if_isSpeedAboveMinChanged(false);
-                activeFlight._isSpeedAboveMin = false;
-                set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN);
-                break;
-            case CLOSE_POINTS_LIMIT_REACHED:
-                ///rethrow
-                set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN);
-                break;
-            case CLOSE_FLIGHT_CANCELED:
-                ///rethrow
-                set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN);
-                break;
+//            case CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST:
+//                ///rethrow
+//                //activeFlight.set_ChangeFlightState_if_isSpeedAboveMinChanged(false);
+//                activeFlight.isSpeedAboveMin = false;
+//                set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
+//                break;
+//            case CLOSE_POINTS_LIMIT_REACHED:
+//                ///rethrow
+//                set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
+//                break;
+//            case CLOSE_FLIGHT_CANCELED:
+//                ///rethrow
+//                set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
+//                break;
             case CLOSE_FLIGHT_DELETE_ALL_POINTS:
                 closeFlightDeleteAllPoints();
                 //activeRoute =null;
@@ -135,7 +136,7 @@ public class Route{
                 break;
             case ON_CLOSE_FLIGHT:
                 /// to avoid ConcurrentModificationException making copy of the flightList
-                Util.appendLog(TAG + "ON_CLOSE_FLIGHT: flightList: size before: " + flightList.size(), 'd');
+                FontLog.appendLog(TAG + "ON_CLOSE_FLIGHT: flightList: size before: " + flightList.size(), 'd');
                 for (Flight f : new ArrayList<>(flightList)) {
                     if (f.flightState == FLIGHTREQUEST.CLOSED) {
 
@@ -150,7 +151,7 @@ public class Route{
 
                 break;
             case CHECK_IFANYFLIGHT_NEED_CLOSE:
-                Util.appendLog(TAG + "ROUTE.CHECK_IFANYFLIGHT_NEED_CLOSE", 'd');
+                FontLog.appendLog(TAG + "ROUTE.CHECK_IFANYFLIGHT_NEED_CLOSE", 'd');
                 checkIfAnyFlightNeedClose();
                 break;
         }
@@ -161,7 +162,7 @@ public class Route{
         if (!(f.flightNumber == null)) {
             activeFlight = f;
             routeNumber = (routeNumber == null ? f.flightNumber : routeNumber);
-            Util.appendLog(TAG + "set_ActiveFlightID: routeNumber " + routeNumber, 'd');
+            FontLog.appendLog(TAG + "set_ActiveFlightID: routeNumber " + routeNumber, 'd');
         }
     }
 
@@ -175,7 +176,7 @@ public class Route{
                 //flights=flights+f.flightNumber+"-"+f.flightState+"-";
             }
         } catch (Exception e) {
-            Util.appendLog(TAG + "checkIfAnyFlightNeedClose: " + e.getMessage() + "\n" + e.getCause(), 'e');
+            FontLog.appendLog(TAG + "checkIfAnyFlightNeedClose: " + e.getMessage() + "\n" + e.getCause(), 'e');
         }
     }
 
@@ -186,7 +187,7 @@ public class Route{
             //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
             activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
         int i = sqlHelper.allLocationsDelete();
-        Util.appendLog(TAG + "Deleted from database: " + i + " all locations", 'd');
+        FontLog.appendLog(TAG + "Deleted from database: " + i + " all locations", 'd');
         if (!(SvcLocationClock.instance == null))
             SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
     }

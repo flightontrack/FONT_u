@@ -9,13 +9,13 @@ import android.provider.Settings;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.shared.Util;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.activity.AircraftActivity;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.communication.SvcComm;
-import com.flightontrack.flight.Route;
 
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.flight.Session.*;
 
 public class ShowAlertClass {
@@ -129,7 +129,7 @@ public class ShowAlertClass {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 //Util.setIsEmptyAcftOk(true);
-                                MainActivity.AppProp.pIsEmptyAcftOk=true;
+                                SessionProp.pIsEmptyAcftOk=true;
                                 dialog.cancel();
                             }
                         });
@@ -168,7 +168,7 @@ public class ShowAlertClass {
                                 }
                                 if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                                 int j = sqlHelper.allLocationsDelete();
-                                Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
+                                FontLog.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
                                 set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);
                             }
                         });

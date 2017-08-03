@@ -13,21 +13,20 @@ import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.communication.ResponseP;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.flight.Session.*;
 
 public class Util {
@@ -63,9 +62,9 @@ public class Util {
 
      public static String getTrackingURL() {
         String[] spinnerUrls = ctxApp.getResources().getStringArray(R.array.url_array);
-        Util.appendLog(TAG + "getTrackingUR : " + spinnerUrls[MainActivity.AppProp.pSpinnerUrlsPos].trim(),'d');
+        FontLog.appendLog(TAG + "getTrackingUR : " + spinnerUrls[SessionProp.pSpinnerUrlsPos].trim(),'d');
         //return sharedPreferences.getString("trackingURL", spinnerUrls[getSpinnerUrlsPos()]).trim();
-        return spinnerUrls[MainActivity.AppProp.pSpinnerUrlsPos].trim();
+        return spinnerUrls[SessionProp.pSpinnerUrlsPos].trim();
     }
 
 //    static int getSpinnerUrlsPos() {
@@ -158,26 +157,26 @@ public class Util {
         editor.putString("cloudpsw", psw).commit();
         SimpleSettingsActivity.txtPsw.setText(psw);
     }
-    public static String getTrackingSpeed() {
-        return sharedPreferences.getString("a_speed_min", ctxApp.getString(R.string.default_tracking_speed));
-    }
+//    public static String getTrackingSpeed() {
+//        return sharedPreferences.getString("a_speed_min", ctxApp.getString(R.string.default_tracking_speed));
+//    }
 
-    public static double getTrackingSpeedIntMeterSec() {
-        return Double.parseDouble(getTrackingSpeed()) * 0.44704;
-    }
+//    public static double getTrackingSpeedIntMeterSec() {
+//        return Double.parseDouble(getTrackingSpeed()) * 0.44704;
+//    }
 
-    public static void setTrackingSpeed(String speed) {
-        editor.putString("a_speed_min", speed).commit();
-    }
+//    public static void setTrackingSpeed(String speed) {
+//        editor.putString("a_speed_min", speed).commit();
+//    }
 
-    public static void setSpinnerSpeedPos(int pos) {
-        editor.putInt("a_spinnerSpeedPos", pos).commit();
-        MainActivity.spinnerMinSpeed.setSelection(pos);
-    }
+//    public static void setSpinnerSpeedPos(int pos) {
+//        editor.putInt("a_spinnerSpeedPos", pos).commit();
+//        MainActivity.spinnerMinSpeed.setSelection(pos);
+//    }
 
-    public static int getSpinnerSpeedPos() {
-        return sharedPreferences.getInt("a_spinnerSpeedPos", DEFAULT_SPEED_SPINNER_POS);
-    }
+//    public static int getSpinnerSpeedPos() {
+//        return sharedPreferences.getInt("a_spinnerSpeedPos", DEFAULT_SPEED_SPINNER_POS);
+//    }
 
 //    static void uiResume() {
 //            setAcftNum(getAcftNum(4));
@@ -257,58 +256,6 @@ public class Util {
         return dateFormat.format(currTime);
     }
 
-    public static void appendLog(String text,char type) {
-
-        switch (type) {
-            case 'd': Log.d(GLOBALTAG, text);
-                break;
-            case 'e': Log.e(GLOBALTAG,text);
-                //startLogcat("appendLog"); TODO need to check permission first
-                break;
-        }
-
-        try {
-            if (!MainActivity.AppProp.pIsDebug) return;
-            //if (getIsDebug()) return; //TODO disabled to check permissions
-            //String timeStr= (new Flight(ctx).get_ActiveFlightID())+"*"+time.format("%H:%M:%S")+"*";
-            //String timeStr = Flight.get_ActiveFlightID() + "*" + getDateTimeNow() + "*";
-            String timeStr = (activeRoute.activeFlight !=null? activeRoute.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + getDateTimeNow() + "*";
-            String LINE_SEPARATOR = System.getProperty("line.separator");
-            File sdcard=null;
-            try {
-                sdcard = Environment.getExternalStorageDirectory();
-            }
-            catch(Exception e){
-                Log.e(TAG, "AppendLog nvironment.getExternalStorageDirectory( "+e);
-                e.printStackTrace();
-            }
-            File dir = new File(sdcard.getAbsolutePath() + "/FONT_LogFiles/");
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            File logFile = new File(dir, "FONT_LogFile.txt");
-            try {
-                if (!logFile.exists()) {
-                    logFile.createNewFile();
-                }
-                BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-                buf.append(timeStr + text + LINE_SEPARATOR);
-                buf.close();
-            }
-            catch (IOException e) {
-                Log.e(TAG, "AppendLog IO "+e);
-                e.printStackTrace();
-                startLogcat("appendLogIOException");
-                return;
-            }
-        }
-        catch (Exception e){
-            Log.e(TAG, "AppendLog Exception: probable cause TBD2");
-            e.printStackTrace();
-            startLogcat("appendLogException");
-        }
-    }
-
     public static String getCurrAppContext() {
         return sharedPreferences.getString("a_currAppContext","0");
     }
@@ -337,24 +284,7 @@ public class Util {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null&&activeNetworkInfo.isConnected() ;
     }
-    public static void startLogcat(String source) {
-        //if (MyApplication.productionRelease) return;
-        Log.e(TAG, "startLogcat :" + source);
-        try {
-            File sdcard = Environment.getExternalStorageDirectory();
-            File dir = new File(sdcard.getAbsolutePath() + "/FONT_LogFiles/Logcat");
-            //create a dir if not exist
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            //start logcat *:W with file rotation
-            String targetLogcatFile = sdcard.getAbsolutePath() + "/FONT_LogFiles/Logcat/"+"LC."+System.currentTimeMillis()+".txt";
-            String cmd_logcatstart = "logcat -f " +targetLogcatFile+" -v time *:W";
-            Runtime.getRuntime().exec(cmd_logcatstart);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
     public static void setCloudPsw(View view){
         final ProgressDialog progressBar;
         progressBar = new ProgressDialog(view.getContext());
@@ -366,7 +296,7 @@ public class Util {
         progressBar.setProgress(100);
         progressBar.show();
 
-        appendLog(TAG + "getCloudPsw Started", 'd');
+        FontLog.appendLog(TAG + "getCloudPsw Started", 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_PSW);
         requestParams.put("userid", Pilot.getUserID());
@@ -375,13 +305,13 @@ public class Util {
         new AsyncHttpClient().post(getTrackingURL() + ctxApp.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        appendLog(TAG + "getCloudPsw OnSuccess", 'd');
+                        FontLog.appendLog(TAG + "getCloudPsw OnSuccess", 'd');
                         ResponseP response = new ResponseP(new String(responseBody));
                         if (response.responseType.equals(RESPONSE_TYPE_DATA_WITHLOAD) && response.responseTypeLoad.equals(RESPONSE_TYPE_DATA_PSW)) {
                             //SimpleSettingsActivity.progressBar.isShowing();
                             progressBar.dismiss();
                             String psw = response.getValue(RESPONSE_TYPE_DATA_PSW);
-                            appendLog(TAG + "ap="+psw, 'd');
+                            FontLog.appendLog(TAG + "ap="+psw, 'd');
                             setPsw(psw);
                         }
                         if (response.responseType.equals(RESPONSE_TYPE_NOTIF_WITHLOAD)) {
@@ -389,7 +319,7 @@ public class Util {
                     }
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        appendLog(TAG + "getCloudPsw onFailure:", 'd');
+                        FontLog.appendLog(TAG + "getCloudPsw onFailure:", 'd');
                         progressBar.dismiss();
                     }
                 }

@@ -13,10 +13,10 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
 import com.flightontrack.shared.Util;
 import com.flightontrack.activity.MainActivity;
-import com.flightontrack.flight.Route;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
@@ -46,18 +46,18 @@ public class SvcLocationClock extends Service implements LocationListener {
     }
 
     public static void stopLocationUpdates() {
-        Util.appendLog(TAG + "stopLocationUpdates : instance = " + instance, 'd');
+        FontLog.appendLog(TAG + "stopLocationUpdates : instance = " + instance, 'd');
         try {
             locationManager.removeUpdates(instance);
         }
         catch(SecurityException e ){
-            Util.appendLog(TAG + e, 'e');
+            FontLog.appendLog(TAG + e, 'e');
         }
     }
 
     public void requestLocationUpdate(int timeSec, long distance) {
 
-        Util.appendLog(TAG + "requestLocationUpdate: interval: " + timeSec + " dist: " + distance, 'd');
+        FontLog.appendLog(TAG + "requestLocationUpdate: interval: " + timeSec + " dist: " + distance, 'd');
         SvcLocationClock.stopLocationUpdates();
         set_intervalClockSecCurrent(timeSec);
         setClockNextTimeLocalMsec(0);
@@ -65,7 +65,7 @@ public class SvcLocationClock extends Service implements LocationListener {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, _intervalClockSecCurrent * 1000, distance, this);
         }
         catch(SecurityException e ){
-            Util.appendLog(TAG + e, 'e');
+            FontLog.appendLog(TAG + e, 'e');
         }
     }
     public void set_mode(MODE m){
@@ -87,13 +87,13 @@ public class SvcLocationClock extends Service implements LocationListener {
     @Override
     public void onLocationChanged(final Location location) {
         counter++;
-        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCount<1&&Route.flightList.size()==0){
+        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCount<1){
             stopServiceSelf();
             return;
         }
         else {
             long currTime = Util.getTimeGMT();
-            Util.appendLog(TAG + "___TIMER-onLocationChanged :  Counter:" + counter, 'd');
+            FontLog.appendLog(TAG + "___TIMER-onLocationChanged :  Counter:" + counter, 'd');
 
             if (currTime + TIME_RESERVE >= alarmNextTimeUTCmsec) {
                 //Util.appendLog(TAG + "isClockTimeReached: ", 'd');
@@ -103,7 +103,7 @@ public class SvcLocationClock extends Service implements LocationListener {
                     activeRoute.activeFlight.onClock(location);
                 }
 
-                Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.flightList.size() + " _mode:" + _mode, 'd');
+                //Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.flightList.size() + " _mode:" + _mode, 'd');
                 //if (!(activeRoute==null)) activeRoute.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
                 set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
             }
@@ -145,7 +145,7 @@ public class SvcLocationClock extends Service implements LocationListener {
             stopSelf();
             return;
         }
-        Util.appendLog(TAG + "onCreate",'d');
+        FontLog.appendLog(TAG + "onCreate",'d');
         instance=this;
         _mode = MODE.CLOCK_LOCATION;
         //ctx = getApplicationContext();
@@ -180,7 +180,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Util.appendLog(TAG + "onDestroy", 'd');
+        FontLog.appendLog(TAG + "onDestroy", 'd');
         setToNull();
     }
 
@@ -189,7 +189,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     {
         super.onTaskRemoved(rootIntent);
         setSignalStrengthListener(false);
-        Util.appendLog(TAG + "onTaskRemoved: ",'d');
+        FontLog.appendLog(TAG + "onTaskRemoved: ",'d');
         if(!(instance==null)){
             stopLocationUpdates();
             setToNull();
@@ -198,7 +198,7 @@ public class SvcLocationClock extends Service implements LocationListener {
         //Util.getLogcat();
     }
     public void stopServiceSelf() {
-        Util.appendLog(TAG + "stopServiceSelf",'d');
+        FontLog.appendLog(TAG + "stopServiceSelf",'d');
         setSignalStrengthListener(false);
         if(!(instance==null)){
             stopLocationUpdates();

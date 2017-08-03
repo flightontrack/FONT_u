@@ -11,7 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.shared.Util;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.flight.Route;
 
 import static com.flightontrack.shared.Const.*;
@@ -35,17 +35,17 @@ public class PermissionActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         try {
-            Util.appendLog(TAG + "onCreate", 'd');
+            FontLog.appendLog(TAG + "onCreate", 'd');
             thisAct = this;
             set_Permissions(permissionType);
         }
         catch (Exception e) {
-            Util.appendLog(TAG + e.toString(), 'e');
+            FontLog.appendLog(TAG + e.toString(), 'e');
         }
     }
     @Override
     public void onResume() {
-        Util.appendLog(TAG + "onResume", 'd');
+        FontLog.appendLog(TAG + "onResume", 'd');
         super.onResume();
     }
 

@@ -22,6 +22,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.flightontrack.R;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.shared.Util;
 import com.flightontrack.pilot.Pilot;
@@ -59,7 +60,7 @@ public class AircraftActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Util.appendLog(TAG + "AircraftActivity onCreate", 'd');
+        FontLog.appendLog(TAG + "AircraftActivity onCreate", 'd');
         //try{
         //sharedPreferences = getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE);
         //editor = sharedPreferences.edit();
@@ -97,7 +98,7 @@ public class AircraftActivity extends Activity {
     }
    @Override
     public void onResume() {
-       Util.appendLog(TAG + "AircraftActivity onResume", 'd');
+       FontLog.appendLog(TAG + "AircraftActivity onResume", 'd');
        txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
        txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
        txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
@@ -173,7 +174,7 @@ public class AircraftActivity extends Activity {
             nfcSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Util.appendLog(TAG + "AircraftActivity onCheckedChanged", 'd');
+                    FontLog.appendLog(TAG + "AircraftActivity onCheckedChanged", 'd');
                     setTagNFCState(buttonView.isChecked());
                 }
             });
@@ -212,7 +213,7 @@ public class AircraftActivity extends Activity {
         void setAcft(JSONObject json){
             try
             {
-                Util.appendLog(TAG+ json.toString(),'d');
+                FontLog.appendLog(TAG+ json.toString(),'d');
                 String AcftMake = json.getString("AcftMake");
                 String AcftModel = json.getString("AcftModel").replace(" ","");
                 String AcftSeries = json.getString("AcftSeries").replace(" ","");
@@ -375,7 +376,7 @@ public class AircraftActivity extends Activity {
         }
 @Override
 public void onNewIntent(Intent intent) {
-    Util.appendLog(TAG+ "AircraftActivity onNewIntent",'d');
+    FontLog.appendLog(TAG+ "AircraftActivity onNewIntent",'d');
     //Util.appendLog(TAG+ intent.getAction());
     if ((intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
             || intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) && getTagNFCState()) {
@@ -388,7 +389,7 @@ public void onNewIntent(Intent intent) {
             j.put("AcftName",txtAcftName.getText().toString());
             setAcft(j);
         } catch (JSONException e) {
-            Util.appendLog(TAG+ "Couldn't create json from NFC: "+e.getMessage(),'e');
+            FontLog.appendLog(TAG+ "Couldn't create json from NFC: "+e.getMessage(),'e');
         }
 
 //        else if (intent.getAction().equals(

@@ -9,8 +9,10 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.*;
 
 import com.flightontrack.communication.SvcComm;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.Util;
@@ -46,12 +48,12 @@ public class Session {
     }
 
     public static void set_SessionRequest(SESSIONREQUEST request) {
-        Util.appendLog(TAG + "set_SessionRequest:" + request, 'd');
+        FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
             case CLOSEAPP_BUTTON_BACK_PRESSED:
                 if (dbLocationRecCount > 0) {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
-                    Util.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
+                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
                 } else {
                     if (!(activeRoute ==null)) activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
                     mainactivityInstance.finishActivity();
@@ -68,7 +70,7 @@ public class Session {
                         startLocationCommService();
                     }
                 } else {
-                    Util.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
+                    FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
                     Toast.makeText(ctxApp, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -113,7 +115,7 @@ public class Session {
         String flightId;
 
         if (activeRoute == null) {
-            Util.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
+            FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
         } else {
             if (activeRoute!=null && activeRoute.activeFlight!=null) {
                 flightId = activeRoute.activeFlight.flightNumber;
@@ -139,7 +141,7 @@ public class Session {
         int count = sqlHelper.getCursorCountLocation();
         //Util.appendLog(TAG+ "getCursorCountLocation :" + count,'d');
 
-        Util.appendLog(TAG + "SvcComm.commBatchSize :" + SvcComm.commBatchSize, 'd');
+        FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + SvcComm.commBatchSize, 'd');
         if (count >= 1) {
             for (int i = 0; i < count; i++) {
                 if (i >= SvcComm.commBatchSize) break;
@@ -170,21 +172,15 @@ public class Session {
         }
     }
 
-    public static class SessionProp {
-        static String pTextRed;
-        static String pTextGreen;
-
-        public static void save() {
-            editor.putString("pTextRed", pTextRed);
-            editor.commit();
+    public static Flight get_FlightInstance(String flightNumber){
+        for (Route r : routeList) {
+            for (Flight f : r.flightList) {
+                if (f.flightNumber.equals(flightNumber)) {
+                    return f;
+                }
+            }
         }
-
-        public static void get() {
-            pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
-        }
-
-        public static void clear() {
-            editor.remove("pTextRed").commit();
-        }
+        return activeRoute.activeFlight;
     }
+
 }

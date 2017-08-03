@@ -7,9 +7,10 @@ import android.os.IBinder;
 import android.widget.Toast;
 
 import com.flightontrack.flight.Flight;
-import com.flightontrack.activity.MainActivity;
 import com.flightontrack.R;
 import com.flightontrack.flight.Route;
+import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -19,7 +20,7 @@ import java.util.Map;
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
-import static com.flightontrack.flight.Route.flightList;
+import static com.flightontrack.shared.Props.*;
 
 public class SvcComm extends Service {
     public SvcComm() {}
@@ -44,14 +45,14 @@ public class SvcComm extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Util.appendLog(TAG+ "ServiceComm  - onStartCommand requestId : " + startId,'d');
+        FontLog.appendLog(TAG+ "ServiceComm  - onStartCommand requestId : " + startId,'d');
         Bundle extras = intent.getExtras();
         setRequest(extras);
         if (startIdDbItemId.containsValue(dbItemId)) return START_STICKY;
         startIdDbItemId.put(startId,dbItemId);
         if (startIdDbItemId.size()>1){
             for (Map.Entry<Integer, Integer> entry : startIdDbItemId.entrySet()) {
-                Util.appendLog("startId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
+                FontLog.appendLog("startId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
             }
         }
         //trackPointNumber
@@ -68,7 +69,7 @@ public class SvcComm extends Service {
         dbItemId = (int) extras.getLong("itemId");
         trackPointNumber = extras.getInt("wp");
         flightID = extras.getString("ft");
-        requestParams.put("isdebug", MainActivity.AppProp.pIsDebug);
+        requestParams.put("isdebug", Props.SessionProp.pIsDebug);
         requestParams.put("speedlowflag",extras.getBoolean("sl"));
         requestParams.put("rcode",      extras.getInt("rc"));
         requestParams.put("latitude",   extras.getString("la"));
@@ -88,7 +89,7 @@ public class SvcComm extends Service {
     public void sendData(int startId){
         //if (!Util.isNetworkAvailable()) {
             try {
-                Util.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber,'d');
+                FontLog.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber,'d');
                 //AsyncHttpClient aSyncClient = new AsyncHttpClient();
                 final LoopjAClient aSyncClient = new LoopjAClient(startId);
                 aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
@@ -103,45 +104,49 @@ public class SvcComm extends Service {
                             return;
                         }
                         try {
+                            Flight flight = get_FlightInstance(response.responseFlightNum);
+
                             if (response.responseAckn != null) {
-                                Util.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');
+                                FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');
                                 sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
                                 set_SessionRequest(SESSIONREQUEST.ON_COMMUNICATION_SUCCESS);
                             }
                             if (response.responseNotif != null) {
-                                Util.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
-                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
+                                FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
+                                flight.set_flightRequest(FLIGHTREQUEST.ON_SERVER_N0TIF);
                             }
                             if (response.responseCommand != null) {
-                                Util.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
+                                FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
                                 // TBD
                                 switch (response.iresponseCommand) {
                                     case COMMAND_CANCELFLIGHT:
-                                        if (Route._isRoad) break; /// just ignore the request
+                                        if (SessionProp.pIsRoad) break; /// just ignore the request
                                         else {
                                             Toast.makeText(ctxApp, R.string.driving, Toast.LENGTH_LONG).show();
-                                            Util.appendLog(TAG + "COMMAND_CANCELFLIGHT request", 'd');
-                                            sqlHelper.flightLocationsDelete(response.responseFlightNum);
-                                            MainActivity.set_isMultileg(false);
-                                            activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_CANCELED);
+                                            FontLog.appendLog(TAG + "COMMAND_CANCELFLIGHT request", 'd');
+                                            flight.set_flightRequest(FLIGHTREQUEST.TERMINATE_FLIGHT);
+//                                            sqlHelper.flightLocationsDelete(response.responseFlightNum);
+//                                            MainActivity.set_isMultileg(false);
+//                                            activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_CANCELED);
                                             break;
                                         }
                                     case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
-                                        Util.appendLog(TAG + "COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN request",'d');
-                                        //Route.sqlHelper.flightLocationsDelete(response.responseFlightId);
-                                        for (Flight f : flightList) {
-                                            if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
-                                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST);
-                                            }
-                                        }
+                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN request",'d');
+                                        flight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_SPEED_BELOW_MIN);
+//                                        for (Flight f : flightList) {
+//                                            if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
+//                                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST);
+//                                            }
+//                                        }
                                         break;
                                     case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
-                                        Util.appendLog(TAG + "COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED request",'d');
-                                        for (Flight f : flightList) {
-                                            if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
-                                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_POINTS_LIMIT_REACHED);
-                                            }
-                                        }
+                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED request",'d');
+                                        flight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED);
+//                                        for (Flight f : flightList) {
+//                                            if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
+//                                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_POINTS_LIMIT_REACHED);
+//                                            }
+//                                        }
                                         break;
                                     case COMMAND_FLIGHT_STATE_PENDING:
                                         break;
@@ -150,17 +155,17 @@ public class SvcComm extends Service {
                                 }
                             }
                             if (response.responseDataLoad!=null){
-                                Util.appendLog(TAG + "Data response : "+response.responseDataLoad,'d');
+                                FontLog.appendLog(TAG + "Data response : "+response.responseDataLoad,'d');
                             }
                         } catch (Exception e) {
-                            Util.appendLog(TAG + "onSuccess : EXCEPTION :" + e.getMessage(),'e');
+                            FontLog.appendLog(TAG + "onSuccess : EXCEPTION :" + e.getMessage(),'e');
                         } finally {
                         }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        Util.appendLog(TAG + "onFailure; startId= " + aSyncClient.getStartID(), 'd');
+                        FontLog.appendLog(TAG + "onFailure; startId= " + aSyncClient.getStartID(), 'd');
                         commBatchSize = COMM_BATCH_SIZE_MIN;
                         failureCounter++;
                     }
@@ -175,7 +180,7 @@ public class SvcComm extends Service {
                 });
             }
             catch (Exception e){
-                Util.appendLog(TAG+"sendData"+e.getMessage(),'d');
+                FontLog.appendLog(TAG+"sendData"+e.getMessage(),'d');
                 return;
             }
 //        }
@@ -185,12 +190,12 @@ public class SvcComm extends Service {
 //        }
     }
     public void onDestroy() {
-        Util.appendLog(TAG + "onDestroy minStartId= "+ minStartId, 'd');
+        FontLog.appendLog(TAG + "onDestroy minStartId= "+ minStartId, 'd');
         super.onDestroy();
     }
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Util.appendLog(TAG + "onTaskRemoved",'d');
+        FontLog.appendLog(TAG + "onTaskRemoved",'d');
         super.onTaskRemoved(rootIntent);
         //ReceiverRouter.alarmDisable = true;
         stopSelf();

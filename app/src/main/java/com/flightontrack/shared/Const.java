@@ -5,17 +5,10 @@ public abstract class Const {
     public static final int APPBOOT_DELAY_MILLISEC = 30000;
 
     public static final int REQUEST_LOCATION_UPDATE = 1;
-//    public static final int REQUEST_LAST_POINT = 3;
     public static final int REQUEST_FLIGHT_NUMBER = 2;
     public static final int REQUEST_STOP_FLIGHT = 4;
-//    public static final int REQUEST_STOP_FLIGHTON_LIMIT_REACHED = 5;
     public static final int REQUEST_PSW = 6;
     public static final int REQUEST_IS_CLOCK_ON = 7;
-
-//    public static final char RESPONSE_TYPE_COMMAND = '1';
-//    public static final char RESPONSE_TYPE_DATA = '0';
-//    public static final char RESPONSE_TYPE_NOTIF = '2';
-//    public static final char RESPONSE_TYPE_ACKN = '3';
 
     public static final String RESPONSE_TYPE_DATA_WITHLOAD = "0";
     public static final String RESPONSE_TYPE_NOTIF_WITHLOAD = "2";
@@ -25,16 +18,6 @@ public abstract class Const {
     public static final int COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED = -9;
     public static final int COMMAND_FLIGHT_STATE_PENDING = -7;
     public static final int COMMAND_CANCELFLIGHT = -6;
-
-//    public static final int NOTIF_UNKNOWN_SERVER_ERROR = -1;
-//    public static final int NOTIF_UNKNOWN_REQUEST = 1;
-//    public static final int NOTIF_DB_ERROR = 2;
-
-    public static final int LOCATION_UPDATE_INTERVAL_SEC_DEFAULT = 3;
-    public static final int MINSPEED_UPDATE_INTERVAL_SEC_DEFAULT = 1; //sec
-    public static final int LOCATION_ACCURACY = 150;
-
-    public static final int FLIGHT_CALLS_NUM = 2;
 
     public static final long DISTANCE_CHANGE_FOR_UPDATES_MIN = 0; //20; //  meters
     public static final long DISTANCE_CHANGE_FOR_UPDATES_ZERO = 0; //  meters
@@ -59,7 +42,6 @@ public abstract class Const {
 
     public static final int COMM_BATCH_SIZE_MAX = 10;
     public static final int COMM_BATCH_SIZE_MIN = 1;
-    public static final int START_TRACKPOINT_COUNTER = 0;
     public static final String GLOBALTAG="FLIGHT_ON_TRACK";
 
     public static final String SPACE=" ";
@@ -88,7 +70,7 @@ public abstract class Const {
         ON_FLIGHTTIME_CHANGED,
         CLOSE_BUTTON_STOP_PRESSED,
         CLOSE_RECEIVEFLIGHT_FAILED,
-        CLOSE_SPEED_BELOW_MIN,
+        CHECK_IF_ROUTE_MULTILEG,
         CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST,
         CLOSE_POINTS_LIMIT_REACHED,
         CLOSE_FLIGHT_CANCELED,
@@ -119,12 +101,15 @@ public abstract class Const {
         CHANGESTATE_STATUSPASSIVE,
         CHANGESTATE_INFLIGHT,
         CHANGESTATE_SPEED_BELOW_MIN,
+        CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED,
         GET_LOCATIONSERVICE,
         CLOSE_FLIGHT,
+        TERMINATE_FLIGHT,
         CLOSED,
         CLOSED_FAILURE,
         FLIGHTTIME_UPDATE,
-        ON_FLIGHTGET_FINISH}
+        ON_FLIGHTGET_FINISH,
+        ON_SERVER_N0TIF}
 
     public enum BUTTONREQUEST{
         BUTTON_STATE_RED,
@@ -142,7 +127,4 @@ public abstract class Const {
         PUBLIC,
         PRIVATE}
 
-    public enum COMMAND{
-        COMMAND_CANCELFLIGHT
-    }
 }

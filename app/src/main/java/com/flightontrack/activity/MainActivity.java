@@ -25,8 +25,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flightontrack.log.FontLog;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
+import com.flightontrack.shared.Props;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.shared.Util;
@@ -42,7 +44,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
-import static com.flightontrack.shared.Const.BUTTONREQUEST.BUTTON_STATE_GREEN;
+import static com.flightontrack.shared.Props.*;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity:";
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView txtAcftNum ;
     static Spinner spinnerUpdFreq;
     public static Spinner spinnerMinSpeed;
-    static CheckBox chBoxIsMultiLeg;
+    public static CheckBox chBoxIsMultiLeg;
     public static Button trackingButton;
     static Toolbar toolbarTop;
     static Toolbar toolbarBottom;
@@ -115,12 +117,13 @@ public class MainActivity extends AppCompatActivity {
             //Util.init(ctxApp, this);
             //Util.resetPreferencesAll();
             AppProp.get();
+            SessionProp.get();
             //Util.setIsDebug(!MyApplication.productionRelease);
             //Util.appendLog(TAG + "onCreate", 'd');
             //startService(new Intent(getApplicationContext(), SvcBackground.class));
 
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
-                Util.appendLog(TAG + "New App Context", 'd');
+                FontLog.appendLog(TAG + "New App Context", 'd');
                 Util.setCurrAppContext(ctxApp.toString());
                 activeRoute = null;
                 //set_myPhoneId();
@@ -137,15 +140,15 @@ public class MainActivity extends AppCompatActivity {
             }
             updFreqSpinnerSetup();
             minSpeedSpinnerSetup();
-            Util.setTrackingSpeed(spinnerMinSpeed.getItemAtPosition(Util.getSpinnerSpeedPos()).toString());
-            set_isMultileg(true);
-            AppProp.save();
+            //Util.setTrackingSpeed(spinnerMinSpeed.getItemAtPosition(SessionProp.pSpinnerMinSpeedPos).toString());
+            SessionProp.set_isMultileg(true);
+            SessionProp.save();
         }
 //        catch (NullPointerException nullPointer){
 //            Util.appendLog(TAG + nullPointer.toString(), 'e');
 //        }
         catch (Exception e) {
-            Util.appendLog(TAG + "EXCEPTION!!!!: "+e.toString(), 'e');
+            FontLog.appendLog(TAG + "EXCEPTION!!!!: "+e.toString(), 'e');
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -154,21 +157,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        Util.appendLog(TAG + "onResume",'d');
+        FontLog.appendLog(TAG + "onResume",'d');
         super.onResume();
         Intent nfcintent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
             ///TODO
         }
-        //if (!Route.isRouteExist()) activeRoute = new Route();
-        //Util.uiResume();
 
-        MainActivity.AppProp.get();
-        SessionProp.get();
+        SessionProp.save();
         Util.setAcftNum(Util.getAcftNum(4));
-        MainActivity.setIntervalSelectedItem(MainActivity.AppProp.pIntervalSelectedItem);
-        Util.setSpinnerSpeedPos(Util.getSpinnerSpeedPos());
-
+        MainActivity.setIntervalSelectedItem(SessionProp.pIntervalSelectedItem);
+        //Util.setSpinnerSpeedPos(SessionProp.pSpinnerMinSpeedPos);
+        MainActivity.spinnerMinSpeed.setSelection(SessionProp.pSpinnerMinSpeedPos);
         setTrackingButtonState(trackingButtonState);
 
         init_listeners();
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        Util.appendLog(TAG + "isToDestroy :" + isToDestroy, 'd');
+        FontLog.appendLog(TAG + "isToDestroy :" + isToDestroy, 'd');
         if (isToDestroy) {
             new ShowAlertClass(this).showBackPressed();
         } else {
@@ -252,9 +252,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Util.appendLog(TAG + "OnDestroy", 'd');
-        AppProp.save();
-        SessionProp.clear();
+        FontLog.appendLog(TAG + "OnDestroy", 'd');
+        SessionProp.save();
+        Props.SessionProp.clear();
         if (isToDestroy && alarmReceiver!=null) {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
@@ -284,9 +284,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        Util.appendLog(TAG + "onStop", 'd');
-        AppProp.save();
+        FontLog.appendLog(TAG + "onStop", 'd');
         SessionProp.save();
+        Props.SessionProp.save();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
@@ -307,16 +307,16 @@ public class MainActivity extends AppCompatActivity {
                         setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
                         if (!AppProp.autostart && !is_services_available()) return;
                         //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
-                        if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
+                        if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
 
                             new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
-                            if (!AppProp.pIsEmptyAcftOk) return;
+                            if (!SessionProp.pIsEmptyAcftOk) return;
                         }
                         routeList.add(new Route());
                         //activeRoute = new Route();
                         break;
                     default:
-                        set_isMultileg(false);
+                        SessionProp.set_isMultileg(false);
                         activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                         break;
                 }
@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 //AppProp.pIsMultileg=b;
-                set_isMultileg(b);
+                SessionProp.set_isMultileg(b);
             }
         });
 
@@ -381,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
         cardLayout1.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Util.appendLog(TAG + "Method1", 'd');
+                FontLog.appendLog(TAG + "Method1", 'd');
                 Intent intent = new Intent(ctxApp, AircraftActivity.class);
                 startActivity(intent);
             }
@@ -485,24 +485,27 @@ public class MainActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        spinnerUpdFreq.setSelection(AppProp.pIntervalSelectedItem);
+        spinnerUpdFreq.setSelection(SessionProp.pIntervalSelectedItem);
     }
 
     void minSpeedSpinnerSetup() {
         ArrayAdapter<CharSequence> adapterSpeed = ArrayAdapter.createFromResource(this, R.array.speed_array, android.R.layout.simple_spinner_item);
         adapterSpeed.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         spinnerMinSpeed.setAdapter(adapterSpeed);
-        Util.setSpinnerSpeedPos(Util.getSpinnerSpeedPos());
+        spinnerMinSpeed.setSelection(SessionProp.pSpinnerMinSpeedPos);
+        //Util.setSpinnerSpeedPos(SessionProp.pSpinnerMinSpeedPos);
         spinnerMinSpeed.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Util.setSpinnerSpeedPos(position);
-                Util.setTrackingSpeed(spinnerMinSpeed.getSelectedItem().toString());
+                //Util.setSpinnerSpeedPos(position);
+                SessionProp.set_pSpinnerMinSpeedPos(position);
+                //Util.setTrackingSpeed(spinnerMinSpeed.getSelectedItem().toString());
 
             }
 
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        SessionProp.pMinSpeedArray= getResources().getStringArray(R.array.speed_array);
     }
 
     public static Boolean isMainActivityExist() {
@@ -560,68 +563,11 @@ public class MainActivity extends AppCompatActivity {
     static void setIntervalSelectedItem(int indx) {
         int[] interval_seconds = {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
         MainActivity.spinnerUpdFreq.setSelection(indx);
-        MainActivity.AppProp.pIntervalLocationUpdateSec=interval_seconds[indx];
-        MainActivity.AppProp.pIntervalSelectedItem=indx;
+        SessionProp.pIntervalLocationUpdateSec=interval_seconds[indx];
+        SessionProp.pIntervalSelectedItem=indx;
     }
 
-    public static void set_isMultileg(boolean isMultileg) {
-        MainActivity.AppProp.pIsMultileg=isMultileg;
-        MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
-    }
-    public static class AppProp{
-        public static boolean pPublicApp = false;
-        public static boolean pIsDebug = false;
-        public static boolean autostart = false;
-
-        public static int          pIntervalLocationUpdateSec;
-        public static int          pIntervalSelectedItem;
-        public static boolean      pIsMultileg;
-        public static boolean      pIsEmptyAcftOk;
-        public static int          pSpinnerUrlsPos;
-        //static String       pUserName;
-
-        public static void save(){
-            //Util.appendLog(TAG + "Save Properties:pIntervalSelectedItem"+pIntervalSelectedItem , 'd');
-            editor.putInt("pIntervalLocationUpdateSec", pIntervalLocationUpdateSec);
-            editor.putInt("pIntervalSelectedItem", pIntervalSelectedItem);
-            editor.putBoolean("pIsMultileg", pIsMultileg);
-            editor.putBoolean("pIsEmptyAcftOk", pIsEmptyAcftOk);
-            editor.putInt("pSpinnerUrlsPos", pSpinnerUrlsPos);
-            //editor.putString("pUserName", pUserName);
-            editor.commit();
-        }
-        public static void get(){
-            //Util.appendLog(TAG + "Restore Properties", 'd');
-            set_isMultileg( sharedPreferences.getBoolean("pIsMultileg", true));
-            pIsEmptyAcftOk=sharedPreferences.getBoolean("pIsEmptyAcftOk", false);
-            pIntervalLocationUpdateSec=sharedPreferences.getInt("pIntervalLocationUpdateSec", MIN_TIME_BW_GPS_UPDATES_SEC);
-            pIntervalSelectedItem=sharedPreferences.getInt("pIntervalSelectedItem", DEFAULT_INTERVAL_SELECTED_ITEM);
-            pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
-            pIsDebug=sharedPreferences.getBoolean("pIsDebug", false);
-            //pUserName =  sharedPreferences.getString("pUserName", new Pilot().getMyUserName());
-
-            //pSpinnerUrlsPos=0;
-        }
-        public static void resetAppProp() {
-            //Log.d.d(TAG, "clearPref()");
-
-            //editor.remove("trackingURL").commit();
-            editor.remove("speed_thresh").commit();
-            editor.remove("spinnerSpeedPos").commit();
-            editor.remove("pIsMultileg").commit();
-            editor.remove("pIntervalLocationUpdateSec").commit();
-            editor.remove("pIntervalSelectedItem").commit();
-            editor.remove("pIsMultileg").commit();
-            editor.remove("pIsEmptyAcftOk").commit();
-            editor.remove("pSpinnerUrlsPos").commit();
-            editor.remove("pUserName").commit();
-            editor.remove("cloudpsw").commit();
-            editor.remove("pIsDebug").commit();
-            MainActivity.AppProp.get();
-        }
-    }
-
-//    static void Method1(View v){
+    //    static void Method1(View v){
 //        Util.appendLog(TAG + "Method1", 'd');
 //        Intent intent = new Intent(this, AircraftActivity.class);
 //        //startActivity(intent);

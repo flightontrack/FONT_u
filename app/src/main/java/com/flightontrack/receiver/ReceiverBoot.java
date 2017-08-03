@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.shared.Props;
 
 import static com.flightontrack.shared.Const.*;
 
@@ -32,7 +33,7 @@ public class ReceiverBoot extends BroadcastReceiver {
             Log.d(TAG, " FONT:ReceiverBoot FONT_RECEIVER_FILTER intend");
             Intent intentActivity = new Intent(context, MainActivity.class);
             intentActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            MainActivity.AppProp.autostart = true;
+            Props.AppProp.autostart = true;
             context.startActivity(intentActivity);
         }
         }

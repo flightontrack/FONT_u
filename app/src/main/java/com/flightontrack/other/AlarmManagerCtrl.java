@@ -5,7 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import com.flightontrack.shared.Util;
+import com.flightontrack.log.FontLog;
 
 import java.util.Date;
 
@@ -30,14 +30,14 @@ public class AlarmManagerCtrl {
     }
 
     public static void setAlarm() {
-        Util.appendLog(TAG+ "setAlarm",'d');
+        FontLog.appendLog(TAG+ "setAlarm",'d');
         alarmManager.set(AlarmManager.RTC_WAKEUP,
                 getAlarmNextTimeUTCmsec(),
                 pendingReceiverIntent);
     }
 
     public static void stopAlarm() {
-        Util.appendLog(TAG+ "stopAlarm",'d');
+        FontLog.appendLog(TAG+ "stopAlarm",'d');
         //initIntent();
         alarmManager.cancel(pendingReceiverIntent);
     }
