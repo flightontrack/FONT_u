@@ -23,12 +23,12 @@ import android.widget.TextView;
 
 import com.flightontrack.R;
 import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.Props;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.shared.Util;
 import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.flight.Session.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +64,7 @@ public class AircraftActivity extends Activity {
         //try{
         //sharedPreferences = getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE);
         //editor = sharedPreferences.edit();
-        setContentView(MainActivity.isNFCcapable? R.layout.activity_acraft: R.layout.activity_acraft_no_nfc);
+        setContentView(Props.AppProp.pIsNFCcapable ? R.layout.activity_acraft: R.layout.activity_acraft_no_nfc);
 //        txtAcftMake = (EditText) findViewById(R.id.txtAcftMake);
 //        txtAcftModel = (EditText) findViewById(R.id.txtAcftModel);
 //        txtAcftSeries = (EditText) findViewById(R.id.txtAcftSeries);
@@ -113,7 +113,7 @@ public class AircraftActivity extends Activity {
        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
        txtUserName = (TextView) findViewById(R.id.txtUserName);
        //showAlertClass = new ShowAlertClass(this);
-       //if (MainActivity.isNFCcapable) enableNfcForegroundMode();
+       //if (MainActivity.pIsNFCcapable) enableNfcForegroundMode();
        init_listeners();
        txtUserName.setText(Pilot.getPilotUserName());
        setAcft(getAcft());
@@ -169,7 +169,7 @@ public class AircraftActivity extends Activity {
                 //finish();
             }
         });
-        if (MainActivity.isNFCcapable) {
+        if (Props.AppProp.pIsNFCcapable) {
             enableNfcForegroundMode();
             nfcSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -220,13 +220,13 @@ public class AircraftActivity extends Activity {
                 String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
                 String AcftTagId = json.getString("AcftTagId");
                 String AcftName = json.getString("AcftName");
-                editor.putString("AcftMake", AcftMake.trim());
-                editor.putString("AcftModel", AcftModel.trim());
-                editor.putString("AcftSeries", AcftSeries.trim());
-                editor.putString("AcftRegNum", AcftRegNum.trim());
-                editor.putString("AcftTagId", AcftTagId.trim());
-                editor.putString("AcftName", AcftName.trim());
-                editor.commit();
+                Props.SessionProp.editor.putString("AcftMake", AcftMake.trim());
+                Props.SessionProp.editor.putString("AcftModel", AcftModel.trim());
+                Props.SessionProp.editor.putString("AcftSeries", AcftSeries.trim());
+                Props.SessionProp.editor.putString("AcftRegNum", AcftRegNum.trim());
+                Props.SessionProp.editor.putString("AcftTagId", AcftTagId.trim());
+                Props.SessionProp.editor.putString("AcftName", AcftName.trim());
+                Props.SessionProp.editor.commit();
 
                 txtAcftMake.setText(AcftMake);
                 txtAcftModel.setText(AcftModel);
@@ -301,12 +301,12 @@ public class AircraftActivity extends Activity {
         JSONObject json  = new JSONObject();
         try
         {
-            json.put("AcftMake",sharedPreferences.getString("AcftMake",""));
-            json.put("AcftModel",sharedPreferences.getString("AcftModel",""));
-            json.put("AcftSeries",sharedPreferences.getString("AcftSeries",""));
-            json.put("AcftRegNum",sharedPreferences.getString("AcftRegNum",getString(R.string.default_acft_N)));
-            json.put("AcftTagId",sharedPreferences.getString("AcftTagId",""));
-            json.put("AcftName",sharedPreferences.getString("AcftName",""));
+            json.put("AcftMake", Props.SessionProp.sharedPreferences.getString("AcftMake",""));
+            json.put("AcftModel", Props.SessionProp.sharedPreferences.getString("AcftModel",""));
+            json.put("AcftSeries", Props.SessionProp.sharedPreferences.getString("AcftSeries",""));
+            json.put("AcftRegNum", Props.SessionProp.sharedPreferences.getString("AcftRegNum",getString(R.string.default_acft_N)));
+            json.put("AcftTagId", Props.SessionProp.sharedPreferences.getString("AcftTagId",""));
+            json.put("AcftName", Props.SessionProp.sharedPreferences.getString("AcftName",""));
         } catch (JSONException e)
         {
             //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
@@ -319,11 +319,11 @@ public class AircraftActivity extends Activity {
         tagstate = false;
         nfcSwitch.setChecked(tagstate);
     }
-        editor.putBoolean("nfctagstate", tagstate).commit();
+        Props.SessionProp.editor.putBoolean("nfctagstate", tagstate).commit();
         txtBlueText.setText(getTagNFCState()?R.string.instructions1:R.string.instructions2);
     }
     public static Boolean getTagNFCState(){
-        return sharedPreferences.getBoolean("nfctagstate", false);
+        return Props.SessionProp.sharedPreferences.getBoolean("nfctagstate", false);
     }
     public void enableNfcForegroundMode() {
         //Util.appendLog(TAG+ "AircraftActivity enableForegroundMode");

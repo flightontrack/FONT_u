@@ -192,7 +192,7 @@ public class Flight {
         requestParams.put("isdebug", SessionProp.pIsDebug);
         if (!(route.routeNumber == null)) requestParams.put("routeid", route.routeNumber);
 //        requestParams.setUseJsonStreamer(true);
-        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+        new AsyncHttpClient().post(Util.getTrackingURL() + SessionProp.ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         FontLog.appendLog(TAG + "getNewFlightID OnSuccess", 'd');
@@ -202,7 +202,7 @@ public class Flight {
 
                         if (response.responseNotif != null) {
                             FontLog.appendLog(TAG + "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd');
-                            Toast.makeText(ctxApp, "Cant get flight number", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SessionProp.ctxApp, "Cant get flight number", Toast.LENGTH_SHORT).show();
                             return;
                         }
                         if (response.responseFlightNum != null) {
@@ -215,7 +215,7 @@ public class Flight {
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                         flightRequestCounter++;
                         FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
-                        Toast.makeText(ctxApp, R.string.reachability_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(SessionProp.ctxApp, R.string.reachability_error, Toast.LENGTH_LONG).show();
                         //if(SvcLocationClock.isInstanceCreated()) ctxApp.stopService(new Intent(ctxApp, SvcLocationClock.class));
                     }
 
@@ -249,7 +249,7 @@ public class Flight {
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", SessionProp.pIsDebug);
 
-        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+        new AsyncHttpClient().post(Util.getTrackingURL() + SessionProp.ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         FontLog.appendLog(TAG + "getCloseFlight OnSuccess", 'd');

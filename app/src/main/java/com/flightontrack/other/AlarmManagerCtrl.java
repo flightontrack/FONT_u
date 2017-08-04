@@ -6,11 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.Props;
 
 import java.util.Date;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.flight.Session.*;
 
 public class AlarmManagerCtrl {
     public AlarmManagerCtrl() {
@@ -25,8 +25,8 @@ public class AlarmManagerCtrl {
         //AlarmManagerCtrl.ctx=ctx;
         receiverIntent = new Intent();
         receiverIntent.setAction(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
-        pendingReceiverIntent = PendingIntent.getBroadcast(ctxApp, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager = (AlarmManager) ctxApp.getSystemService(Context.ALARM_SERVICE);
+        pendingReceiverIntent = PendingIntent.getBroadcast(Props.SessionProp.ctxApp, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager = (AlarmManager) Props.SessionProp.ctxApp.getSystemService(Context.ALARM_SERVICE);
     }
 
     public static void setAlarm() {
@@ -42,7 +42,7 @@ public class AlarmManagerCtrl {
         alarmManager.cancel(pendingReceiverIntent);
     }
     public static boolean getAlarm() {
-        return (PendingIntent.getBroadcast(ctxApp, 0, receiverIntent, PendingIntent.FLAG_NO_CREATE) != null);
+        return (PendingIntent.getBroadcast(Props.SessionProp.ctxApp, 0, receiverIntent, PendingIntent.FLAG_NO_CREATE) != null);
     }
 
     public static long getAlarmNextTimeUTCmsec() {

@@ -2,7 +2,6 @@ package com.flightontrack.flight;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -27,9 +26,6 @@ import java.util.ArrayList;
 
 public class Session {
     private static final String TAG = "Session:";
-    public static Context ctxApp;
-    public static SharedPreferences sharedPreferences;
-    public static SharedPreferences.Editor editor;
     public static MainActivity mainactivityInstance;
     public static Route activeRoute;
     public static SQLHelper sqlHelper;
@@ -39,9 +35,9 @@ public class Session {
     public static ArrayList<Route> routeList = new ArrayList<>();
 
     public Session(Context ctx, MainActivity maInstance) {
-        ctxApp = ctx;
-        sharedPreferences =ctxApp.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
-        editor =sharedPreferences.edit();
+        SessionProp.ctxApp = ctx;
+        SessionProp.sharedPreferences = SessionProp.ctxApp.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
+        SessionProp.editor = SessionProp.sharedPreferences.edit();
         mainactivityInstance = maInstance;
         sqlHelper = new SQLHelper();
 
@@ -71,11 +67,12 @@ public class Session {
                     }
                 } else {
                     FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-                    Toast.makeText(ctxApp, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SessionProp.ctxApp, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
+
     public static void setTrackingButtonState(BUTTONREQUEST request) {
         //Util.appendLog(TAG+"trackingButtonState request:" +request,'d');
         switch (request) {
@@ -85,7 +82,7 @@ public class Session {
                 break;
             case BUTTON_STATE_YELLOW:
                 MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                MainActivity.trackingButton.setText("Flight " + (activeRoute.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
+                MainActivity.trackingButton.setText("Flight " + (activeRoute.activeFlight.flightNumber) + SessionProp.ctxApp.getString(R.string.tracking_ready_to_takeoff));
                 //editor.putInt("trackingButtonState", BUTTON_STATE_YELLOW);
                 break;
             case BUTTON_STATE_GREEN:
@@ -95,7 +92,7 @@ public class Session {
                 break;
             case BUTTON_STATE_GETFLIGHTID:
                 MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                MainActivity.trackingButton.setText(ctxApp.getString(R.string.tracking_gettingflight));
+                MainActivity.trackingButton.setText(SessionProp.ctxApp.getString(R.string.tracking_gettingflight));
                 break;
             case BUTTON_STATE_STOPPING:
                 //appendLog(LOGTAG+"BUTTON_STATE_STOPPING");
@@ -119,7 +116,7 @@ public class Session {
         } else {
             if (activeRoute!=null && activeRoute.activeFlight!=null) {
                 flightId = activeRoute.activeFlight.flightNumber;
-                fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
+                fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? SessionProp.ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : SessionProp.ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
             }
             else {flightId = FLIGHT_NUMBER_DEFAULT;}
             fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
@@ -131,10 +128,11 @@ public class Session {
     private static String setTextGreen() {
         SessionProp.pTextGreen = "Flight: " + (activeRoute.activeFlight.flightNumber) + '\n' +
                 "Point: " + activeRoute.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString + '\n'
+                SessionProp.ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString + '\n'
                 + "Alt: " + activeRoute.activeFlight.lastAltitudeFt + " ft";
         return SessionProp.pTextGreen;
     }
+
     private static void startLocationCommService() {
 
         sqlHelper.setCursorDataLocation();
@@ -145,7 +143,7 @@ public class Session {
         if (count >= 1) {
             for (int i = 0; i < count; i++) {
                 if (i >= SvcComm.commBatchSize) break;
-                Intent intentComm = new Intent(ctxApp, SvcComm.class);
+                Intent intentComm = new Intent(SessionProp.ctxApp, SvcComm.class);
                 //Intent intentComm = new Intent(context, SvcIntentComm.class);
                 Bundle bundle = new Bundle();
                 bundle.putLong("itemId", sqlHelper.cl.getLong(sqlHelper.cl.getColumnIndexOrThrow(DBSchema._ID)));
@@ -164,7 +162,7 @@ public class Session {
 
                 intentComm.putExtras(bundle);
                 //Log.d(TAG, "FlightRouterThread:" + Thread.currentThread().getId());
-                ctxApp.startService(intentComm);
+                SessionProp.ctxApp.startService(intentComm);
                 sqlHelper.cl.moveToNext();
             }
             sqlHelper.cl.close();

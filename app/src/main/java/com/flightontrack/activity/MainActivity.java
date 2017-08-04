@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
-import com.flightontrack.shared.Props;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.shared.Util;
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     //public static Context ctxApp;
     static TextView txtUserName;
     public static TextView txtAcftNum ;
-    static Spinner spinnerUpdFreq;
+    public static Spinner spinnerUpdFreq;
     public static Spinner spinnerMinSpeed;
     public static CheckBox chBoxIsMultiLeg;
     public static Button trackingButton;
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     static Toolbar toolbarBottom;
     static ActionMenuView amvMenu;
     static View cardLayout1;
-    public static boolean isNFCcapable = false;
     //public static MainActivity instanceThis = null;
     //public Route route;
     public static boolean isToDestroy = true;
@@ -112,25 +110,25 @@ public class MainActivity extends AppCompatActivity {
             //editor = sharedPreferences.edit();
             //MainActivity.ctxBase = getBaseContext();
             //MainActivity.ctxActv = this;
-            isNFCcapable = isNFCcapable();
+            AppProp.pIsNFCcapable = isNFCcapable();
 
             //Util.init(ctxApp, this);
             //Util.resetPreferencesAll();
             AppProp.get();
-            SessionProp.get();
+            //SessionProp.get();
             //Util.setIsDebug(!MyApplication.productionRelease);
             //Util.appendLog(TAG + "onCreate", 'd');
             //startService(new Intent(getApplicationContext(), SvcBackground.class));
 
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 FontLog.appendLog(TAG + "New App Context", 'd');
-                Util.setCurrAppContext(ctxApp.toString());
+                Util.setCurrAppContext(SessionProp.ctxApp.toString());
                 activeRoute = null;
                 //set_myPhoneId();
                 //route = new Route();
             }
 
-            //if (!AppProp.pPublicApp && AppProp.autostart) {
+            //if (!AppProp.pPublicApp && AppProp.pAutostart) {
             if (!AppProp.pPublicApp) {
                 IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
                 alarmReceiver = new ReceiverHealthCheckAlarm();
@@ -164,15 +162,15 @@ public class MainActivity extends AppCompatActivity {
             ///TODO
         }
 
-        SessionProp.save();
+        SessionProp.get();
         Util.setAcftNum(Util.getAcftNum(4));
-        MainActivity.setIntervalSelectedItem(SessionProp.pIntervalSelectedItem);
+        //SessionProp.set_pIntervalLocationUpdateSecPos(SessionProp.pIntervalSelectedItem);
         //Util.setSpinnerSpeedPos(SessionProp.pSpinnerMinSpeedPos);
-        MainActivity.spinnerMinSpeed.setSelection(SessionProp.pSpinnerMinSpeedPos);
+        //MainActivity.spinnerMinSpeed.setSelection(SessionProp.pSpinnerMinSpeedPos);
         setTrackingButtonState(trackingButtonState);
 
         init_listeners();
-        //Util.appendLog(TAG + "onResume: autostart: " + autostart, 'd');
+        //Util.appendLog(TAG + "onResume: pAutostart: " + pAutostart, 'd');
         int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
         int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheckLocation == PackageManager.PERMISSION_DENIED) {
@@ -187,9 +185,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else txtUserName.setText(Pilot.getPilotUserName());
 
-        if (AppProp.autostart) {
+        if (AppProp.pAutostart) {
             trackingButton.performClick();
-            AppProp.autostart = false;
+            AppProp.pAutostart = false;
         }
         isToDestroy = true;
     }
@@ -254,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         FontLog.appendLog(TAG + "OnDestroy", 'd');
         SessionProp.save();
-        Props.SessionProp.clear();
+        SessionProp.clearOnDestroy();
         if (isToDestroy && alarmReceiver!=null) {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
@@ -282,11 +280,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        FontLog.appendLog(TAG + "onPause", 'd');
+        SessionProp.save();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         FontLog.appendLog(TAG + "onStop", 'd');
         SessionProp.save();
-        Props.SessionProp.save();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
@@ -304,8 +308,8 @@ public class MainActivity extends AppCompatActivity {
                     case BUTTON_STATE_RED:
                         //Util.setUserName(txtUserName.getText().toString());
                         Util.setAcftNum(txtAcftNum.getText().toString());
-                        setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
-                        if (!AppProp.autostart && !is_services_available()) return;
+                        SessionProp.set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
+                        if (!AppProp.pAutostart && !is_services_available()) return;
                         //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
                         if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
 
@@ -323,8 +327,8 @@ public class MainActivity extends AppCompatActivity {
 //                if (activeRoute == null) {
 //                    //Util.setUserName(txtUserName.getText().toString());
 //                    Util.setAcftNum(txtAcftNum.getText().toString());
-//                    setIntervalSelectedItem(spinnerUpdFreq.getSelectedItemPosition());
-//                    if (!AppProp.autostart && !is_services_available()) return;
+//                    set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
+//                    if (!AppProp.pAutostart && !is_services_available()) return;
 //                    //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
 //                    if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
 //
@@ -382,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FontLog.appendLog(TAG + "Method1", 'd');
-                Intent intent = new Intent(ctxApp, AircraftActivity.class);
+                Intent intent = new Intent(SessionProp.ctxApp, AircraftActivity.class);
                 startActivity(intent);
             }
 
@@ -416,16 +420,16 @@ public class MainActivity extends AppCompatActivity {
 
     void helpPage() {
         try {
-            Intent intent = new Intent(ctxApp, HelpPageActivity.class);
+            Intent intent = new Intent(SessionProp.ctxApp, HelpPageActivity.class);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Toast.makeText(ctxApp, "Can't reach help webpage.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SessionProp.ctxApp, "Can't reach help webpage.", Toast.LENGTH_SHORT).show();
         }
     }
 
     void logBookPage() {
         try {
-            Intent intent = new Intent(ctxApp, LogBookActivity.class);
+            Intent intent = new Intent(SessionProp.ctxApp, LogBookActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
@@ -464,11 +468,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void settingsActivity() {
         try {
-            Intent intent = new Intent(ctxApp, SimpleSettingsActivity.class);
+            Intent intent = new Intent(SessionProp.ctxApp, SimpleSettingsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Toast.makeText(ctxApp,
+            Toast.makeText(SessionProp.ctxApp,
                     "Can't start Settings.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -480,12 +484,12 @@ public class MainActivity extends AppCompatActivity {
         spinnerUpdFreq.setAdapter(adapter);
         spinnerUpdFreq.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setIntervalSelectedItem(position);
+                SessionProp.set_pIntervalLocationUpdateSecPos(position);
             }
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        spinnerUpdFreq.setSelection(SessionProp.pIntervalSelectedItem);
+        //spinnerUpdFreq.setSelection(SessionProp.pIntervalSelectedItem);
     }
 
     void minSpeedSpinnerSetup() {
@@ -519,7 +523,7 @@ public class MainActivity extends AppCompatActivity {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
         }
-        ctxApp = null;
+        SessionProp.ctxApp = null;
         txtUserName = null;
         txtAcftNum = null;
         spinnerUpdFreq = null;
@@ -558,13 +562,6 @@ public class MainActivity extends AppCompatActivity {
                 .setObject(object)
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
-    }
-
-    static void setIntervalSelectedItem(int indx) {
-        int[] interval_seconds = {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
-        MainActivity.spinnerUpdFreq.setSelection(indx);
-        SessionProp.pIntervalLocationUpdateSec=interval_seconds[indx];
-        SessionProp.pIntervalSelectedItem=indx;
     }
 
     //    static void Method1(View v){

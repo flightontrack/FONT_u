@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.Props;
 
 import static com.flightontrack.flight.Session.*;
 
@@ -19,7 +20,7 @@ public class SQLHelper extends SQLiteOpenHelper {
     public static Cursor cl;
 
     public SQLHelper() {
-        super(ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
+        super(Props.SessionProp.ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
         FontLog.appendLog(TAG + "SQLHelper:SQLHelper", 'd');
         dbw = getWritableDatabase();
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);

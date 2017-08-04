@@ -6,9 +6,8 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 
 import com.flightontrack.locationclock.SvcLocationClock;
+import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
-
-import static com.flightontrack.flight.Session.*;
 
 public class PhoneListener extends PhoneStateListener
 {
@@ -50,9 +49,9 @@ public class PhoneListener extends PhoneStateListener
 
     public static void enableSignalStrengthListen(boolean start){
         if (start) {
-            ((TelephonyManager) ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+            ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
         } else {
-            ((TelephonyManager) ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_NONE);
+            ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_NONE);
         }
 
     }

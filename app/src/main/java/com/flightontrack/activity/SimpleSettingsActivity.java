@@ -47,8 +47,8 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             @Override
             public void onClick(View view) {
                 SessionProp.resetSessionProp();
-                //spinnerUrls.setSelection(Util.getSpinnerUrlsPos());
-                spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
+                updateUI();
+                //spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
                 Util.setPsw(null);
                 getPswButton.setText(R.string.label_btnpsw_get);
                 //MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
@@ -74,6 +74,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             }
         });
         chBoxIsDebug = (CheckBox) findViewById(R.id.isDebugCheckBoxCheckBox);
+        //chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsDebug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                     @Override
                                                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -83,7 +84,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                                                     }
                                                 });
         chBoxIsRoad = (CheckBox) findViewById(R.id.isRoadCheckBox);
-        chBoxIsRoad.setChecked(SessionProp.pIsRoad);
+        //chBoxIsRoad.setChecked(SessionProp.pIsRoad);
         chBoxIsRoad.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -96,14 +97,15 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         txtPsw= (TextView) findViewById((R.id.txtWebsitePsw));
         txtPsw.setText(Util.getPsw());
         //chBoxIsDebug.setChecked(Util.getIsDebug());
-        chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         spinnerUrls = (Spinner) findViewById(R.id.spinnerUrlId);
         ArrayAdapter<CharSequence> adapterUrl = ArrayAdapter.createFromResource(this,R.array.url_array, android.R.layout.simple_spinner_item);
         adapterUrl.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrls.setAdapter(adapterUrl);
         spinnerUrls.setOnItemSelectedListener(this);
-        //spinnerUrls.setSelection(Util.getSpinnerUrlsPos());
-        spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
+
+        //spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
+
+        updateUI();
     }
     @Override
     public void onResume() {
@@ -170,16 +172,22 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Props.AppProp.save();
+        SessionProp.save();
     }
     @Override
     public void onStop() {
         super.onStop();
-        Props.AppProp.save();
+        SessionProp.save();
     }
     @Override
     public void onPause() {
         super.onPause();
-        Props.AppProp.save();
+        SessionProp.save();
+    }
+
+    private void updateUI(){
+        spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
+        chBoxIsDebug.setChecked(SessionProp.pIsDebug);
+        chBoxIsRoad.setChecked(SessionProp.pIsRoad);
     }
 }

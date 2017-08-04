@@ -6,7 +6,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
-import static com.flightontrack.flight.Session.*;
+import com.flightontrack.shared.Props;
 
 public class MyPhone {
 
@@ -42,7 +42,7 @@ public class MyPhone {
 
     public int getVersionCode() {
         try {
-            versionCode = ctxApp.getPackageManager().getPackageInfo(ctxApp.getPackageName(), 0).versionCode;
+            versionCode = Props.SessionProp.ctxApp.getPackageManager().getPackageInfo(Props.SessionProp.ctxApp.getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             versionCode = -1;
         }
@@ -50,14 +50,14 @@ public class MyPhone {
     }
 
     static void getMyPhoneID() {
-        _phoneNumber = ((TelephonyManager) ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-        _myDeviceId = ((TelephonyManager) ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+        _phoneNumber = ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+        _myDeviceId = ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         String strId = (_phoneNumber == null||_phoneNumber.isEmpty()) ? _myDeviceId : _phoneNumber;
         _myPhoneId = strId.substring(strId.length() - 10); /// 10 digits number
     }
 
     public static String getMyAndroidID() {
-        return Settings.Secure.getString(ctxApp.getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(Props.SessionProp.ctxApp.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     public String   getMyAndroidVersion() {

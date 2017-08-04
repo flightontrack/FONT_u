@@ -1,6 +1,7 @@
 package com.flightontrack.pilot;
 
-import static com.flightontrack.flight.Session.*;
+import com.flightontrack.shared.Props;
+
 /**
  * Created by hotvk on 5/15/2017.
  */
@@ -25,7 +26,7 @@ public class Pilot extends MyPhone {
     }
 
     public static void setPilotUserName(String un) {
-        editor.putString("pilot_UserName", un.trim().replace(" ","")).commit();
+        Props.SessionProp.editor.putString("pilot_UserName", un.trim().replace(" ","")).commit();
         //editor.putString("userName", un.trim()).commit();
         //MainActivity.txtUserName.setText(un);
         //AircraftActivity.txtUserName.setText(un);
@@ -36,6 +37,6 @@ public class Pilot extends MyPhone {
         getMyPhoneID();
         _userName = _myPhoneId.substring(0,3)+deviceBrand.substring(0,4).toUpperCase()+_myPhoneId.substring(8);
         //String r = sharedPreferences.getString("pilot_UserName", _userName);
-        return sharedPreferences.getString("pilot_UserName", _userName);
+        return Props.SessionProp.sharedPreferences.getString("pilot_UserName", _userName);
     }
 }
