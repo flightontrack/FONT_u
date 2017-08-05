@@ -14,19 +14,17 @@ import static com.flightontrack.shared.Const.*;
 
 public class Props {
     public static class AppProp{
-        public static boolean pPublicApp = false;
-        public static boolean pAutostart = false;
-        public static boolean pIsNFCcapable = false;
+        public static boolean pPublicApp;
+            /// if false: start healthcheckalarmreceiver
+        public static boolean pAutostart;
+        public static boolean pIsNFCcapable;
+        public static boolean pIsNFCEnable;
 
-        //static String       pUserName;
-
-        public static void save(){
-            SessionProp.editor.commit();
-        }
         public static void get(){
-            //Util.appendLog(TAG + "Restore Properties", 'd');
-            //pIsDebug=sharedPreferences.getBoolean("pIsDebug", false);
-            //pUserName =  sharedPreferences.getString("pUserName", new Pilot().getMyUserName());
+            pPublicApp = false;
+            pAutostart = false;
+            pIsNFCEnable = false;
+            pIsNFCcapable = false;
         }
 
     }
@@ -70,7 +68,22 @@ public class Props {
             pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
             //pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerMinSpeed", DEFAULT_SPEED_SPINNER_POS);
             pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
+        }
 
+        public static void set_isMultileg(boolean isMultileg) {
+            pIsMultileg=isMultileg;
+            MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
+        }
+        public static void set_pSpinnerMinSpeedPos(int pos) {
+            pSpinnerMinSpeedPos = pos;
+            pSpinnerMinSpeed = Double.parseDouble(pMinSpeedArray[pos]) * 0.44704;
+            MainActivity.spinnerMinSpeed.setSelection(pos);
+
+        }
+        public static void set_pIntervalLocationUpdateSecPos(int pos) {
+            pIntervalSelectedItem =pos;
+            pIntervalLocationUpdateSec =pUpdateIntervalSec[pos];
+            MainActivity.spinnerUpdFreq.setSelection(pos);
         }
 
         public static void clearOnDestroy() {
@@ -80,7 +93,6 @@ public class Props {
             pIsRoad = false;
             pIsDebug = false;
         }
-
         public static void clearToDefault() {
             editor.remove("pIsMultileg").commit();
             editor.remove("pIntervalLocationUpdateSec").commit();
@@ -96,26 +108,11 @@ public class Props {
             //Toast.makeText(SessionProp.ctxApp, R.string.user_needs_to_restart_app, Toast.LENGTH_LONG).show();
             sharedPreferences.edit().clear().commit();
         }
-        public static void set_isMultileg(boolean isMultileg) {
-            pIsMultileg=isMultileg;
-            MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
-        }
-        public static void set_pSpinnerMinSpeedPos(int pos) {
-            pSpinnerMinSpeedPos = pos;
-            pSpinnerMinSpeed = Double.parseDouble(pMinSpeedArray[pos]) * 0.44704;
-            MainActivity.spinnerMinSpeed.setSelection(pos);
 
-        }
         public static void resetSessionProp() {
             clearToDefault();
             get();
             //save();
-        }
-
-        public static void set_pIntervalLocationUpdateSecPos(int pos) {
-            pIntervalSelectedItem =pos;
-            pIntervalLocationUpdateSec =pUpdateIntervalSec[pos];
-            MainActivity.spinnerUpdFreq.setSelection(pos);
         }
     }
 }

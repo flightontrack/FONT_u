@@ -110,11 +110,11 @@ public class MainActivity extends AppCompatActivity {
             //editor = sharedPreferences.edit();
             //MainActivity.ctxBase = getBaseContext();
             //MainActivity.ctxActv = this;
-            AppProp.pIsNFCcapable = isNFCcapable();
+            AppProp.get();
+            AppProp.pIsNFCcapable = AppProp.pIsNFCEnable&&isNFCcapable();
 
             //Util.init(ctxApp, this);
             //Util.resetPreferencesAll();
-            AppProp.get();
             //SessionProp.get();
             //Util.setIsDebug(!MyApplication.productionRelease);
             //Util.appendLog(TAG + "onCreate", 'd');
