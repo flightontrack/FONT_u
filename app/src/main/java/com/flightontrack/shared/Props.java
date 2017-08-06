@@ -44,7 +44,7 @@ public class Props {
         public static boolean      pIsDebug = false;
         public static String        pTextRed;
         public static String        pTextGreen;
-        public static String[]      pMinSpeedArray = ctxApp.getResources().getStringArray(R.array.speed_array);
+        public static String[]      pMinSpeedArray;
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
 
         public static void save() {

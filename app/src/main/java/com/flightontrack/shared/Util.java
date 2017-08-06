@@ -207,16 +207,6 @@ public class Util {
 //        MainActivity.AppProp.get();
 //    }
 
-    public static void clearAcftPreferences() {
-        //Log.d.d(TAG, "clearPref()");
-        SessionProp.editor.remove("AcftMake").commit();
-        SessionProp.editor.remove("AcftModel").commit();
-        SessionProp.editor.remove("AcftSeries").commit();
-        SessionProp.editor.remove("AcftRegNum").commit();
-        SessionProp.editor.remove("AcftTagId").commit();
-        SessionProp.editor.remove("AcftName").commit();
-    }
-
 
     public static void setSignalStregth(String name, int value) {
         try {

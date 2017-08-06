@@ -17,7 +17,7 @@
 
         <TextView
             android:layout_width="0dp"
-            style="@style/label_text_small"
+            style="@style/label_text"
             android:layout_height="wrap_content"
             android:text="Aircraft Number"
             android:layout_weight="6.5"
@@ -27,7 +27,6 @@
             android:id="@+id/txtAcftRegNum"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:singleLine="true"
             android:inputType="text"
             android:layout_weight="3.5"
             android:gravity="end"/>
@@ -42,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Aircraft Name"
-            style="@style/label_text_small"
+            style="@style/label_text"
             android:layout_weight="4"
             />
 
@@ -51,12 +50,34 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:singleLine="true"
             android:inputType="text"
             android:text=""
             android:layout_weight="6" />
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="wrap_content"
+            android:text="@string/label_pilotphone"
+            style="@style/label_text"
+            android:typeface="normal"
+            android:clickable="false"
+            />
+
+        <EditText
+            android:id="@+id/txtUserName"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:gravity="end" />
+    </LinearLayout>
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="20dp"
@@ -97,92 +118,9 @@
         android:orientation="horizontal"
         android:weightSum="10">
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10"
-        android:visibility="invisible">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Info:"
-            style="@style/label_text"
-            android:layout_weight="5"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10"
-        android:visibility="invisible">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            style="@style/label_text_small"
-            android:text="Make"
-            android:layout_weight="2"
-            />
 
-        <TextView
-            android:id="@+id/txtAcftMake"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:inputType="text"
-            android:layout_weight="8"
-            android:gravity="end"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10"
-        android:visibility="invisible">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            style="@style/label_text_small"
-            android:text="Model"
-            android:layout_weight="2"
-            />
-
-        <TextView
-            android:id="@+id/txtAcftModel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:inputType="text"
-            android:layout_weight="8"
-            android:gravity="end"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10"
-        android:visibility="invisible">
-
-        <TextView
-            android:layout_width="0dp"
-            style="@style/label_text_small"
-            android:layout_height="wrap_content"
-            android:text="Series"
-            android:layout_weight="2"
-            />
-
-        <TextView
-            android:id="@+id/txtAcftSeries"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:inputType="text"
-            android:layout_weight="8"
-            android:gravity="end"/>
-    </LinearLayout>
 
 </LinearLayout>

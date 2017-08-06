@@ -25,7 +25,6 @@ import com.flightontrack.R;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.Props;
 import com.flightontrack.ui.ShowAlertClass;
-import com.flightontrack.shared.Util;
 import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
@@ -57,37 +56,21 @@ public class AircraftActivity extends Activity {
     IntentFilter[] nfcFilters;
     PendingIntent pendingIntent;
 
+    public static void clearAcftPreferences() {
+        //Log.d.d(TAG, "clearPref()");
+        Props.SessionProp.editor.remove("AcftMake").commit();
+        Props.SessionProp.editor.remove("AcftModel").commit();
+        Props.SessionProp.editor.remove("AcftSeries").commit();
+        Props.SessionProp.editor.remove("AcftRegNum").commit();
+        Props.SessionProp.editor.remove("AcftTagId").commit();
+        Props.SessionProp.editor.remove("AcftName").commit();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FontLog.appendLog(TAG + "AircraftActivity onCreate", 'd');
-        //try{
-        //sharedPreferences = getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE);
-        //editor = sharedPreferences.edit();
         setContentView(Props.AppProp.pIsNFCcapable ? R.layout.activity_acraft: R.layout.activity_acraft_no_nfc);
-//        txtAcftMake = (EditText) findViewById(R.id.txtAcftMake);
-//        txtAcftModel = (EditText) findViewById(R.id.txtAcftModel);
-//        txtAcftSeries = (EditText) findViewById(R.id.txtAcftSeries);
-//        txtAcftRegNum = (EditText) findViewById(R.id.txtAcftRegNum);
-//        txtAcftName = (EditText) findViewById(R.id.txtAcftName);
-//        txtAcftTagId = (EditText) findViewById(R.id.txtAcftTagId);
-//        doneButton = (Button) findViewById(R.id.btn_acft_done);
-//        cancelButton = (Button) findViewById(R.id.btn_acft_cancel);
-//        clearButton = (Button) findViewById(R.id.btn_acft_clear);
-//        nfcSwitch= (Switch)findViewById(R.id.switch_nfc);
-//        txtBlueText=(TextView)findViewById(R.id.txtBlueText);
-//        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-//        //showAlertClass = new ShowAlertClass(this);
-//        enableNfcForegroundMode();
-//        init_listeners();
-//        setAcft(getAcft());
-    //}
-//        catch (NullPointerException nullPointer){
-//            //Log.d(GLOBALTAG,TAG+ nullPointer.toString());
-//        }
-//        catch (Exception e){
-//            //Log.d(GLOBALTAG,TAG+e.toString());
-//        }
     }
 
     @Override
@@ -99,28 +82,29 @@ public class AircraftActivity extends Activity {
    @Override
     public void onResume() {
        FontLog.appendLog(TAG + "AircraftActivity onResume", 'd');
-       txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
-       txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
-       txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
-       txtAcftRegNum = (EditText) findViewById(R.id.txtAcftRegNum);
+       txtUserName = (TextView) findViewById(R.id.txtUserName);
+       txtUserName.setText(Pilot.getPilotUserName());
        txtAcftName = (EditText) findViewById(R.id.txtAcftName);
-       txtAcftTagId = (TextView) findViewById(R.id.txtAcftTagId);
+       txtAcftRegNum = (EditText) findViewById(R.id.txtAcftRegNum);
+
        doneButton = (Button) findViewById(R.id.btn_acft_done);
        cancelButton = (Button) findViewById(R.id.btn_acft_cancel);
        clearButton = (Button) findViewById(R.id.btn_acft_clear);
-       nfcSwitch= (Switch)findViewById(R.id.switch_nfc);
-       txtBlueText=(TextView)findViewById(R.id.txtBlueText);
-       nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-       txtUserName = (TextView) findViewById(R.id.txtUserName);
-       //showAlertClass = new ShowAlertClass(this);
-       //if (MainActivity.pIsNFCcapable) enableNfcForegroundMode();
+
+       if (Props.AppProp.pIsNFCcapable) {
+           nfcSwitch = (Switch) findViewById(R.id.switch_nfc);
+           txtBlueText = (TextView) findViewById(R.id.txtBlueText);
+           nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+           txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
+           txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
+           txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
+           txtAcftTagId = (TextView) findViewById(R.id.txtAcftTagId);
+           setAcft(getAcft());
+       }
+       setAcft_nonfc(getAcft());
        init_listeners();
-       txtUserName.setText(Pilot.getPilotUserName());
-       setAcft(getAcft());
 
        super.onResume();
-
-//       nfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcFilters, null);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -140,17 +124,20 @@ public class AircraftActivity extends Activity {
                 JSONObject json  = new JSONObject();
                 try
                 {
-                    json.put("AcftMake",txtAcftMake.getText().toString());
-                    json.put("AcftModel",txtAcftModel.getText().toString());
-                    json.put("AcftSeries", txtAcftSeries.getText().toString());
                     json.put("AcftRegNum",txtAcftRegNum.getText().toString());
-                    json.put("AcftTagId",txtAcftTagId.getText().toString());
                     json.put("AcftName",txtAcftName.getText().toString());
+                    setAcft_nonfc(json);
+                    if (Props.AppProp.pIsNFCcapable) {
+                        json.put("AcftMake", txtAcftMake.getText().toString());
+                        json.put("AcftModel", txtAcftModel.getText().toString());
+                        json.put("AcftSeries", txtAcftSeries.getText().toString());
+                        json.put("AcftTagId", txtAcftTagId.getText().toString());
+                        setAcft(json);
+                    }
                 } catch (JSONException e)
                 {
                     //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
                 }
-                setAcft(json);
                 Pilot.setPilotUserName(txtUserName.getText().toString());
                 finish();
             }
@@ -164,9 +151,11 @@ public class AircraftActivity extends Activity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Util.clearAcftPreferences();
-                setAcft(getAcft());
-                //finish();
+                clearAcftPreferences();
+                setAcft_nonfc(getAcft());
+                if (Props.AppProp.pIsNFCcapable) {
+                    setAcft(getAcft());
+                }
             }
         });
         if (Props.AppProp.pIsNFCcapable) {
@@ -210,88 +199,54 @@ public class AircraftActivity extends Activity {
         });
     }
     //void setAcft(String AcftMake,String AcftModel,String AcftSeries,String AcftRegNum,String AcftTagId){
-        void setAcft(JSONObject json){
-            try
-            {
-                FontLog.appendLog(TAG+ json.toString(),'d');
-                String AcftMake = json.getString("AcftMake");
-                String AcftModel = json.getString("AcftModel").replace(" ","");
-                String AcftSeries = json.getString("AcftSeries").replace(" ","");
-                String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
-                String AcftTagId = json.getString("AcftTagId");
-                String AcftName = json.getString("AcftName");
-                Props.SessionProp.editor.putString("AcftMake", AcftMake.trim());
-                Props.SessionProp.editor.putString("AcftModel", AcftModel.trim());
-                Props.SessionProp.editor.putString("AcftSeries", AcftSeries.trim());
-                Props.SessionProp.editor.putString("AcftRegNum", AcftRegNum.trim());
-                Props.SessionProp.editor.putString("AcftTagId", AcftTagId.trim());
-                Props.SessionProp.editor.putString("AcftName", AcftName.trim());
-                Props.SessionProp.editor.commit();
+    void setAcft(JSONObject json){
+        try
+        {
+            FontLog.appendLog(TAG+ json.toString(),'d');
+            String AcftMake = json.getString("AcftMake");
+            String AcftModel = json.getString("AcftModel").replace(" ","");
+            String AcftSeries = json.getString("AcftSeries").replace(" ","");
+            String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
+            String AcftTagId = json.getString("AcftTagId");
+            String AcftName = json.getString("AcftName");
+            Props.SessionProp.editor.putString("AcftMake", AcftMake.trim());
+            Props.SessionProp.editor.putString("AcftModel", AcftModel.trim());
+            Props.SessionProp.editor.putString("AcftSeries", AcftSeries.trim());
+            Props.SessionProp.editor.putString("AcftRegNum", AcftRegNum.trim());
+            Props.SessionProp.editor.putString("AcftTagId", AcftTagId.trim());
+            Props.SessionProp.editor.putString("AcftName", AcftName.trim());
+            Props.SessionProp.editor.commit();
 
-                txtAcftMake.setText(AcftMake);
-                txtAcftModel.setText(AcftModel);
-                txtAcftSeries.setText(AcftSeries);
-                txtAcftRegNum.setText(AcftRegNum);
-                txtAcftTagId.setText(AcftTagId);
-                txtAcftName.setText(AcftName);
+            txtAcftMake.setText(AcftMake);
+            txtAcftModel.setText(AcftModel);
+            txtAcftSeries.setText(AcftSeries);
+            txtAcftRegNum.setText(AcftRegNum);
+            txtAcftTagId.setText(AcftTagId);
+            txtAcftName.setText(AcftName);
 
-//                Editable FieldAcftMake = txtAcftMake.getText();
-//                FieldAcftMake.clear();
-//                FieldAcftMake.append(AcftMake);
-//
-//                Editable FieldAcftModel = txtAcftModel.getText();
-//                FieldAcftModel.clear();
-//                FieldAcftModel.append(AcftModel);
-//
-//                Editable FieldAcftSeries = txtAcftSeries.getText();
-//                FieldAcftSeries.clear();
-//                FieldAcftSeries.append(AcftSeries);
-//
-//                Editable FieldAcftRegNum = txtAcftRegNum.getText();
-//                FieldAcftRegNum.clear();
-//                FieldAcftRegNum.append(AcftRegNum);
-//
-//                Editable FieldAcftTagId = txtAcftTagId.getText();
-//                FieldAcftTagId.clear();
-//                FieldAcftTagId.append(AcftTagId);
-//
-//                Editable FieldAcftName = txtAcftName.getText();
-//                FieldAcftName.clear();
-//                FieldAcftName.append(AcftName);
+        } catch (JSONException e)
+        {
+            Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ");
+        }
+    }
+    void setAcft_nonfc(JSONObject json){
+        try
+        {
+            FontLog.appendLog(TAG+ json.toString(),'d');
+            String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
+            String AcftName = json.getString("AcftName");
+            Props.SessionProp.editor.putString("AcftRegNum", AcftRegNum.trim());
+            Props.SessionProp.editor.putString("AcftName", AcftName.trim());
+            Props.SessionProp.editor.commit();
 
-            } catch (JSONException e)
-            {
-                Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ");
-            }
-//        editor.putString("AcftMake", AcftMake.trim());
-//        editor.putString("AcftModel", AcftModel.trim());
-//        editor.putString("AcftSeries", AcftSeries.trim());
-//        editor.putString("AcftRegNum", AcftRegNum.trim());
-//        editor.putString("AcftTagId", AcftTagId.trim());
-//        editor.commit();
-//
-//        Editable FieldAcftMake = txtAcftMake.getText();
-//        FieldAcftMake.clear();
-//        FieldAcftMake.append(AcftMake);
-//
-//        Editable FieldAcftModel = txtAcftModel.getText();
-//        FieldAcftModel.clear();
-//        FieldAcftModel.append(AcftModel);
-//
-//        Editable FieldAcftSeries = txtAcftSeries.getText();
-//        FieldAcftSeries.clear();
-//        FieldAcftSeries.append(AcftSeries);
-//
-//        Editable FieldAcftRegNum = txtAcftRegNum.getText();
-//        FieldAcftRegNum.clear();
-//        FieldAcftRegNum.append(AcftRegNum);
-//
-//        Editable FieldAcftTagId = txtAcftTagId.getText();
-//        FieldAcftTagId.clear();
-//        FieldAcftTagId.append(AcftTagId);
-        //MainActivity.txtAcftNum.setText(a1);
-     }
+            txtAcftRegNum.setText(AcftRegNum);
+            txtAcftName.setText(AcftName);
 
+        } catch (JSONException e)
+        {
+            Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ");
+        }
+    }
     JSONObject getAcft(){
 //        txtAcftMake.setText(sharedPreferences.getString("AcftMake",""));
 //        txtAcftModel.setText(sharedPreferences.getString("AcftModel",""));
@@ -391,36 +346,6 @@ public void onNewIntent(Intent intent) {
         } catch (JSONException e) {
             FontLog.appendLog(TAG+ "Couldn't create json from NFC: "+e.getMessage(),'e');
         }
-
-//        else if (intent.getAction().equals(
-//        NfcAdapter.ACTION_TAG_DISCOVERED))
-//        {
-//        Toast.makeText(this,
-//        "This NFC tag currently has no inventory NDEF data.",
-//        Toast.LENGTH_LONG).show();
-//        }
     }
 }
-//    private void setAcftFieldValues(String jsonString)
-//    {
-//        JSONObject nfcJsonRec;
-//        String AcftMake = "";
-//        String AcftModel = "";
-//        String AcftSeries = "";
-//        String AcftRegNum = "";
-//        String AcftTagId = "";
-//        try
-//        {
-//            nfcJsonRec = new JSONObject(jsonString);
-//            AcftMake = nfcJsonRec.getString("AcftMake");
-//            AcftModel = nfcJsonRec.getString("AcftModel");
-//            AcftSeries = nfcJsonRec.getString("AcftSeries");
-//            AcftRegNum = nfcJsonRec.getString("AcftRegNum");
-//            AcftTagId = nfcJsonRec.getString("AcftTagId");
-//        } catch (JSONException e)
-//        {
-//            //Util.appendLog(TAG+ "Couldn't parse JSON: ", e);
-//        }
-//        setAcft(AcftMake,AcftModel,AcftSeries,AcftRegNum,AcftTagId);
-//    }
 }

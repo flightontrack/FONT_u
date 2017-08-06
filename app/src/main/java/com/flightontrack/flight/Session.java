@@ -36,8 +36,9 @@ public class Session {
 
     public Session(Context ctx, MainActivity maInstance) {
         SessionProp.ctxApp = ctx;
-        SessionProp.sharedPreferences = SessionProp.ctxApp.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
+        SessionProp.sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
         SessionProp.editor = SessionProp.sharedPreferences.edit();
+        SessionProp.pMinSpeedArray = ctx.getResources().getStringArray(R.array.speed_array);
         mainactivityInstance = maInstance;
         sqlHelper = new SQLHelper();
 
