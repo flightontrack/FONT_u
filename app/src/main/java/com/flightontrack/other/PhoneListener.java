@@ -49,9 +49,9 @@ public class PhoneListener extends PhoneStateListener
 
     public static void enableSignalStrengthListen(boolean start){
         if (start) {
-            ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+            ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
         } else {
-            ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_NONE);
+            ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(SvcLocationClock.phStateListener, PhoneStateListener.LISTEN_NONE);
         }
 
     }

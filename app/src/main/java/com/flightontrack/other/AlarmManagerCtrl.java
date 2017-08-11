@@ -25,8 +25,8 @@ public class AlarmManagerCtrl {
         //AlarmManagerCtrl.ctx=ctx;
         receiverIntent = new Intent();
         receiverIntent.setAction(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
-        pendingReceiverIntent = PendingIntent.getBroadcast(Props.SessionProp.ctxApp, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager = (AlarmManager) Props.SessionProp.ctxApp.getSystemService(Context.ALARM_SERVICE);
+        pendingReceiverIntent = PendingIntent.getBroadcast(Props.ctxApp, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager = (AlarmManager) Props.ctxApp.getSystemService(Context.ALARM_SERVICE);
     }
 
     public static void setAlarm() {
@@ -42,7 +42,7 @@ public class AlarmManagerCtrl {
         alarmManager.cancel(pendingReceiverIntent);
     }
     public static boolean getAlarm() {
-        return (PendingIntent.getBroadcast(Props.SessionProp.ctxApp, 0, receiverIntent, PendingIntent.FLAG_NO_CREATE) != null);
+        return (PendingIntent.getBroadcast(Props.ctxApp, 0, receiverIntent, PendingIntent.FLAG_NO_CREATE) != null);
     }
 
     public static long getAlarmNextTimeUTCmsec() {

@@ -69,7 +69,7 @@ public class Route{
                 break;
             case SWITCH_TO_PENDING:
                 if (!SvcLocationClock.isInstanceCreated())
-                    SessionProp.ctxApp.startService(new Intent(SessionProp.ctxApp, SvcLocationClock.class));
+                    ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 set_ActiveFlightID(flightList.get(flightList.size() - 1));
                 setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
                 activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);

@@ -20,7 +20,7 @@ public class SQLHelper extends SQLiteOpenHelper {
     public static Cursor cl;
 
     public SQLHelper() {
-        super(Props.SessionProp.ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
+        super(Props.ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
         FontLog.appendLog(TAG + "SQLHelper:SQLHelper", 'd');
         dbw = getWritableDatabase();
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);

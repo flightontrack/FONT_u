@@ -121,11 +121,11 @@ android:weightSum="100"
             android:text="@string/label_build"
             style="@style/label_text" />
         <TextView
+            android:id="@+id/txtBuild"
             android:layout_width="0dp"
             android:layout_weight="6"
             android:layout_height="wrap_content"
             style="@style/label_text"
-            android:text="@string/app_ver"
             />
     </LinearLayout>
 

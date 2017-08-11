@@ -7,32 +7,39 @@ import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.AppProp.*;
 
 /**
  * Created by hotvk on 8/1/2017.
  */
 
 public class Props {
+    public static Context ctxApp;
+    public static SharedPreferences sharedPreferences;
+    public static SharedPreferences.Editor editor;
+
     public static class AppProp{
-        public static boolean pPublicApp;
-            /// if false: start healthcheckalarmreceiver
-        public static boolean pAutostart;
+        public static boolean pIsAppTypePublic=true;
+        /// if false:   1. start healthcheckalarmreceiver
+            ///             2. layout is no nfc
+            ///             3. autostart (request flight) is true
+            ///             4. app start on reboot
+        public static boolean pAutostart=!pIsAppTypePublic;
+        public static String pAppRelease = "1.73";
+        public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
+
         public static boolean pIsNFCcapable;
-        public static boolean pIsNFCEnable;
+        public static boolean pIsNFCEnable=false;
 
         public static void get(){
-            pPublicApp = false;
-            pAutostart = false;
-            pIsNFCEnable = false;
+            //pIsAppTypePublic = false;
+            //pAutostart = false;
+            //pIsNFCEnable = false;
             pIsNFCcapable = false;
         }
-
     }
 
     public static class SessionProp {
-        public static Context ctxApp;
-        public static SharedPreferences sharedPreferences;
-        public static SharedPreferences.Editor editor;
         public static boolean       pIsMultileg;
         public static int          pIntervalLocationUpdateSec;
         public static int          pIntervalSelectedItem;
@@ -46,6 +53,7 @@ public class Props {
         public static String        pTextGreen;
         public static String[]      pMinSpeedArray;
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
+        public static boolean       pIsOnReboot=!pIsAppTypePublic;
 
         public static void save() {
             editor.putBoolean("pIsMultileg", pIsMultileg);
@@ -56,6 +64,7 @@ public class Props {
             editor.putBoolean("pIsEmptyAcftOk", pIsEmptyAcftOk);
             editor.putInt("pSpinnerUrlsPos", pSpinnerUrlsPos);
             editor.putString("pTextRed", pTextRed);
+            editor.putBoolean("pIsOnReboot", pIsOnReboot);
             editor.commit();
         }
 
@@ -68,6 +77,7 @@ public class Props {
             pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
             //pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerMinSpeed", DEFAULT_SPEED_SPINNER_POS);
             pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
+            pIsOnReboot=sharedPreferences.getBoolean("pIsOnReboot", false);
         }
 
         public static void set_isMultileg(boolean isMultileg) {

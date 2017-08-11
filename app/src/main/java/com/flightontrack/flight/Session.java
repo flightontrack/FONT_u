@@ -35,9 +35,9 @@ public class Session {
     public static ArrayList<Route> routeList = new ArrayList<>();
 
     public Session(Context ctx, MainActivity maInstance) {
-        SessionProp.ctxApp = ctx;
-        SessionProp.sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
-        SessionProp.editor = SessionProp.sharedPreferences.edit();
+        ctxApp = ctx;
+        sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         SessionProp.pMinSpeedArray = ctx.getResources().getStringArray(R.array.speed_array);
         mainactivityInstance = maInstance;
         sqlHelper = new SQLHelper();
@@ -68,7 +68,7 @@ public class Session {
                     }
                 } else {
                     FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-                    Toast.makeText(SessionProp.ctxApp, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctxApp, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -83,7 +83,7 @@ public class Session {
                 break;
             case BUTTON_STATE_YELLOW:
                 MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                MainActivity.trackingButton.setText("Flight " + (activeRoute.activeFlight.flightNumber) + SessionProp.ctxApp.getString(R.string.tracking_ready_to_takeoff));
+                MainActivity.trackingButton.setText("Flight " + (activeRoute.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
                 //editor.putInt("trackingButtonState", BUTTON_STATE_YELLOW);
                 break;
             case BUTTON_STATE_GREEN:
@@ -93,7 +93,7 @@ public class Session {
                 break;
             case BUTTON_STATE_GETFLIGHTID:
                 MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                MainActivity.trackingButton.setText(SessionProp.ctxApp.getString(R.string.tracking_gettingflight));
+                MainActivity.trackingButton.setText(ctxApp.getString(R.string.tracking_gettingflight));
                 break;
             case BUTTON_STATE_STOPPING:
                 //appendLog(LOGTAG+"BUTTON_STATE_STOPPING");
@@ -117,7 +117,7 @@ public class Session {
         } else {
             if (activeRoute!=null && activeRoute.activeFlight!=null) {
                 flightId = activeRoute.activeFlight.flightNumber;
-                fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? SessionProp.ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : SessionProp.ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
+                fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
             }
             else {flightId = FLIGHT_NUMBER_DEFAULT;}
             fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
@@ -129,7 +129,7 @@ public class Session {
     private static String setTextGreen() {
         SessionProp.pTextGreen = "Flight: " + (activeRoute.activeFlight.flightNumber) + '\n' +
                 "Point: " + activeRoute.activeFlight._wayPointsCount +
-                SessionProp.ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString + '\n'
+                ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString + '\n'
                 + "Alt: " + activeRoute.activeFlight.lastAltitudeFt + " ft";
         return SessionProp.pTextGreen;
     }
@@ -144,7 +144,7 @@ public class Session {
         if (count >= 1) {
             for (int i = 0; i < count; i++) {
                 if (i >= SvcComm.commBatchSize) break;
-                Intent intentComm = new Intent(SessionProp.ctxApp, SvcComm.class);
+                Intent intentComm = new Intent(ctxApp, SvcComm.class);
                 //Intent intentComm = new Intent(context, SvcIntentComm.class);
                 Bundle bundle = new Bundle();
                 bundle.putLong("itemId", sqlHelper.cl.getLong(sqlHelper.cl.getColumnIndexOrThrow(DBSchema._ID)));
@@ -163,7 +163,7 @@ public class Session {
 
                 intentComm.putExtras(bundle);
                 //Log.d(TAG, "FlightRouterThread:" + Thread.currentThread().getId());
-                SessionProp.ctxApp.startService(intentComm);
+                ctxApp.startService(intentComm);
                 sqlHelper.cl.moveToNext();
             }
             sqlHelper.cl.close();

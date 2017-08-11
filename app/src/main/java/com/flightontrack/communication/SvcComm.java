@@ -91,7 +91,7 @@ public class SvcComm extends Service {
                 FontLog.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber,'d');
                 //AsyncHttpClient aSyncClient = new AsyncHttpClient();
                 final LoopjAClient aSyncClient = new LoopjAClient(startId);
-                aSyncClient.post(Util.getTrackingURL() + SessionProp.ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+                aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         failureCounter=0;
@@ -121,7 +121,7 @@ public class SvcComm extends Service {
                                     case COMMAND_CANCELFLIGHT:
                                         if (SessionProp.pIsRoad) break; /// just ignore the request
                                         else {
-                                            Toast.makeText(SessionProp.ctxApp, R.string.driving, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(ctxApp, R.string.driving, Toast.LENGTH_LONG).show();
                                             FontLog.appendLog(TAG + "COMMAND_CANCELFLIGHT request", 'd');
                                             flight.set_flightRequest(FLIGHTREQUEST.TERMINATE_FLIGHT);
 //                                            sqlHelper.flightLocationsDelete(response.responseFlightNum);

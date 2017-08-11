@@ -159,7 +159,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     public static void setSignalStrengthListener(Boolean start) {
         if (start) {
             phStateListener = new PhoneListener();
-            ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+            ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
         } else {
         }
     }
@@ -175,7 +175,7 @@ public class SvcLocationClock extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(Props.SessionProp.ctxApp, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Props.ctxApp, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
     }
 
     @Override

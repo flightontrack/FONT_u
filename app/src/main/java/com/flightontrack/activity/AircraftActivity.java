@@ -58,12 +58,12 @@ public class AircraftActivity extends Activity {
 
     public static void clearAcftPreferences() {
         //Log.d.d(TAG, "clearPref()");
-        Props.SessionProp.editor.remove("AcftMake").commit();
-        Props.SessionProp.editor.remove("AcftModel").commit();
-        Props.SessionProp.editor.remove("AcftSeries").commit();
-        Props.SessionProp.editor.remove("AcftRegNum").commit();
-        Props.SessionProp.editor.remove("AcftTagId").commit();
-        Props.SessionProp.editor.remove("AcftName").commit();
+        Props.editor.remove("AcftMake").commit();
+        Props.editor.remove("AcftModel").commit();
+        Props.editor.remove("AcftSeries").commit();
+        Props.editor.remove("AcftRegNum").commit();
+        Props.editor.remove("AcftTagId").commit();
+        Props.editor.remove("AcftName").commit();
     }
 
     @Override
@@ -209,13 +209,13 @@ public class AircraftActivity extends Activity {
             String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
             String AcftTagId = json.getString("AcftTagId");
             String AcftName = json.getString("AcftName");
-            Props.SessionProp.editor.putString("AcftMake", AcftMake.trim());
-            Props.SessionProp.editor.putString("AcftModel", AcftModel.trim());
-            Props.SessionProp.editor.putString("AcftSeries", AcftSeries.trim());
-            Props.SessionProp.editor.putString("AcftRegNum", AcftRegNum.trim());
-            Props.SessionProp.editor.putString("AcftTagId", AcftTagId.trim());
-            Props.SessionProp.editor.putString("AcftName", AcftName.trim());
-            Props.SessionProp.editor.commit();
+            Props.editor.putString("AcftMake", AcftMake.trim());
+            Props.editor.putString("AcftModel", AcftModel.trim());
+            Props.editor.putString("AcftSeries", AcftSeries.trim());
+            Props.editor.putString("AcftRegNum", AcftRegNum.trim());
+            Props.editor.putString("AcftTagId", AcftTagId.trim());
+            Props.editor.putString("AcftName", AcftName.trim());
+            Props.editor.commit();
 
             txtAcftMake.setText(AcftMake);
             txtAcftModel.setText(AcftModel);
@@ -235,9 +235,9 @@ public class AircraftActivity extends Activity {
             FontLog.appendLog(TAG+ json.toString(),'d');
             String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
             String AcftName = json.getString("AcftName");
-            Props.SessionProp.editor.putString("AcftRegNum", AcftRegNum.trim());
-            Props.SessionProp.editor.putString("AcftName", AcftName.trim());
-            Props.SessionProp.editor.commit();
+            Props.editor.putString("AcftRegNum", AcftRegNum.trim());
+            Props.editor.putString("AcftName", AcftName.trim());
+            Props.editor.commit();
 
             txtAcftRegNum.setText(AcftRegNum);
             txtAcftName.setText(AcftName);
@@ -256,12 +256,12 @@ public class AircraftActivity extends Activity {
         JSONObject json  = new JSONObject();
         try
         {
-            json.put("AcftMake", Props.SessionProp.sharedPreferences.getString("AcftMake",""));
-            json.put("AcftModel", Props.SessionProp.sharedPreferences.getString("AcftModel",""));
-            json.put("AcftSeries", Props.SessionProp.sharedPreferences.getString("AcftSeries",""));
-            json.put("AcftRegNum", Props.SessionProp.sharedPreferences.getString("AcftRegNum",getString(R.string.default_acft_N)));
-            json.put("AcftTagId", Props.SessionProp.sharedPreferences.getString("AcftTagId",""));
-            json.put("AcftName", Props.SessionProp.sharedPreferences.getString("AcftName",""));
+            json.put("AcftMake", Props.sharedPreferences.getString("AcftMake",""));
+            json.put("AcftModel", Props.sharedPreferences.getString("AcftModel",""));
+            json.put("AcftSeries", Props.sharedPreferences.getString("AcftSeries",""));
+            json.put("AcftRegNum", Props.sharedPreferences.getString("AcftRegNum",getString(R.string.default_acft_N)));
+            json.put("AcftTagId", Props.sharedPreferences.getString("AcftTagId",""));
+            json.put("AcftName", Props.sharedPreferences.getString("AcftName",""));
         } catch (JSONException e)
         {
             //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
@@ -274,11 +274,11 @@ public class AircraftActivity extends Activity {
         tagstate = false;
         nfcSwitch.setChecked(tagstate);
     }
-        Props.SessionProp.editor.putBoolean("nfctagstate", tagstate).commit();
+        Props.editor.putBoolean("nfctagstate", tagstate).commit();
         txtBlueText.setText(getTagNFCState()?R.string.instructions1:R.string.instructions2);
     }
     public static Boolean getTagNFCState(){
-        return Props.SessionProp.sharedPreferences.getBoolean("nfctagstate", false);
+        return Props.sharedPreferences.getBoolean("nfctagstate", false);
     }
     public void enableNfcForegroundMode() {
         //Util.appendLog(TAG+ "AircraftActivity enableForegroundMode");

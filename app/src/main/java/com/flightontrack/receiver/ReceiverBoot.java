@@ -22,7 +22,7 @@ public class ReceiverBoot extends BroadcastReceiver {
         Log.d(TAG,"onReceive intent: "+intent);
         if (intent.getAction().contains("BOOT_COMPLETED")) {
             Log.d(TAG, " FONT:ReceiverBoot Started: isOnBoot: "+context.getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE).getBoolean("a_isOnBoot", false));
-            if(!context.getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE).getBoolean("a_isOnBoot", false)) return;
+            if(!context.getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE).getBoolean("pIsOnReboot", false)) return;
             Intent alarmIntent = new Intent(context, ReceiverBoot.class);
             alarmIntent.setAction(FONT_RECEIVER_FILTER);
             PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);

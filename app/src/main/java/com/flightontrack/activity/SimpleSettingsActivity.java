@@ -31,6 +31,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
 
     TextView txtUser;
     public static TextView txtPsw;
+    public static TextView txtBuild;
     Button resetButton;
     Button getPswButton;
     Spinner spinnerUrls;
@@ -42,6 +43,8 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_settings);
+        txtBuild= (TextView) findViewById((R.id.txtBuild));
+        txtBuild.setText((getString(R.string.app_label)+" "+AppProp.pAppRelease+AppProp.pAppReleaseSuffix));
         resetButton = (Button) findViewById(R.id.btnClear);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,14 +68,17 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 txtPsw.setVisibility(View.VISIBLE);
             }
         });
-        chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
-        chBoxIsOnReboot.setChecked(Util.getIsOnBoot());
-        chBoxIsOnReboot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Util.setIsOnBoot(b);
-            }
-        });
+        if(!AppProp.pIsAppTypePublic) {
+            chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
+            chBoxIsOnReboot.setChecked(SessionProp.pIsOnReboot);
+            chBoxIsOnReboot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    SessionProp.pIsOnReboot = true;
+                    //Util.setIsOnBoot(b);
+                }
+            });
+        }
         chBoxIsDebug = (CheckBox) findViewById(R.id.isDebugCheckBoxCheckBox);
         //chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsDebug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

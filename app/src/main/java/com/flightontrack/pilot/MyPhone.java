@@ -42,7 +42,7 @@ public class MyPhone {
 
     public int getVersionCode() {
         try {
-            versionCode = Props.SessionProp.ctxApp.getPackageManager().getPackageInfo(Props.SessionProp.ctxApp.getPackageName(), 0).versionCode;
+            versionCode = Props.ctxApp.getPackageManager().getPackageInfo(Props.ctxApp.getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             versionCode = -1;
         }
@@ -50,14 +50,14 @@ public class MyPhone {
     }
 
     static void getMyPhoneID() {
-        _phoneNumber = ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-        _myDeviceId = ((TelephonyManager) Props.SessionProp.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+        _phoneNumber = ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+        _myDeviceId = ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         String strId = (_phoneNumber == null||_phoneNumber.isEmpty()) ? _myDeviceId : _phoneNumber;
         _myPhoneId = strId.substring(strId.length() - 10); /// 10 digits number
     }
 
     public static String getMyAndroidID() {
-        return Settings.Secure.getString(Props.SessionProp.ctxApp.getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(Props.ctxApp.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     public String   getMyAndroidVersion() {

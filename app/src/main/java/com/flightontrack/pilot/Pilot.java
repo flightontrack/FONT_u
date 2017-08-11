@@ -26,7 +26,7 @@ public class Pilot extends MyPhone {
     }
 
     public static void setPilotUserName(String un) {
-        Props.SessionProp.editor.putString("pilot_UserName", un.trim().replace(" ","")).commit();
+        Props.editor.putString("pilot_UserName", un.trim().replace(" ","")).commit();
         //editor.putString("userName", un.trim()).commit();
         //MainActivity.txtUserName.setText(un);
         //AircraftActivity.txtUserName.setText(un);
@@ -37,6 +37,6 @@ public class Pilot extends MyPhone {
         getMyPhoneID();
         _userName = _myPhoneId.substring(0,3)+deviceBrand.substring(0,4).toUpperCase()+_myPhoneId.substring(8);
         //String r = sharedPreferences.getString("pilot_UserName", _userName);
-        return Props.SessionProp.sharedPreferences.getString("pilot_UserName", _userName);
+        return Props.sharedPreferences.getString("pilot_UserName", _userName);
     }
 }

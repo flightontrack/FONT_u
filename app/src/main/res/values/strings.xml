@@ -3,7 +3,7 @@
 
     <string name="app_name">Flight On Track</string>
     <string name="app_label">FONT</string>
-    <string name="app_ver">1.71u</string>
+    <!--<string name="app_ver">1.71u</string>-->
 
     <string name="action_settings">Settings</string>
     <string name="action_email">Report Problem</string>

@@ -70,7 +70,6 @@ android:weightSum="100">
             android:layout_weight="6.5"
             android:id="@+id/txtWebsiteUser"
             android:layout_height="wrap_content"
-            android:singleLine="true"
             style="@style/label_text"
             />
     </LinearLayout>
@@ -90,7 +89,6 @@ android:weightSum="100">
         <TextView
             android:id="@+id/txtWebsitePsw"
             android:layout_height="wrap_content"
-            android:singleLine="true"
             style="@style/label_text"
             android:visibility="gone"
             android:layout_width="0dp"
@@ -131,11 +129,11 @@ android:weightSum="100">
             android:text="@string/label_build"
             style="@style/label_text" />
         <TextView
+            android:id="@+id/txtBuild"
             android:layout_width="0dp"
             android:layout_weight="6"
             android:layout_height="wrap_content"
             style="@style/label_text"
-            android:text="@string/app_ver"
             />
     </LinearLayout>
     <LinearLayout
@@ -196,32 +194,32 @@ android:weightSum="100">
             android:scaleX="2"
             android:scaleY="2"/>
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_weight="1"
-        android:weightSum="10"
-        >
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="5"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:text="@string/label_chbox_boot"
-            android:id="@+id/txtOnRebootLabel"
-            style="@style/label_text"
-            />
+    <!--<LinearLayout-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_weight="1"-->
+        <!--android:weightSum="10"-->
+        <!--&gt;-->
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="5"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:inputType="text"-->
+            <!--android:text="@string/label_chbox_boot"-->
+            <!--android:id="@+id/txtOnRebootLabel"-->
+            <!--style="@style/label_text"-->
+            <!--/>-->
 
-        <CheckBox
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/isOnRebootCheckBox"
-            android:layout_weight="1.1"
-            android:ellipsize="middle"
-            android:scaleX="2"
-            android:scaleY="2"/>
-    </LinearLayout>
+        <!--<CheckBox-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/isOnRebootCheckBox"-->
+            <!--android:layout_weight="1.1"-->
+            <!--android:ellipsize="middle"-->
+            <!--android:scaleX="2"-->
+            <!--android:scaleY="2"/>-->
+    <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

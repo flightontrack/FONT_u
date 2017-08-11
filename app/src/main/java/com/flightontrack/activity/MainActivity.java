@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
             toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
             setSupportActionBar(toolbarTop);
-            toolbarTop.setTitle(getString(R.string.app_label)+" "+getString(R.string.app_ver));
+            toolbarTop.setTitle(getString(R.string.app_label)+" "+AppProp.pAppRelease+AppProp.pAppReleaseSuffix);//getString(R.string.app_ver));
 
             toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
             amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
@@ -122,14 +122,14 @@ public class MainActivity extends AppCompatActivity {
 
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 FontLog.appendLog(TAG + "New App Context", 'd');
-                Util.setCurrAppContext(SessionProp.ctxApp.toString());
+                Util.setCurrAppContext(ctxApp.toString());
                 activeRoute = null;
                 //set_myPhoneId();
                 //route = new Route();
             }
 
-            //if (!AppProp.pPublicApp && AppProp.pAutostart) {
-            if (!AppProp.pPublicApp) {
+            //if (!AppProp.pIsAppTypePublic && AppProp.pAutostart) {
+            if (!AppProp.pIsAppTypePublic) {
                 IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
                 alarmReceiver = new ReceiverHealthCheckAlarm();
                 registerReceiver(alarmReceiver, filter);
@@ -386,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FontLog.appendLog(TAG + "Method1", 'd');
-                Intent intent = new Intent(SessionProp.ctxApp, AircraftActivity.class);
+                Intent intent = new Intent(ctxApp, AircraftActivity.class);
                 startActivity(intent);
             }
 
@@ -420,16 +420,16 @@ public class MainActivity extends AppCompatActivity {
 
     void helpPage() {
         try {
-            Intent intent = new Intent(SessionProp.ctxApp, HelpPageActivity.class);
+            Intent intent = new Intent(ctxApp, HelpPageActivity.class);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Toast.makeText(SessionProp.ctxApp, "Can't reach help webpage.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctxApp, "Can't reach help webpage.", Toast.LENGTH_SHORT).show();
         }
     }
 
     void logBookPage() {
         try {
-            Intent intent = new Intent(SessionProp.ctxApp, LogBookActivity.class);
+            Intent intent = new Intent(ctxApp, LogBookActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
@@ -468,11 +468,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void settingsActivity() {
         try {
-            Intent intent = new Intent(SessionProp.ctxApp, SimpleSettingsActivity.class);
+            Intent intent = new Intent(ctxApp, SimpleSettingsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Toast.makeText(SessionProp.ctxApp,
+            Toast.makeText(ctxApp,
                     "Can't start Settings.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -523,7 +523,7 @@ public class MainActivity extends AppCompatActivity {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
         }
-        SessionProp.ctxApp = null;
+        ctxApp = null;
         txtUserName = null;
         txtAcftNum = null;
         spinnerUpdFreq = null;

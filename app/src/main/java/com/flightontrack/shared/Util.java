@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
@@ -59,7 +58,7 @@ public class Util {
 //    }
 
      public static String getTrackingURL() {
-        String[] spinnerUrls = SessionProp.ctxApp.getResources().getStringArray(R.array.url_array);
+        String[] spinnerUrls = ctxApp.getResources().getStringArray(R.array.url_array);
         FontLog.appendLog(TAG + "getTrackingUR : " + spinnerUrls[SessionProp.pSpinnerUrlsPos].trim(),'d');
         //return sharedPreferences.getString("trackingURL", spinnerUrls[getSpinnerUrlsPos()]).trim();
         return spinnerUrls[SessionProp.pSpinnerUrlsPos].trim();
@@ -75,11 +74,11 @@ public class Util {
 //    }
 
     public static int getWayPointLimit() {
-        return SessionProp.sharedPreferences.getInt("wayPointLimit", WAY_POINT_HARD_LIMIT);
+        return sharedPreferences.getInt("wayPointLimit", WAY_POINT_HARD_LIMIT);
     }
 
     public static void setWayPointLimit(int wp_limit) {
-        SessionProp.editor.putInt("wayPointLimit", WAY_POINT_HARD_LIMIT > wp_limit ? WAY_POINT_HARD_LIMIT : wp_limit).commit();
+        editor.putInt("wayPointLimit", WAY_POINT_HARD_LIMIT > wp_limit ? WAY_POINT_HARD_LIMIT : wp_limit).commit();
     }
 
     public static void setAcftNum(String an) {
@@ -90,28 +89,28 @@ public class Util {
         String acft;
         switch (a) {
             case 1:
-                acft = SessionProp.sharedPreferences.getString("AcftMake", SessionProp.ctxApp.getString(R.string.default_acft_Make));
+                acft = sharedPreferences.getString("AcftMake", ctxApp.getString(R.string.default_acft_Make));
                 break;
             case 2:
-                acft = SessionProp.sharedPreferences.getString("AcftModel", SessionProp.ctxApp.getString(R.string.default_acft_Model));
+                acft = sharedPreferences.getString("AcftModel", ctxApp.getString(R.string.default_acft_Model));
                 break;
             case 3:
-                acft = SessionProp.sharedPreferences.getString("AcftSeries", SessionProp.ctxApp.getString(R.string.default_acft_Series));
+                acft = sharedPreferences.getString("AcftSeries", ctxApp.getString(R.string.default_acft_Series));
                 break;
             case 4:
-                acft = SessionProp.sharedPreferences.getString("AcftRegNum", SessionProp.ctxApp.getString(R.string.default_acft_N));
+                acft = sharedPreferences.getString("AcftRegNum", ctxApp.getString(R.string.default_acft_N));
                 break;
             case 5:
-                acft = SessionProp.sharedPreferences.getString("AcftTagId", "");
+                acft = sharedPreferences.getString("AcftTagId", "");
                 break;
             case 6:
-                acft = SessionProp.sharedPreferences.getString("AcftName", "");
+                acft = sharedPreferences.getString("AcftName", "");
                 break;
             default:
-                acft = SessionProp.sharedPreferences.getString("AcftMake", SessionProp.ctxApp.getString(R.string.default_acft_Make))
-                        + " " + SessionProp.sharedPreferences.getString("AcftModel", SessionProp.ctxApp.getString(R.string.default_acft_Model))
-                        + " " + SessionProp.sharedPreferences.getString("AcftSeries", SessionProp.ctxApp.getString(R.string.default_acft_Series))
-                        + " " + SessionProp.sharedPreferences.getString("AcftRegNum", SessionProp.ctxApp.getString(R.string.default_acft_N));
+                acft = sharedPreferences.getString("AcftMake", ctxApp.getString(R.string.default_acft_Make))
+                        + " " + sharedPreferences.getString("AcftModel", ctxApp.getString(R.string.default_acft_Model))
+                        + " " + sharedPreferences.getString("AcftSeries", ctxApp.getString(R.string.default_acft_Series))
+                        + " " + sharedPreferences.getString("AcftRegNum", ctxApp.getString(R.string.default_acft_N));
         }
         return acft;
     }
@@ -145,14 +144,14 @@ public class Util {
 //    }
 
     public static String getPsw() {
-        return SessionProp.sharedPreferences.getString("cloudpsw",null);
+        return sharedPreferences.getString("cloudpsw",null);
 //        if (psw==null) {
 //            getCloudPsw();
 //        }
 //        else SimpleSettingsActivity.txtPsw.setText(psw);
     }
     public static void setPsw(String psw) {
-        SessionProp.editor.putString("cloudpsw", psw).commit();
+        editor.putString("cloudpsw", psw).commit();
         SimpleSettingsActivity.txtPsw.setText(psw);
     }
 //    public static String getTrackingSpeed() {
@@ -210,13 +209,13 @@ public class Util {
 
     public static void setSignalStregth(String name, int value) {
         try {
-            SessionProp.editor.putInt(name, value).commit();
+            editor.putInt(name, value).commit();
         }
         catch (Exception e) {Log.e(TAG,"!!!!!!!!!!!!!!"+e.getMessage());}
     }
 
     public static int getSignalStregth() {
-        return SessionProp.sharedPreferences.getInt("gsmsignalstrength", -1);
+        return sharedPreferences.getInt("gsmsignalstrength", -1);
     }
 
     public static String getTimeLocal() {
@@ -241,11 +240,11 @@ public class Util {
     }
 
     public static String getCurrAppContext() {
-        return SessionProp.sharedPreferences.getString("a_currAppContext","0");
+        return sharedPreferences.getString("a_currAppContext","0");
     }
 
     public static void setCurrAppContext(String appContext) {
-        SessionProp.sharedPreferences.edit().putString("a_currAppContext",appContext).commit();
+        sharedPreferences.edit().putString("a_currAppContext",appContext).commit();
     }
 
 //    static Boolean getIsDebug() {
@@ -257,14 +256,14 @@ public class Util {
 //    }
 
     public static Boolean getIsOnBoot() {
-        return SessionProp.sharedPreferences.getBoolean("a_isOnBoot", false);
+        return sharedPreferences.getBoolean("a_isOnBoot", false);
     }
 
-    public static void setIsOnBoot(Boolean isDebug) {
-        SessionProp.editor.putBoolean("a_isOnBoot", isDebug).commit();
-    }
+//    public static void setIsOnBoot(Boolean isDebug) {
+//        editor.putBoolean("a_isOnBoot", isDebug).commit();
+//    }
     public static boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) SessionProp.ctxApp.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ctxApp.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null&&activeNetworkInfo.isConnected() ;
     }
@@ -286,7 +285,7 @@ public class Util {
         requestParams.put("userid", Pilot.getUserID());
         requestParams.put("phonenumber", MyPhone._myPhoneId);
         requestParams.put("deviceid", MyPhone._myDeviceId);
-        new AsyncHttpClient().post(getTrackingURL() + SessionProp.ctxApp.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
+        new AsyncHttpClient().post(getTrackingURL() + ctxApp.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         FontLog.appendLog(TAG + "getCloudPsw OnSuccess", 'd');
