@@ -14,6 +14,7 @@
         android:layout_alignParentTop="true"
         android:orientation="horizontal"
         >
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_top"
             android:layout_width="match_parent"
@@ -21,8 +22,8 @@
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
             android:theme="@style/ToolbarTheme"
-            app:popupTheme="@style/ToolbarPopupTheme"
-            app:navigationIcon="@drawable/ic_launcher">
+            app:navigationIcon="@drawable/ic_launcher"
+            app:popupTheme="@style/ToolbarPopupTheme">
 
         </android.support.v7.widget.Toolbar>
     </LinearLayout>
@@ -260,7 +261,13 @@
 
     </LinearLayout>
     <include layout="@layout/toolbar_bottom"/>
-
+    <View
+        android:id="@+id/TagView"
+        android:tag= "full"
+        android:visibility="invisible"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
 </RelativeLayout>
 
 

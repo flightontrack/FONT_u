@@ -84,21 +84,22 @@ public class MainActivity extends AppCompatActivity {
             //MainActivity.ctxApp = getApplicationContext();
 
             setContentView(R.layout.activity_main);
+            if(findViewById(R.id.TagView).getTag().toString().equals("full")) {
 
-            toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
-            setSupportActionBar(toolbarTop);
-            toolbarTop.setTitle(getString(R.string.app_label)+" "+AppProp.pAppRelease+AppProp.pAppReleaseSuffix);//getString(R.string.app_ver));
+                toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
+                setSupportActionBar(toolbarTop);
+                toolbarTop.setTitle(getString(R.string.app_label) + " " + AppProp.pAppRelease + AppProp.pAppReleaseSuffix);//getString(R.string.app_ver));
 
-            toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
-            amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
-            amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    return onOptionsItemSelected(menuItem);
-                }
-            });
-            setSupportActionBar(toolbarBottom);
-
+                toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
+                amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
+                amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        return onOptionsItemSelected(menuItem);
+                    }
+                });
+                setSupportActionBar(toolbarBottom);
+            };
             txtAcftNum = (TextView) findViewById(R.id.txtAcftNum);
             txtUserName = (TextView) findViewById(R.id.txtUserName);
             chBoxIsMultiLeg = (CheckBox) findViewById(R.id.patternCheckBox);

@@ -181,7 +181,6 @@
             android:layout_width="0dp"
             android:layout_weight="7"
             android:layout_height="wrap_content"
-            android:singleLine="true"
             android:inputType="text"
             android:gravity="right"
             />
@@ -194,5 +193,11 @@
         <!--android:weightSum="10">-->
 
     <!--</LinearLayout>-->
-
+    <View
+        android:id="@+id/TagView"
+        android:tag= "simple"
+        android:visibility="invisible"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
 </LinearLayout>
