@@ -99,6 +99,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 setSupportActionBar(toolbarBottom);
+                cardLayout1 = findViewById(R.id.cardLayoutId1);
+                cardLayout1.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        //FontLog.appendLog(TAG + "Method1", 'd');
+                        Intent intent = new Intent(ctxApp, AircraftActivity.class);
+                        startActivity(intent);
+                    }
+
+                });
             };
             txtAcftNum = (TextView) findViewById(R.id.txtAcftNum);
             txtUserName = (TextView) findViewById(R.id.txtUserName);
@@ -106,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
             spinnerUpdFreq = (Spinner) findViewById(R.id.spinnerId);
             spinnerMinSpeed = (Spinner) findViewById(R.id.spinnerMinSpeedId);
             trackingButton = (Button) findViewById(R.id.btnTracking);
-            cardLayout1 = findViewById(R.id.cardLayoutId1);
             //sharedPreferences = ctxApp.getSharedPreferences(PACKAGE_NAME, Context.MODE_PRIVATE);
             //editor = sharedPreferences.edit();
             //MainActivity.ctxBase = getBaseContext();
@@ -383,16 +392,6 @@ public class MainActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
-        cardLayout1.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                FontLog.appendLog(TAG + "Method1", 'd');
-                Intent intent = new Intent(ctxApp, AircraftActivity.class);
-                startActivity(intent);
-            }
-
-        });
-
     }
 
     private boolean isGPSEnabled() {
