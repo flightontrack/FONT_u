@@ -36,7 +36,7 @@ public class Pilot extends MyPhone {
         getBuldProp();
         getMyPhoneID();
         int deviceBrandLength = deviceBrand.length()>3?3:deviceBrand.length();
-        _userName = _myPhoneId.substring(0,3)+deviceBrand.substring(0,deviceBrandLength).toUpperCase()+_myPhoneId.substring(4+deviceBrandLength);
+        _userName = _myPhoneId.substring(0,3)+deviceBrand.substring(0,deviceBrandLength).toUpperCase()+_myPhoneId.substring(3+deviceBrandLength);
         //String r = sharedPreferences.getString("pilot_UserName", _userName);
         return Props.sharedPreferences.getString("pilot_UserName", _userName);
     }

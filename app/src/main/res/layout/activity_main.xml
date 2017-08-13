@@ -10,14 +10,28 @@
     tools:context=".activity.MainActivity"
     android:weightSum="100"
     android:orientation="vertical">
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/my_toolbar"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar_top_layout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_top"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ToolbarTheme"
+            app:navigationIcon="@drawable/ic_launcher"
+            app:popupTheme="@style/ToolbarPopupTheme">
+
+        </android.support.v7.widget.Toolbar>
+    </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -60,28 +74,8 @@
             android:layout_height="fill_parent"
             android:id="@+id/spinnerId"
             android:textAlignment="gravity"
-            android:gravity="right" />
+            android:gravity="end" />
     </LinearLayout>
-    <!--<LinearLayout-->
-    <!--android:orientation="horizontal"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:weightSum="10"-->
-    <!-->-->
-    <!--<TextView-->
-    <!--style="@style/label_text"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="@string/label_minspeed"-->
-    <!--android:layout_weight="6" />-->
-    <!--<Spinner-->
-    <!--android:id="@+id/spinnerSpeedId"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_weight="4"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:gravity="right"-->
-    <!--/>-->
-    <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -89,10 +83,33 @@
         android:weightSum="10">
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="2.8"
-            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:layout_height="fill_parent"
+            android:text="@string/label_minspeed"
+            style="@style/label_text_small"
+            android:gravity="center_vertical" />
+        <Spinner
+            android:id="@+id/spinnerMinSpeedId"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="match_parent"
+            android:textAlignment="textEnd"
+            android:gravity="end"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:weightSum="10">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="match_parent"
             android:text="@string/label_pattern"
             style="@style/label_text_small"
+            android:gravity="center_vertical"
             />
 
         <CheckBox
@@ -104,22 +121,6 @@
             android:scaleX="2"
             android:scaleY="2"
             android:gravity="fill" />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="3.9"
-            android:layout_height="wrap_content"
-            android:text="@string/label_minspeed"
-            style="@style/label_text_small"
-            android:gravity="right" />
-        <Spinner
-            android:id="@+id/spinnerMinSpeedId"
-            android:layout_width="0dp"
-            android:layout_weight="2.1"
-            android:layout_height="match_parent"
-            android:textAlignment="textEnd"
-            android:gravity="end"
-            />
-
     </LinearLayout>
 
     <LinearLayout

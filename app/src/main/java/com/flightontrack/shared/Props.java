@@ -114,15 +114,15 @@ public class Props {
             pIsRoad = false;
             pIsDebug = false;
         }
-        public static void clearAll() {
-            //Toast.makeText(SessionProp.ctxApp, R.string.user_needs_to_restart_app, Toast.LENGTH_LONG).show();
-            sharedPreferences.edit().clear().commit();
-        }
-
         public static void resetSessionProp() {
             clearToDefault();
             get();
             //save();
         }
+
+    }
+    public static void clearAll() {
+        //Toast.makeText(SessionProp.ctxApp, R.string.user_needs_to_restart_app, Toast.LENGTH_LONG).show();
+        sharedPreferences.edit().clear().commit();
     }
 }

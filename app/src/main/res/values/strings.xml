@@ -65,7 +65,8 @@
     <string name="label_pilotphone">Pilot</string>
     <string name="label_aircrafttag">Aircraft</string>
     <string name="label_interval">Update Freq</string>
-    <string name="label_minspeed">Min Speed MpH</string>
+    <string name="label_minspeedMPH">Min Speed MpH</string>
+    <string name="label_minspeed">Min Speed</string>
     <string name="label_interval_small">Freq:</string>
     <string name="label_pattern">Multileg</string>
     <string name="label_flightid">Flight ID:</string>

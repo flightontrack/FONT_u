@@ -86,19 +86,6 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
             if(findViewById(R.id.TagView).getTag().toString().equals("full")) {
 
-                toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
-                setSupportActionBar(toolbarTop);
-                toolbarTop.setTitle(getString(R.string.app_label) + " " + AppProp.pAppRelease + AppProp.pAppReleaseSuffix);//getString(R.string.app_ver));
-
-                toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
-                amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
-                amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        return onOptionsItemSelected(menuItem);
-                    }
-                });
-                setSupportActionBar(toolbarBottom);
                 cardLayout1 = findViewById(R.id.cardLayoutId1);
                 cardLayout1.setOnClickListener(new View.OnClickListener(){
                     @Override
@@ -109,36 +96,35 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 });
-            };
+                toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
+                amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
+                amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        return onOptionsItemSelected(menuItem);
+                    }
+                });
+                setSupportActionBar(toolbarBottom);
+            }
+            toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
+            setSupportActionBar(toolbarTop);
+            getSupportActionBar().setTitle(getString(R.string.app_label) + " " + AppProp.pAppRelease + AppProp.pAppReleaseSuffix);
             txtAcftNum = (TextView) findViewById(R.id.txtAcftNum);
             txtUserName = (TextView) findViewById(R.id.txtUserName);
             chBoxIsMultiLeg = (CheckBox) findViewById(R.id.patternCheckBox);
             spinnerUpdFreq = (Spinner) findViewById(R.id.spinnerId);
             spinnerMinSpeed = (Spinner) findViewById(R.id.spinnerMinSpeedId);
             trackingButton = (Button) findViewById(R.id.btnTracking);
-            //sharedPreferences = ctxApp.getSharedPreferences(PACKAGE_NAME, Context.MODE_PRIVATE);
-            //editor = sharedPreferences.edit();
-            //MainActivity.ctxBase = getBaseContext();
-            //MainActivity.ctxActv = this;
+            clearAll();
             AppProp.get();
             AppProp.pIsNFCcapable = AppProp.pIsNFCEnable&&isNFCcapable();
-
-            //Util.init(ctxApp, this);
-            //Util.resetPreferencesAll();
-            //SessionProp.get();
-            //Util.setIsDebug(!MyApplication.productionRelease);
-            //Util.appendLog(TAG + "onCreate", 'd');
-            //startService(new Intent(getApplicationContext(), SvcBackground.class));
 
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 FontLog.appendLog(TAG + "New App Context", 'd');
                 Util.setCurrAppContext(ctxApp.toString());
                 activeRoute = null;
-                //set_myPhoneId();
-                //route = new Route();
             }
 
-            //if (!AppProp.pIsAppTypePublic && AppProp.pAutostart) {
             if (!AppProp.pIsAppTypePublic) {
                 IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
                 alarmReceiver = new ReceiverHealthCheckAlarm();
@@ -148,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             }
             updFreqSpinnerSetup();
             minSpeedSpinnerSetup();
-            //Util.setTrackingSpeed(spinnerMinSpeed.getItemAtPosition(SessionProp.pSpinnerMinSpeedPos).toString());
             SessionProp.set_isMultileg(true);
             SessionProp.save();
         }
@@ -174,13 +159,9 @@ public class MainActivity extends AppCompatActivity {
 
         SessionProp.get();
         Util.setAcftNum(Util.getAcftNum(4));
-        //SessionProp.set_pIntervalLocationUpdateSecPos(SessionProp.pIntervalSelectedItem);
-        //Util.setSpinnerSpeedPos(SessionProp.pSpinnerMinSpeedPos);
-        //MainActivity.spinnerMinSpeed.setSelection(SessionProp.pSpinnerMinSpeedPos);
         setTrackingButtonState(trackingButtonState);
 
         init_listeners();
-        //Util.appendLog(TAG + "onResume: pAutostart: " + pAutostart, 'd');
         int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
         int permissionCheckLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheckLocation == PackageManager.PERMISSION_DENIED) {
@@ -201,9 +182,10 @@ public class MainActivity extends AppCompatActivity {
         }
         isToDestroy = true;
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //getSupportActionBar().setDisplayShowTitleEnabled(true);
         getMenuInflater().inflate(R.menu.menu_bottom, amvMenu.getMenu());
         toolbarTop.inflateMenu(R.menu.menu_top);
         return true;
