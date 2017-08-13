@@ -123,69 +123,148 @@
             android:gravity="fill" />
     </LinearLayout>
 
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:weightSum="10"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:layout_marginBottom="10dp"-->
+        <!--android:layout_weight="6.24">-->
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="2dip"-->
+            <!--android:background="@android:color/holo_blue_bright" />-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:weightSum="10"-->
+        <!--android:layout_weight="14.29">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="5"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/label_pilotphone"-->
+            <!--style="@style/label_text_small"-->
+            <!--android:typeface="normal"-->
+            <!--android:clickable="false"-->
+            <!--/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/txtUserName"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="5"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:singleLine="true"-->
+            <!--android:inputType="text"-->
+            <!--android:gravity="end"-->
+            <!--android:focusableInTouchMode="true"/>-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:weightSum="10"-->
+        <!--android:layout_weight="14.29">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="3"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/label_aircrafttag"-->
+            <!--style="@style/label_text_small"-->
+            <!--/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/txtAcftNum"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="7"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:inputType="text"-->
+            <!--android:gravity="right"-->
+            <!--/>-->
+
+    <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="10"
+        android:orientation="horizontal"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="10dp"
-        android:layout_weight="6.24">
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="2dip"
-            android:background="@android:color/holo_blue_bright" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10"
-        android:layout_weight="14.29">
+        >
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/card_view1"
+            card_view:cardCornerRadius="8dp"
+            card_view:cardElevation="4dp"
+            card_view:cardUseCompatPadding="true"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:theme="@style/Cards"
+            >
+            <LinearLayout
+                android:id="@+id/cardLayoutId1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                >
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="10"
+                    >
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="5"
-            android:layout_height="wrap_content"
-            android:text="@string/label_pilotphone"
-            style="@style/label_text_small"
-            android:typeface="normal"
-            android:clickable="false"
-            />
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:gravity="start"
+                        android:text="@string/label_pilotphone"
+                        android:typeface="normal" />
 
-        <EditText
-            android:id="@+id/txtUserName"
-            android:layout_width="0dp"
-            android:layout_weight="5"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:inputType="text"
-            android:gravity="end"
-            android:focusableInTouchMode="true"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10"
-        android:layout_weight="14.29">
+                    <TextView
+                        android:id="@+id/txtUserName"
+                        android:layout_width="0dp"
+                        android:layout_weight="6"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        style="@style/label_text"
+                        />
+                </LinearLayout>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content"
-            android:text="@string/label_aircrafttag"
-            style="@style/label_text_small"
-            />
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="10">
 
-        <TextView
-            android:id="@+id/txtAcftNum"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:gravity="right"
-            />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="4"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_aircrafttag"
+                        android:gravity="start"
+                        />
 
+                    <TextView
+                        android:id="@+id/txtAcftNum"
+                        android:layout_width="0dp"
+                        android:layout_weight="6"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        style="@style/label_text"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
     </LinearLayout>
     <!--<LinearLayout-->
         <!--android:layout_width="fill_parent"-->

@@ -21,20 +21,23 @@ public class Props {
     public static class AppProp{
         public static boolean pIsAppTypePublic=true;
         /// if false:   1. start healthcheckalarmreceiver
-            ///             2. layout is no nfc
+            ///             2. aicraft activity layout has no nfc
             ///             3. autostart (request flight) is true
-            ///             4. app start on reboot
+            ///             4. app starts on reboot
         public static boolean pAutostart=!pIsAppTypePublic;
+        public static boolean pIsNFCEnabled =false;
         public static String pAppRelease = "1.73";
         public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
 
-        public static boolean pIsNFCcapable;
-        public static boolean pIsNFCEnable=false;
+        /// these properties updated dynamically in run time
+        public static String pMainActivityLayout = "full";
+        public static boolean pIsNFCcapable=false;
+        public static boolean pIsOnRebootCheckBoxEnabled=false;
 
         public static void get(){
             //pIsAppTypePublic = false;
             //pAutostart = false;
-            //pIsNFCEnable = false;
+            //pIsNFCEnabled = false;
             pIsNFCcapable = false;
         }
     }

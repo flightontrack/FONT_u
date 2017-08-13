@@ -44,6 +44,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.*;
+//import static com.flightontrack.shared.Props.AppProp.pMainActivityLayout;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity:";
@@ -84,18 +85,9 @@ public class MainActivity extends AppCompatActivity {
             //MainActivity.ctxApp = getApplicationContext();
 
             setContentView(R.layout.activity_main);
-            if(findViewById(R.id.TagView).getTag().toString().equals("full")) {
-
-                cardLayout1 = findViewById(R.id.cardLayoutId1);
-                cardLayout1.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view) {
-                        //FontLog.appendLog(TAG + "Method1", 'd');
-                        Intent intent = new Intent(ctxApp, AircraftActivity.class);
-                        startActivity(intent);
-                    }
-
-                });
+            AppProp.pMainActivityLayout = findViewById(R.id.TagView).getTag().toString();
+            if(AppProp.pMainActivityLayout.equals("full")) {
+                //AppProp.pIsOnRebootCheckBoxEnabled = true;
                 toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
                 amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
                 amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
@@ -106,6 +98,16 @@ public class MainActivity extends AppCompatActivity {
                 });
                 setSupportActionBar(toolbarBottom);
             }
+            cardLayout1 = findViewById(R.id.cardLayoutId1);
+            cardLayout1.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    //FontLog.appendLog(TAG + "Method1", 'd');
+                    Intent intent = new Intent(ctxApp, AircraftActivity.class);
+                    startActivity(intent);
+                }
+
+            });
             toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
             setSupportActionBar(toolbarTop);
             getSupportActionBar().setTitle(getString(R.string.app_label) + " " + AppProp.pAppRelease + AppProp.pAppReleaseSuffix);
@@ -115,9 +117,9 @@ public class MainActivity extends AppCompatActivity {
             spinnerUpdFreq = (Spinner) findViewById(R.id.spinnerId);
             spinnerMinSpeed = (Spinner) findViewById(R.id.spinnerMinSpeedId);
             trackingButton = (Button) findViewById(R.id.btnTracking);
-            clearAll();
+            //clearAll();
             AppProp.get();
-            AppProp.pIsNFCcapable = AppProp.pIsNFCEnable&&isNFCcapable();
+            AppProp.pIsNFCcapable = AppProp.pIsNFCEnabled &&isNFCcapable();
 
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 FontLog.appendLog(TAG + "New App Context", 'd');
@@ -186,7 +188,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getMenuInflater().inflate(R.menu.menu_bottom, amvMenu.getMenu());
+        if(AppProp.pMainActivityLayout.equals("full")) {
+            getMenuInflater().inflate(R.menu.menu_bottom, amvMenu.getMenu());
+        }
         toolbarTop.inflateMenu(R.menu.menu_top);
         return true;
     }
