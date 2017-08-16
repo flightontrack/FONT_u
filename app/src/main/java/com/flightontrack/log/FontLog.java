@@ -10,10 +10,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static com.flightontrack.flight.Session.activeRoute;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
-
+import static com.flightontrack.shared.Props.SessionProp.*;
 /**
  * Created by hotvk on 8/3/2017.
  */

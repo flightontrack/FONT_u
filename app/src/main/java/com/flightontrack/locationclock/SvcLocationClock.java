@@ -13,16 +13,17 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
-import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
 import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.flight.Session.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
+import static com.flightontrack.shared.Props.ctxApp;
 
-public class SvcLocationClock extends Service implements LocationListener {
+public class SvcLocationClock extends Service implements LocationListener,Session {
     private static final String TAG = "SvcLocationClock:";
     //private static Context ctx;
     static LocationManager locationManager;
@@ -159,7 +160,7 @@ public class SvcLocationClock extends Service implements LocationListener {
     public static void setSignalStrengthListener(Boolean start) {
         if (start) {
             phStateListener = new PhoneListener();
-            ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+            ((TelephonyManager) ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).listen(phStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
         } else {
         }
     }
@@ -175,7 +176,7 @@ public class SvcLocationClock extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(Props.ctxApp, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctxApp, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
     }
 
     @Override

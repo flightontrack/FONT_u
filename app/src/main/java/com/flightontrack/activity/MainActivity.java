@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
@@ -35,16 +36,14 @@ import com.flightontrack.flight.Route;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.receiver.ReceiverHealthCheckAlarm;
-import com.flightontrack.flight.Session;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.*;
-//import static com.flightontrack.shared.Props.AppProp.pMainActivityLayout;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class MainActivity extends AppCompatActivity implements Session{
     private static final String TAG = "MainActivity:";
@@ -83,11 +82,12 @@ public class MainActivity extends AppCompatActivity implements Session{
             //instanceThis = this;
             // Session c = new Session(getApplicationContext(),this);
             //MainActivity.ctxApp = getApplicationContext();
+            initProp(getApplicationContext(),this);
 
             setContentView(R.layout.activity_main);
-            AppProp.pMainActivityLayout = findViewById(R.id.TagView).getTag().toString();
-            if(AppProp.pMainActivityLayout.equals("full")) {
-                //AppProp.pIsOnRebootCheckBoxEnabled = true;
+            AppConfig.pMainActivityLayout = findViewById(R.id.TagView).getTag().toString();
+            if(AppConfig.pMainActivityLayout.equals("full")) {
+                //AppConfig.pIsOnRebootCheckBoxEnabled = true;
                 toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
                 amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
                 amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements Session{
             });
             toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
             setSupportActionBar(toolbarTop);
-            getSupportActionBar().setTitle(getString(R.string.app_label) + " " + AppProp.pAppRelease + AppProp.pAppReleaseSuffix);
+            getSupportActionBar().setTitle(getString(R.string.app_label) + " " + AppConfig.pAppRelease + AppConfig.pAppReleaseSuffix);
             txtAcftNum = (TextView) findViewById(R.id.txtAcftNum);
             txtUserName = (TextView) findViewById(R.id.txtUserName);
             chBoxIsMultiLeg = (CheckBox) findViewById(R.id.patternCheckBox);
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements Session{
             spinnerMinSpeed = (Spinner) findViewById(R.id.spinnerMinSpeedId);
             trackingButton = (Button) findViewById(R.id.btnTracking);
             //clearAll();
-            AppProp.get();
-            AppProp.pIsNFCcapable = AppProp.pIsNFCEnabled &&isNFCcapable();
+            AppConfig.get();
+            AppConfig.pIsNFCcapable = AppConfig.pIsNFCEnabled &&isNFCcapable();
 
             if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
                 FontLog.appendLog(TAG + "New App Context", 'd');
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements Session{
                 activeRoute = null;
             }
 
-            if (!AppProp.pIsAppTypePublic) {
+            if (!AppConfig.pIsAppTypePublic) {
                 IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
                 alarmReceiver = new ReceiverHealthCheckAlarm();
                 registerReceiver(alarmReceiver, filter);
@@ -154,10 +154,10 @@ public class MainActivity extends AppCompatActivity implements Session{
     public void onResume() {
         FontLog.appendLog(TAG + "onResume",'d');
         super.onResume();
-        Intent nfcintent = getIntent();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
-            ///TODO
-        }
+//        Intent nfcintent = getIntent();
+//        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(nfcintent.getAction())) {
+//            ///TODO
+//        }
 
         SessionProp.get();
         Util.setAcftNum(Util.getAcftNum(4));
@@ -178,9 +178,9 @@ public class MainActivity extends AppCompatActivity implements Session{
         }
         else txtUserName.setText(Pilot.getPilotUserName());
 
-        if (AppProp.pAutostart) {
+        if (AppConfig.pAutostart) {
             trackingButton.performClick();
-            AppProp.pAutostart = false;
+            AppConfig.pAutostart = false;
         }
         isToDestroy = true;
     }
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements Session{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //getSupportActionBar().setDisplayShowTitleEnabled(true);
-        if(AppProp.pMainActivityLayout.equals("full")) {
+        if(AppConfig.pMainActivityLayout.equals("full")) {
             getMenuInflater().inflate(R.menu.menu_bottom, amvMenu.getMenu());
         }
         toolbarTop.inflateMenu(R.menu.menu_top);
@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements Session{
                         //Util.setUserName(txtUserName.getText().toString());
                         Util.setAcftNum(txtAcftNum.getText().toString());
                         SessionProp.set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
-                        if (!AppProp.pAutostart && !is_services_available()) return;
+                        if (!AppConfig.pAutostart && !is_services_available()) return;
                         //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
                         if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
 
@@ -324,12 +324,12 @@ public class MainActivity extends AppCompatActivity implements Session{
 //                    //Util.setUserName(txtUserName.getText().toString());
 //                    Util.setAcftNum(txtAcftNum.getText().toString());
 //                    set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
-//                    if (!AppProp.pAutostart && !is_services_available()) return;
+//                    if (!AppConfig.pAutostart && !is_services_available()) return;
 //                    //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
-//                    if (!isAircraftPopulated() && !AppProp.pIsEmptyAcftOk) {
+//                    if (!isAircraftPopulated() && !AppConfig.pIsEmptyAcftOk) {
 //
 //                        new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
-//                        if (!AppProp.pIsEmptyAcftOk) return;
+//                        if (!AppConfig.pIsEmptyAcftOk) return;
 //                    }
 //                    routeList.add(new Route());
 //                    //activeRoute = new Route();
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements Session{
         chBoxIsMultiLeg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                //AppProp.pIsMultileg=b;
+                //AppConfig.pIsMultileg=b;
                 SessionProp.set_isMultileg(b);
             }
         });

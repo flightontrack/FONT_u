@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.widget.Toast;
 
 import com.flightontrack.R;
+import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.activity.AircraftActivity;
 import com.flightontrack.activity.MainActivity;
@@ -16,9 +17,9 @@ import com.flightontrack.communication.SvcComm;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
-import static com.flightontrack.flight.Session.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class ShowAlertClass {
+public class ShowAlertClass implements Session{
 
     //MainActivity ctxActivity;
     Context ctx;
@@ -154,9 +155,9 @@ public class ShowAlertClass {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                                 int MAX_count = 5;
-                                SvcComm.commBatchSize= dbLocationRecCount;
+                                SvcComm.commBatchSize= SessionProp.dbLocationRecCount;
                                 int counter =0;
-                                while (dbLocationRecCount>0){
+                                while (SessionProp.dbLocationRecCount>0){
                                     if (counter >MAX_count) break;
                                     try {
                                         Thread.sleep(1000);
@@ -166,7 +167,7 @@ public class ShowAlertClass {
                                     counter++;
                                     set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
                                 }
-                                if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
+                                if(SessionProp.dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                                 int j = sqlHelper.allLocationsDelete();
                                 FontLog.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
                                 set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED);

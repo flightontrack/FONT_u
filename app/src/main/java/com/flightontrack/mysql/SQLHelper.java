@@ -10,8 +10,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.Props;
 
-import static com.flightontrack.flight.Session.*;
-
 public class SQLHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLHelper:";
     private static final int DATABASE_VERSION = 1;
@@ -56,7 +54,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = getLocationTableCount();
+        Props.SessionProp.dbLocationRecCount = getLocationTableCount();
     }
     public void flightLocationsDelete(String flightId) {
         String selection = DBSchema.COLUMN_NAME_COL2+"= ?";
@@ -73,7 +71,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = getLocationTableCount();
+        Props.SessionProp.dbLocationRecCount = getLocationTableCount();
     }
     public int allLocationsDelete() {
         int i =0;
@@ -86,7 +84,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = 0;
+        Props.SessionProp.dbLocationRecCount = 0;
         return i;
     }
     public long  rowLocationInsert(ContentValues values) {
@@ -101,7 +99,7 @@ public class SQLHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = getLocationTableCount();
+        Props.SessionProp.dbLocationRecCount = getLocationTableCount();
         return r;
     }
 

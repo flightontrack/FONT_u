@@ -19,9 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
-import com.flightontrack.flight.Route;
 import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
@@ -44,7 +42,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_settings);
         txtBuild= (TextView) findViewById((R.id.txtBuild));
-        txtBuild.setText((getString(R.string.app_label)+" "+AppProp.pAppRelease+AppProp.pAppReleaseSuffix));
+        txtBuild.setText((getString(R.string.app_label)+" "+ AppConfig.pAppRelease+ AppConfig.pAppReleaseSuffix));
         resetButton = (Button) findViewById(R.id.btnClear);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +66,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 txtPsw.setVisibility(View.VISIBLE);
             }
         });
-        if((!AppProp.pIsAppTypePublic)&&AppProp.pIsOnRebootCheckBoxEnabled) {
+        if((!AppConfig.pIsAppTypePublic)&& AppConfig.pIsOnRebootCheckBoxEnabled) {
             chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
             if (null!=chBoxIsOnReboot) {
                 chBoxIsOnReboot.setChecked(SessionProp.pIsOnReboot);

@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static com.flightontrack.flight.Session.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class SvcBackground extends Service {
     public SvcBackground() {

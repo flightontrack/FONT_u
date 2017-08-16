@@ -25,9 +25,9 @@ import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class Flight {
     private static final String TAG = "Flight:";
@@ -325,7 +325,7 @@ public class Flight {
             if (r > 0) {
                 lastAltitudeFt = (int) (Math.round(location.getAltitude() * 3.281));
                 set_wayPointsCount(p);
-                FontLog.appendLog(TAG + "saveLocation: dbLocationRecCount: " + dbLocationRecCount, 'd');
+                FontLog.appendLog(TAG + "saveLocation: dbLocationRecCount: " + SessionProp.dbLocationRecCount, 'd');
             }
         } catch (Exception e) {
             FontLog.appendLog(TAG + "SQLite Exception Placeholder", 'e');

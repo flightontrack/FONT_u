@@ -33,7 +33,7 @@ public class ReceiverBoot extends BroadcastReceiver {
             Log.d(TAG, " FONT:ReceiverBoot FONT_RECEIVER_FILTER intend");
             Intent intentActivity = new Intent(context, MainActivity.class);
             intentActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Props.AppProp.pAutostart = true;
+            Props.AppConfig.pAutostart = true;
             context.startActivity(intentActivity);
         }
         }

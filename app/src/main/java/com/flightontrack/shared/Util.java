@@ -177,13 +177,13 @@ public class Util {
 
 //    static void uiResume() {
 //            setAcftNum(getAcftNum(4));
-//            MainActivity.set_pIntervalLocationUpdateSecPos(MainActivity.AppProp.pIntervalSelectedItem);
+//            MainActivity.set_pIntervalLocationUpdateSecPos(MainActivity.AppConfig.pIntervalSelectedItem);
 //            setSpinnerSpeedPos(getSpinnerSpeedPos());
 //
 //        if (!(MainActivity._phoneNumber==null)&&!(MainActivity._myDeviceId==null)) {
 //            setUserName(getUserName());
 //        }
-//        MainActivity.AppProp.get();
+//        MainActivity.AppConfig.get();
 //        Route.SessionProp.get();
 //        Route.setTrackingButtonState(Route.trackingButtonState);
 //    }
@@ -203,7 +203,7 @@ public class Util {
 //        editor.remove("pUserName").commit();
 //        editor.remove("cloudpsw").commit();
 //        editor.remove("pIsDebug").commit();
-//        MainActivity.AppProp.get();
+//        MainActivity.AppConfig.get();
 //    }
 
 

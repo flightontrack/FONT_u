@@ -70,7 +70,7 @@ public class AircraftActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FontLog.appendLog(TAG + "AircraftActivity onCreate", 'd');
-        setContentView(Props.AppProp.pIsNFCcapable ? R.layout.activity_acraft: R.layout.activity_acraft_no_nfc);
+        setContentView(Props.AppConfig.pIsNFCcapable ? R.layout.activity_acraft: R.layout.activity_acraft_no_nfc);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class AircraftActivity extends Activity {
        cancelButton = (Button) findViewById(R.id.btn_acft_cancel);
        clearButton = (Button) findViewById(R.id.btn_acft_clear);
 
-       if (Props.AppProp.pIsNFCcapable) {
+       if (Props.AppConfig.pIsNFCcapable) {
            nfcSwitch = (Switch) findViewById(R.id.switch_nfc);
            txtBlueText = (TextView) findViewById(R.id.txtBlueText);
            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -127,7 +127,7 @@ public class AircraftActivity extends Activity {
                     json.put("AcftRegNum",txtAcftRegNum.getText().toString());
                     json.put("AcftName",txtAcftName.getText().toString());
                     setAcft_nonfc(json);
-                    if (Props.AppProp.pIsNFCcapable) {
+                    if (Props.AppConfig.pIsNFCcapable) {
                         json.put("AcftMake", txtAcftMake.getText().toString());
                         json.put("AcftModel", txtAcftModel.getText().toString());
                         json.put("AcftSeries", txtAcftSeries.getText().toString());
@@ -153,12 +153,12 @@ public class AircraftActivity extends Activity {
             public void onClick(View view) {
                 clearAcftPreferences();
                 setAcft_nonfc(getAcft());
-                if (Props.AppProp.pIsNFCcapable) {
+                if (Props.AppConfig.pIsNFCcapable) {
                     setAcft(getAcft());
                 }
             }
         });
-        if (Props.AppProp.pIsNFCcapable) {
+        if (Props.AppConfig.pIsNFCcapable) {
             enableNfcForegroundMode();
             nfcSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

@@ -8,9 +8,8 @@ import com.flightontrack.log.FontLog;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
-import static com.flightontrack.flight.Session.*;
-
-public class Route{
+import static com.flightontrack.shared.Props.SessionProp.*;
+public class Route implements Session{
     private static final String TAG = "Route:";
 
     public Flight activeFlight;
@@ -145,7 +144,7 @@ public class Route{
                     }
                     if (flightList.isEmpty()) {
                         if (activeRoute == this) activeRoute = null;
-                        routeList.remove(this);
+                        SessionProp.routeList.remove(this);
                     }
                 }
 

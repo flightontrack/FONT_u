@@ -9,6 +9,7 @@ import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
 import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
@@ -17,24 +18,18 @@ import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
-import java.util.ArrayList;
-
 
 /**
  * Created by hotvk on 7/6/2017.
  */
 
 public interface Session {
-//    static final String TAG = "Session:";
+    static final String TAG = "Session:";
 //    public static MainActivity mainactivityInstance;
 //    public static Route activeRoute;
 //    public static SQLHelper sqlHelper;
 
-//    public static int dbLocationRecCount = 0;
-//    public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
-//    public static ArrayList<Route> routeList = new ArrayList<>();
-
-//    public Session(Context ctx, MainActivity maInstance) {
+    //    public Session(Context ctx, MainActivity maInstance) {
 //        ctxApp = ctx;
 //        sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
 //        editor = sharedPreferences.edit();
@@ -45,7 +40,7 @@ public interface Session {
 //    }
 
 
-    static void set_SessionRequest(SESSIONREQUEST request) {
+    default void set_SessionRequest(SESSIONREQUEST request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
             case CLOSEAPP_BUTTON_BACK_PRESSED:
@@ -74,13 +69,15 @@ public interface Session {
                 break;
         }
     }
-    static void init(Context ctx, MainActivity maInstance) {
+    default void initProp(Context ctx, MainActivity maInstance) {
         ctxApp = ctx;
         sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        mainactivityInstance = maInstance;
+        sqlHelper = new SQLHelper();
     }
 
-    static void setTrackingButtonState(BUTTONREQUEST request) {
+    default void setTrackingButtonState(BUTTONREQUEST request) {
         //Util.appendLog(TAG+"trackingButtonState request:" +request,'d');
         switch (request) {
             case BUTTON_STATE_RED:
@@ -132,7 +129,7 @@ public interface Session {
         return SessionProp.pTextRed;
     }
 
-    private static String setTextGreen() {
+    static String setTextGreen() {
         SessionProp.pTextGreen = "Flight: " + (activeRoute.activeFlight.flightNumber) + '\n' +
                 "Point: " + activeRoute.activeFlight._wayPointsCount +
                 ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString + '\n'
@@ -140,7 +137,7 @@ public interface Session {
         return SessionProp.pTextGreen;
     }
 
-    private static void startLocationCommService() {
+    static void startLocationCommService() {
 
         sqlHelper.setCursorDataLocation();
         int count = sqlHelper.getCursorCountLocation();
@@ -177,7 +174,7 @@ public interface Session {
         }
     }
 
-    public static Flight get_FlightInstance(String flightNumber){
+    default Flight get_FlightInstance(String flightNumber){
         for (Route r : routeList) {
             for (Flight f : r.flightList) {
                 if (f.flightNumber.equals(flightNumber)) {

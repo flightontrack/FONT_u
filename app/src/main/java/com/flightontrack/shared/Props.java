@@ -8,19 +8,19 @@ import com.flightontrack.activity.MainActivity;
 import com.flightontrack.flight.Route;
 import com.flightontrack.mysql.SQLHelper;
 
-import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.shared.Props.AppProp.*;
+import java.util.ArrayList;
 
-/**
- * Created by hotvk on 8/1/2017.
- */
+import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.AppConfig.*;
+
 
 public class Props {
     public static Context ctxApp;
+    public static MainActivity mainactivityInstance;
     public static SharedPreferences sharedPreferences;
     public static SharedPreferences.Editor editor;
 
-    public static class AppProp{
+    public static class AppConfig {
         public static boolean pIsAppTypePublic=true;
         /// if false:   1. start healthcheckalarmreceiver
             ///             2. aicraft activity layout has no nfc
@@ -54,15 +54,17 @@ public class Props {
         public static double       pSpinnerMinSpeed;
         public static boolean      pIsRoad = false;
         public static boolean      pIsDebug = false;
-        public static String        pTextRed;
-        public static String        pTextGreen;
         public static String[]      pMinSpeedArray;
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
         public static boolean       pIsOnReboot=!pIsAppTypePublic;
 
-        public static MainActivity mainactivityInstance;
         public static Route activeRoute;
         public static SQLHelper sqlHelper;
+        public static ArrayList<Route> routeList = new ArrayList<>();
+        public static int dbLocationRecCount = 0;
+        public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
+        public static String        pTextRed;
+        public static String        pTextGreen;
 
         public static void save() {
             editor.putBoolean("pIsMultileg", pIsMultileg);

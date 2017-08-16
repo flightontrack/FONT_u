@@ -8,8 +8,8 @@ import android.widget.Toast;
 
 import com.flightontrack.flight.Flight;
 import com.flightontrack.R;
+import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
-import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
-import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class SvcComm extends Service {
+public class SvcComm extends Service implements Session{
     public SvcComm() {}
     private static final String TAG = "SvcComm:";
     private RequestParams requestParams = new RequestParams();
@@ -68,7 +68,7 @@ public class SvcComm extends Service {
         dbItemId = (int) extras.getLong("itemId");
         trackPointNumber = extras.getInt("wp");
         flightID = extras.getString("ft");
-        requestParams.put("isdebug", Props.SessionProp.pIsDebug);
+        requestParams.put("isdebug", SessionProp.pIsDebug);
         requestParams.put("speedlowflag",extras.getBoolean("sl"));
         requestParams.put("rcode",      extras.getInt("rc"));
         requestParams.put("latitude",   extras.getString("la"));
