@@ -24,27 +24,28 @@ import java.util.ArrayList;
  * Created by hotvk on 7/6/2017.
  */
 
-public class Session {
-    private static final String TAG = "Session:";
-    public static MainActivity mainactivityInstance;
-    public static Route activeRoute;
-    public static SQLHelper sqlHelper;
+public interface Session {
+//    static final String TAG = "Session:";
+//    public static MainActivity mainactivityInstance;
+//    public static Route activeRoute;
+//    public static SQLHelper sqlHelper;
 
-    public static int dbLocationRecCount = 0;
-    public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
-    public static ArrayList<Route> routeList = new ArrayList<>();
+//    public static int dbLocationRecCount = 0;
+//    public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
+//    public static ArrayList<Route> routeList = new ArrayList<>();
 
-    public Session(Context ctx, MainActivity maInstance) {
-        ctxApp = ctx;
-        sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        SessionProp.pMinSpeedArray = ctx.getResources().getStringArray(R.array.speed_array);
-        mainactivityInstance = maInstance;
-        sqlHelper = new SQLHelper();
+//    public Session(Context ctx, MainActivity maInstance) {
+//        ctxApp = ctx;
+//        sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
+//        editor = sharedPreferences.edit();
+//        SessionProp.pMinSpeedArray = ctx.getResources().getStringArray(R.array.speed_array);
+//        mainactivityInstance = maInstance;
+//        sqlHelper = new SQLHelper();
+//
+//    }
 
-    }
 
-    public static void set_SessionRequest(SESSIONREQUEST request) {
+    static void set_SessionRequest(SESSIONREQUEST request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
             case CLOSEAPP_BUTTON_BACK_PRESSED:
@@ -73,8 +74,13 @@ public class Session {
                 break;
         }
     }
+    static void init(Context ctx, MainActivity maInstance) {
+        ctxApp = ctx;
+        sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+    }
 
-    public static void setTrackingButtonState(BUTTONREQUEST request) {
+    static void setTrackingButtonState(BUTTONREQUEST request) {
         //Util.appendLog(TAG+"trackingButtonState request:" +request,'d');
         switch (request) {
             case BUTTON_STATE_RED:
@@ -107,7 +113,7 @@ public class Session {
         trackingButtonState = request;
     }
 
-    private static String setTextRed() {
+    static String setTextRed() {
         String fid = SessionProp.pTextRed;
         String fTime = "";
         String flightId;

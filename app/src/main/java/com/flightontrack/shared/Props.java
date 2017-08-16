@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.flight.Route;
+import com.flightontrack.mysql.SQLHelper;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.AppProp.*;
@@ -57,6 +59,10 @@ public class Props {
         public static String[]      pMinSpeedArray;
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
         public static boolean       pIsOnReboot=!pIsAppTypePublic;
+
+        public static MainActivity mainactivityInstance;
+        public static Route activeRoute;
+        public static SQLHelper sqlHelper;
 
         public static void save() {
             editor.putBoolean("pIsMultileg", pIsMultileg);

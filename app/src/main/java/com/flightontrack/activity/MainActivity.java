@@ -46,7 +46,7 @@ import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.*;
 //import static com.flightontrack.shared.Props.AppProp.pMainActivityLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Session{
     private static final String TAG = "MainActivity:";
     //public static Context ctxApp;
     static TextView txtUserName;
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             //Log.d(TAG, "MainActivityThread:" + Thread.currentThread().getId());
             //instanceThis = this;
-            Session c = new Session(getApplicationContext(),this);
+            // Session c = new Session(getApplicationContext(),this);
             //MainActivity.ctxApp = getApplicationContext();
 
             setContentView(R.layout.activity_main);
