@@ -13,6 +13,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
@@ -102,7 +103,7 @@ public class SvcLocationClock extends Service implements LocationListener,Sessio
                 /// it is a protection
                 setClockNextTimeLocalMsec(_intervalClockSecCurrent);
                 if (_mode == MODE.CLOCK_LOCATION) {
-                    activeRoute.activeFlight.onClock(location);
+                    Route.activeRoute.activeFlight.onClock(location);
                 }
 
                 //Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.flightList.size() + " _mode:" + _mode, 'd');

@@ -48,14 +48,14 @@ public interface Session {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
                     FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
                 } else {
-                    if (!(activeRoute ==null)) activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
+                    if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
                     mainactivityInstance.finishActivity();
                 }
                 break;
             case ON_COMMUNICATION_SUCCESS:
                 break;
             case START_COMMUNICATION:
-                for (Route r : routeList) {
+                for (Route r : Route.routeList) {
                     r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
                 }
                 if (Util.isNetworkAvailable()) {
@@ -86,7 +86,7 @@ public interface Session {
                 break;
             case BUTTON_STATE_YELLOW:
                 MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                MainActivity.trackingButton.setText("Flight " + (activeRoute.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
+                MainActivity.trackingButton.setText("Flight " + (Route.activeRoute.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
                 //editor.putInt("trackingButtonState", BUTTON_STATE_YELLOW);
                 break;
             case BUTTON_STATE_GREEN:
@@ -115,12 +115,12 @@ public interface Session {
         String fTime = "";
         String flightId;
 
-        if (activeRoute == null) {
+        if (Route.activeRoute == null) {
             FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
         } else {
-            if (activeRoute!=null && activeRoute.activeFlight!=null) {
-                flightId = activeRoute.activeFlight.flightNumber;
-                fTime = activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString;
+            if (Route.activeRoute!=null && Route.activeRoute.activeFlight!=null) {
+                flightId = Route.activeRoute.activeFlight.flightNumber;
+                fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
             }
             else {flightId = FLIGHT_NUMBER_DEFAULT;}
             fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
@@ -130,10 +130,10 @@ public interface Session {
     }
 
     static String setTextGreen() {
-        SessionProp.pTextGreen = "Flight: " + (activeRoute.activeFlight.flightNumber) + '\n' +
-                "Point: " + activeRoute.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeRoute.activeFlight.flightTimeString + '\n'
-                + "Alt: " + activeRoute.activeFlight.lastAltitudeFt + " ft";
+        SessionProp.pTextGreen = "Flight: " + (Route.activeRoute.activeFlight.flightNumber) + '\n' +
+                "Point: " + Route.activeRoute.activeFlight._wayPointsCount +
+                ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString + '\n'
+                + "Alt: " + Route.activeRoute.activeFlight.lastAltitudeFt + " ft";
         return SessionProp.pTextGreen;
     }
 
@@ -175,14 +175,14 @@ public interface Session {
     }
 
     default Flight get_FlightInstance(String flightNumber){
-        for (Route r : routeList) {
+        for (Route r : Route.routeList) {
             for (Flight f : r.flightList) {
                 if (f.flightNumber.equals(flightNumber)) {
                     return f;
                 }
             }
         }
-        return activeRoute.activeFlight;
+        return Route.activeRoute.activeFlight;
     }
 
 }

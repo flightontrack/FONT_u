@@ -58,9 +58,7 @@ public class Props {
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
         public static boolean       pIsOnReboot=!pIsAppTypePublic;
 
-        public static Route activeRoute;
         public static SQLHelper sqlHelper;
-        public static ArrayList<Route> routeList = new ArrayList<>();
         public static int dbLocationRecCount = 0;
         public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
         public static String        pTextRed;

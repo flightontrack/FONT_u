@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.flight.Route;
 import com.flightontrack.shared.Const;
 import com.flightontrack.shared.Props;
 
@@ -19,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class SvcBackground extends Service {
@@ -82,7 +82,7 @@ public class SvcBackground extends Service {
                 break;
         }
         if (!Props.SessionProp.pIsDebug) return;
-        String timeStr = activeRoute.activeFlight.flightNumber + getDateTime() + "*";
+        String timeStr = Route.activeRoute.activeFlight.flightNumber + getDateTime() + "*";
         String LINE_SEPARATOR = System.getProperty("line.separator");
 
         File sdcard = Environment.getExternalStorageDirectory();

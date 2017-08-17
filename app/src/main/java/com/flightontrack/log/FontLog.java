@@ -3,6 +3,7 @@ package com.flightontrack.log;
 import android.os.Environment;
 import android.util.Log;
 
+import com.flightontrack.flight.Route;
 import com.flightontrack.shared.Util;
 
 import java.io.BufferedWriter;
@@ -12,7 +13,7 @@ import java.io.IOException;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
-import static com.flightontrack.shared.Props.SessionProp.*;
+
 /**
  * Created by hotvk on 8/3/2017.
  */
@@ -35,7 +36,7 @@ public class FontLog {
             //if (getIsDebug()) return; //TODO disabled to check permissions
             //String timeStr= (new Flight(ctx).get_ActiveFlightID())+"*"+time.format("%H:%M:%S")+"*";
             //String timeStr = Flight.get_ActiveFlightID() + "*" + getDateTimeNow() + "*";
-            String timeStr = (activeRoute !=null&&!(null==activeRoute.activeFlight)? activeRoute.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + Util.getDateTimeNow() + "*";
+            String timeStr = (Route.activeRoute !=null&&!(null== Route.activeRoute.activeFlight)? Route.activeRoute.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + Util.getDateTimeNow() + "*";
             String LINE_SEPARATOR = System.getProperty("line.separator");
             File sdcard=null;
             try {

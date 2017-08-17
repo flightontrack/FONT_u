@@ -10,10 +10,12 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 public class Route implements Session{
-    private static final String TAG = "Route:";
+
+    private final String TAG = "Route:";
+    public static Route activeRoute;
+    public static ArrayList<Route> routeList = new ArrayList<>();
 
     public Flight activeFlight;
-    public static boolean _isRoad = false; //change isRoad() too in two places
     public ArrayList<Flight> flightList = new ArrayList<>();
     String routeNumber = null;
     int _legCount = 0;
@@ -144,7 +146,7 @@ public class Route implements Session{
                     }
                     if (flightList.isEmpty()) {
                         if (activeRoute == this) activeRoute = null;
-                        SessionProp.routeList.remove(this);
+                        routeList.remove(this);
                     }
                 }
 

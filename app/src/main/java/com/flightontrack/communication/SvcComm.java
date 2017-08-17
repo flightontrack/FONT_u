@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.flightontrack.flight.Flight;
 import com.flightontrack.R;
+import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.Util;
@@ -99,7 +100,7 @@ public class SvcComm extends Service implements Session{
                         Response response = new Response(new String(responseBody));
                         //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
                         if (response.jsonErrorCount>0) {
-                            if (response.jsonErrorCount>MAX_JSON_ERROR) activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                            if (response.jsonErrorCount>MAX_JSON_ERROR) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                             return;
                         }
                         try {

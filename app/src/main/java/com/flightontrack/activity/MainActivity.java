@@ -121,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements Session{
             AppConfig.get();
             AppConfig.pIsNFCcapable = AppConfig.pIsNFCEnabled &&isNFCcapable();
 
-            if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
-                FontLog.appendLog(TAG + "New App Context", 'd');
-                Util.setCurrAppContext(ctxApp.toString());
-                activeRoute = null;
-            }
+//            if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
+//                FontLog.appendLog(TAG + "New App Context", 'd');
+//                Util.setCurrAppContext(ctxApp.toString());
+//                Route.activeRoute = null;
+//            }
 
             if (!AppConfig.pIsAppTypePublic) {
                 IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements Session{
                 acftActivity();
                 return true;
             case R.id.action_facebook:
-                if (!(activeRoute.activeFlight == null)) facebActivity();
+                if (!(Route.activeRoute.activeFlight == null)) facebActivity();
                 else
                     Toast.makeText(MainActivity.this, getString(R.string.start_flight_first), Toast.LENGTH_LONG).show();
                 return true;
@@ -312,12 +312,12 @@ public class MainActivity extends AppCompatActivity implements Session{
                             new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
                             if (!SessionProp.pIsEmptyAcftOk) return;
                         }
-                        routeList.add(new Route());
+                        Route.routeList.add(new Route());
                         //activeRoute = new Route();
                         break;
                     default:
                         SessionProp.set_isMultileg(false);
-                        activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                        Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                         break;
                 }
 //                if (activeRoute == null) {
