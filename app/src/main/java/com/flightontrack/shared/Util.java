@@ -218,42 +218,6 @@ public class Util {
         return sharedPreferences.getInt("gsmsignalstrength", -1);
     }
 
-    public static String getTimeLocal() {
-        long currTime = new Date().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getDefault());
-        return dateFormat.format(currTime);
-    }
-
-    public static long getTimeGMT() {
-        long currTime = new Date().getTime();
-        //DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        //dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
-        return currTime;
-    }
-
-    public static String getDateTimeNow() {
-        long currTime = new Date().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getDefault());
-        return dateFormat.format(currTime);
-    }
-
-    public static String getCurrAppContext() {
-        return sharedPreferences.getString("a_currAppContext","0");
-    }
-
-    public static void setCurrAppContext(String appContext) {
-        sharedPreferences.edit().putString("a_currAppContext",appContext).commit();
-    }
-
-//    static Boolean getIsDebug() {
-//        return sharedPreferences.getBoolean("a_isDebug", false);
-//    }
-
-//    static void setIsDebug(Boolean isDebug) {
-//        editor.putBoolean("a_isDebug", isDebug).commit();
-//    }
 
     public static Boolean getIsOnBoot() {
         return sharedPreferences.getBoolean("a_isOnBoot", false);

@@ -15,6 +15,7 @@ import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.mysql.SQLHelper;
+import com.flightontrack.shared.GetTime;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
@@ -23,7 +24,7 @@ import com.flightontrack.ui.ShowAlertClass;
  * Created by hotvk on 7/6/2017.
  */
 
-public interface Session {
+public interface Session extends GetTime{
     static final String TAG = "Session:";
 //    public static MainActivity mainactivityInstance;
 //    public static Route activeRoute;
@@ -120,7 +121,7 @@ public interface Session {
         } else {
             if (Route.activeRoute!=null && Route.activeRoute.activeFlight!=null) {
                 flightId = Route.activeRoute.activeFlight.flightNumber;
-                fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
+                fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + GetTime.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
             }
             else {flightId = FLIGHT_NUMBER_DEFAULT;}
             fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';

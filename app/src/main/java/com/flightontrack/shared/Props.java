@@ -128,7 +128,13 @@ public class Props {
             get();
             //save();
         }
+    }
+    public static String getCurrAppContext() {
+        return sharedPreferences.getString("a_currAppContext","0");
+    }
 
+    public static void setCurrAppContext(String appContext) {
+        sharedPreferences.edit().putString("a_currAppContext",appContext).commit();
     }
     public static void clearAll() {
         //Toast.makeText(SessionProp.ctxApp, R.string.user_needs_to_restart_app, Toast.LENGTH_LONG).show();

@@ -17,14 +17,14 @@ import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
-import com.flightontrack.shared.Util;
+import com.flightontrack.shared.GetTime;
 import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.shared.Props.ctxApp;
 
-public class SvcLocationClock extends Service implements LocationListener,Session {
+public class SvcLocationClock extends Service implements LocationListener,GetTime,Session {
     private static final String TAG = "SvcLocationClock:";
     //private static Context ctx;
     static LocationManager locationManager;
@@ -95,7 +95,7 @@ public class SvcLocationClock extends Service implements LocationListener,Sessio
             return;
         }
         else {
-            long currTime = Util.getTimeGMT();
+            long currTime = getTimeGMT();
             FontLog.appendLog(TAG + "___TIMER-onLocationChanged :  Counter:" + counter, 'd');
 
             if (currTime + TIME_RESERVE >= alarmNextTimeUTCmsec) {
@@ -152,7 +152,7 @@ public class SvcLocationClock extends Service implements LocationListener,Sessio
         instance=this;
         _mode = MODE.CLOCK_LOCATION;
         //ctx = getApplicationContext();
-        alarmNextTimeUTCmsec = Util.getTimeGMT();
+        alarmNextTimeUTCmsec = getTimeGMT();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //ReceiverHealthCheckAlarm.isRestart = true;
 
@@ -215,7 +215,7 @@ public class SvcLocationClock extends Service implements LocationListener,Sessio
         phStateListener=null;
     }
 
-    static void setClockNextTimeLocalMsec(int intervalSec) {
-        alarmNextTimeUTCmsec = Util.getTimeGMT()+ intervalSec*1000;
+    void setClockNextTimeLocalMsec(int intervalSec) {
+        alarmNextTimeUTCmsec = getTimeGMT()+ intervalSec*1000;
     }
 }

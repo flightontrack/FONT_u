@@ -12,6 +12,7 @@ import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.shared.Const;
+import com.flightontrack.shared.GetTime;
 import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpClient;
@@ -29,7 +30,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class Flight {
+public class Flight implements GetTime{
     private static final String TAG = "Flight:";
     public String flightNumber;
     public FSTATUS fStatus = FSTATUS.PASSIVE;
@@ -63,7 +64,7 @@ public class Flight {
                 switch (request) {
                     case CHANGESTATE_INFLIGHT:
                         /// reset Timer 1 to slower rate
-                        _flightStartTimeGMT = Util.getTimeGMT();
+                        _flightStartTimeGMT = getTimeGMT();
                         SvcLocationClock.instance.requestLocationUpdate(SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
                         route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
                         flightState = request;
@@ -319,7 +320,7 @@ public class Flight {
             values.put(DBSchema.COLUMN_NAME_COL9, Math.round(location.getAltitude())); //extrainfo
             values.put(DBSchema.COLUMN_NAME_COL10, p); //wpntnum
             values.put(DBSchema.COLUMN_NAME_COL11, Integer.toString(Util.getSignalStregth())); //gsmsignal
-            values.put(DBSchema.COLUMN_NAME_COL12, URLEncoder.encode(Util.getDateTimeNow(), "UTF-8")); //date
+            values.put(DBSchema.COLUMN_NAME_COL12, URLEncoder.encode(getDateTimeNow(), "UTF-8")); //date
             values.put(DBSchema.COLUMN_NAME_COL13, iselevecheck);
             long r = sqlHelper.rowLocationInsert(values);
             if (r > 0) {
@@ -333,7 +334,7 @@ public class Flight {
     }
 
     public void set_flightTimeSec() {
-        long elapsedTime = Util.getTimeGMT() - _flightStartTimeGMT;
+        long elapsedTime = getTimeGMT() - _flightStartTimeGMT;
         _flightTimeSec = (int) elapsedTime / 1000;
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
