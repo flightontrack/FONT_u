@@ -15,7 +15,6 @@ import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.mysql.SQLHelper;
-import com.flightontrack.shared.GetTime;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
@@ -29,22 +28,23 @@ public interface Session{
     default void set_SessionRequest(SESSIONREQUEST request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
-            case CLOSEAPP_BUTTON_BACK_PRESSED:
+            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
                 if (dbLocationRecCount > 0) {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
                     FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
                 } else {
+                    set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
+                }
+                break;
+                case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
                     if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
                     mainactivityInstance.finishActivity();
-                }
                 break;
             case BUTTON_STOP_PRESSED:
                 if (dbLocationRecCount > 0) {
-                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
-                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
-                } else {
-                    Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                    set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
                 }
+                Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                 break;
             case SEND_STORED_LOCATIONS:
                 sendStoredLocations();

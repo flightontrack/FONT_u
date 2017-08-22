@@ -317,7 +317,8 @@ public class MainActivity extends AppCompatActivity implements Session{
                         break;
                     default:
                         SessionProp.set_isMultileg(false);
-                        Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                        set_SessionRequest(SESSIONREQUEST.BUTTON_STOP_PRESSED);
+                        //Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
                         break;
                 }
 //                if (activeRoute == null) {

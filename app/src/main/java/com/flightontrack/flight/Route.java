@@ -115,7 +115,7 @@ public class Route implements Session{
                 closeFlightDeleteAllPoints();
                 //activeRoute =null;
                 break;
-//            case CLOSEAPP_BUTTON_BACK_PRESSED:
+//            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
 //                if (dbLocationRecCount > 0) {
 //                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
 //                    Util.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
