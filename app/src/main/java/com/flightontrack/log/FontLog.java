@@ -10,6 +10,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
@@ -18,9 +22,18 @@ import static com.flightontrack.shared.Props.*;
  * Created by hotvk on 8/3/2017.
  */
 
-public class FontLog implements GetTime{
+public class FontLog{
 
     private static final String TAG = "FontLog:";
+
+    private static String getDateTimeNow() {
+        /// this method id identical to GetTime default method
+        long currTime = new Date().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+        return dateFormat.format(currTime);
+    }
+
     public static void appendLog(String text,char type) {
 
         switch (type) {
@@ -36,7 +49,7 @@ public class FontLog implements GetTime{
             //if (getIsDebug()) return; //TODO disabled to check permissions
             //String timeStr= (new Flight(ctx).get_ActiveFlightID())+"*"+time.format("%H:%M:%S")+"*";
             //String timeStr = Flight.get_ActiveFlightID() + "*" + getDateTimeNow() + "*";
-            String timeStr = (Route.activeRoute !=null&&!(null== Route.activeRoute.activeFlight)? Route.activeRoute.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "*" + getDateTimeNow() + "*";
+            String timeStr = (Route.activeRoute !=null&&!(null== Route.activeRoute.activeFlight)? Route.activeRoute.activeFlight.flightNumber :FLIGHT_NUMBER_DEFAULT) + "[" + getDateTimeNow() + "]";
             String LINE_SEPARATOR = System.getProperty("line.separator");
             File sdcard=null;
             try {

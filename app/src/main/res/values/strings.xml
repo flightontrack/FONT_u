@@ -97,14 +97,15 @@
     <string name="driving">Looks like you are driving on road. The flight has been terminated.</string>
     <string name="toast_permiss_declined_1">The app cannot run without this permission.</string>
     <string name="toast_permiss_declined_2">The app cannot run in debug mode without this permission.</string>
-    <string name="toast_noconnectivity">Connectivity unavailable, cant send location.</string>
+    <string name="toast_noconnectivity">FONT: Connectivity unavailable, cant send location.</string>
 
     <!--dialog-->
     <string name="acft_dialog">You do not have Aircraft N number populated. Is it OK?</string>
     <string name="acft_dialog_neg">No, go to Aircraft Settings</string>
     <string name="acft_dialog_pos">Yes, I will restart the flight</string>
 
-    <string name="unsentrecords_dialog"> points left unsent in cache. Do you want to send them to cloud now?</string>
+    <string name="unsentrecords_toast"> Sending points left in cache.</string>
+    <string name="unsentrecords_dialog"> points left in cache. Do you want to send them to cloud now?</string>
     <string name="unsentrecords_dialog_neg">No, just cancel. The points will be lost.</string>
     <string name="unsentrecords_dialog_pos">Yes, try it now.</string>
     <string name="unsentrecords_failed">Failed to send. The points will be lost.</string>

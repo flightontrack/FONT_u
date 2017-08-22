@@ -24,23 +24,8 @@ import com.flightontrack.ui.ShowAlertClass;
  * Created by hotvk on 7/6/2017.
  */
 
-public interface Session extends GetTime{
+public interface Session{
     static final String TAG = "Session:";
-//    public static MainActivity mainactivityInstance;
-//    public static Route activeRoute;
-//    public static SQLHelper sqlHelper;
-
-    //    public Session(Context ctx, MainActivity maInstance) {
-//        ctxApp = ctx;
-//        sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
-//        editor = sharedPreferences.edit();
-//        SessionProp.pMinSpeedArray = ctx.getResources().getStringArray(R.array.speed_array);
-//        mainactivityInstance = maInstance;
-//        sqlHelper = new SQLHelper();
-//
-//    }
-
-
     default void set_SessionRequest(SESSIONREQUEST request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
@@ -52,6 +37,17 @@ public interface Session extends GetTime{
                     if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
                     mainactivityInstance.finishActivity();
                 }
+                break;
+            case BUTTON_STOP_PRESSED:
+                if (dbLocationRecCount > 0) {
+                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
+                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
+                } else {
+                    Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                }
+                break;
+            case SEND_STORED_LOCATIONS:
+                sendStoredLocations();
                 break;
             case ON_COMMUNICATION_SUCCESS:
                 break;
@@ -70,6 +66,7 @@ public interface Session extends GetTime{
                 break;
         }
     }
+
     default void initProp(Context ctx, MainActivity maInstance) {
         ctxApp = ctx;
         sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
@@ -121,7 +118,8 @@ public interface Session extends GetTime{
         } else {
             if (Route.activeRoute!=null && Route.activeRoute.activeFlight!=null) {
                 flightId = Route.activeRoute.activeFlight.flightNumber;
-                fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + GetTime.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
+                //fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + GetTime.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
+                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
             }
             else {flightId = FLIGHT_NUMBER_DEFAULT;}
             fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
@@ -186,4 +184,23 @@ public interface Session extends GetTime{
         return Route.activeRoute.activeFlight;
     }
 
+    default void sendStoredLocations(){
+        int MaxTryCount = 5;
+        SvcComm.commBatchSize= dbLocationRecCount;
+        int counter =0;
+        while (dbLocationRecCount>0){
+            if (counter >MaxTryCount) {
+                Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            counter++;
+            Toast.makeText(mainactivityInstance, R.string.unsentrecords_toast, Toast.LENGTH_SHORT).show();
+            set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
+        }
+    }
 }

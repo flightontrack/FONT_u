@@ -2,10 +2,8 @@ package com.flightontrack.activity;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-//import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-//import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;

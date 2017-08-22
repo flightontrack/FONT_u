@@ -154,11 +154,11 @@ public class ShowAlertClass implements Session{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                int MAX_count = 5;
+                                int MaxTryCount = 5;
                                 SvcComm.commBatchSize= SessionProp.dbLocationRecCount;
                                 int counter =0;
                                 while (SessionProp.dbLocationRecCount>0){
-                                    if (counter >MAX_count) break;
+                                    if (counter >MaxTryCount) break;
                                     try {
                                         Thread.sleep(1000);
                                     } catch(InterruptedException ex) {

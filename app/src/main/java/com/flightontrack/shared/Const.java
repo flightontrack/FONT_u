@@ -40,7 +40,7 @@ public abstract class Const {
     public static final String FLIGHT_NUMBER_DEFAULT = "00";
     public static final String ROUTE_NUMBER_DEFAULT = "00";
 
-    public static final int COMM_BATCH_SIZE_MAX = 10;
+    public static final int COMM_BATCH_SIZE_MAX = 50;
     public static final int COMM_BATCH_SIZE_MIN = 1;
     public static final String GLOBALTAG="FLIGHT_ON_TRACK";
 
@@ -80,6 +80,8 @@ public abstract class Const {
     }
     public enum SESSIONREQUEST{
         CLOSEAPP_BUTTON_BACK_PRESSED,
+        BUTTON_STOP_PRESSED,
+        SEND_STORED_LOCATIONS,
         START_COMMUNICATION,
         ON_COMMUNICATION_SUCCESS
     }
