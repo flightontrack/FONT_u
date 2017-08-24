@@ -5,28 +5,27 @@ import android.content.SharedPreferences;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
-import com.flightontrack.flight.Route;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.SQLHelper;
-
-import java.util.ArrayList;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.AppConfig.*;
 
 
 public class Props {
+    private static final String TAG = "Props:";
     public static Context ctxApp;
     public static MainActivity mainactivityInstance;
     public static SharedPreferences sharedPreferences;
     public static SharedPreferences.Editor editor;
 
     public static class AppConfig {
-        public static boolean pIsAppTypePublic=true;
+        public static boolean pIsAppTypePublic=false;
         /// if false:   1. start healthcheckalarmreceiver
             ///             2. aicraft activity layout has no nfc
             ///             3. autostart (request flight) is true
             ///             4. app starts on reboot
-        public static boolean pAutostart=!pIsAppTypePublic;
+        public static boolean pAutostart=!pIsAppTypePublic&&SessionProp.pIsStartedOnReboot;
         public static boolean pIsNFCEnabled =false;
         public static String pAppRelease = "1.73";
         public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
@@ -34,7 +33,6 @@ public class Props {
         /// these properties updated dynamically in run time
         public static String pMainActivityLayout = "full";
         public static boolean pIsNFCcapable=false;
-        public static boolean pIsOnRebootCheckBoxEnabled=false;
 
         public static void get(){
             //pIsAppTypePublic = false;
@@ -54,9 +52,10 @@ public class Props {
         public static double       pSpinnerMinSpeed;
         public static boolean      pIsRoad = false;
         public static boolean      pIsDebug = false;
-        public static String[]      pMinSpeedArray;
+        //public static String[]      pMinSpeedArray=ctxApp.getResources().getStringArray(R.array.speed_array);
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
         public static boolean       pIsOnReboot=!pIsAppTypePublic;
+        public static boolean       pIsStartedOnReboot =false;
 
         public static SQLHelper sqlHelper;
         public static int dbLocationRecCount = 0;
@@ -87,6 +86,7 @@ public class Props {
             //pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerMinSpeed", DEFAULT_SPEED_SPINNER_POS);
             pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
             pIsOnReboot=sharedPreferences.getBoolean("pIsOnReboot", false);
+            pIsStartedOnReboot =sharedPreferences.getBoolean("pIsStartedOnReboot", false);
         }
 
         public static void set_isMultileg(boolean isMultileg) {
@@ -95,11 +95,13 @@ public class Props {
         }
         public static void set_pSpinnerMinSpeedPos(int pos) {
             pSpinnerMinSpeedPos = pos;
-            pSpinnerMinSpeed = Double.parseDouble(pMinSpeedArray[pos]) * 0.44704;
+            String[] minSpeedArray=ctxApp.getResources().getStringArray(R.array.speed_array);
+            pSpinnerMinSpeed = Double.parseDouble(minSpeedArray[pos]) * 0.44704;
             MainActivity.spinnerMinSpeed.setSelection(pos);
 
         }
         public static void set_pIntervalLocationUpdateSecPos(int pos) {
+            FontLog.appendLog(TAG + "set_pIntervalLocationUpdateSecPos:"+pos,'d');
             pIntervalSelectedItem =pos;
             pIntervalLocationUpdateSec =pUpdateIntervalSec[pos];
             MainActivity.spinnerUpdFreq.setSelection(pos);

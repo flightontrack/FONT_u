@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements Session{
             //clearAll();
             AppConfig.get();
             AppConfig.pIsNFCcapable = AppConfig.pIsNFCEnabled &&isNFCcapable();
+            SessionProp.get();
 
 //            if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
 //                FontLog.appendLog(TAG + "New App Context", 'd');
@@ -304,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements Session{
                     case BUTTON_STATE_RED:
                         //Util.setUserName(txtUserName.getText().toString());
                         Util.setAcftNum(txtAcftNum.getText().toString());
-                        SessionProp.set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
+                        //set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
                         if (!AppConfig.pAutostart && !is_services_available()) return;
                         //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
                         if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
@@ -471,12 +472,12 @@ public class MainActivity extends AppCompatActivity implements Session{
         spinnerUpdFreq.setAdapter(adapter);
         spinnerUpdFreq.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SessionProp.set_pIntervalLocationUpdateSecPos(position);
+                set_pIntervalLocationUpdateSecPos(position);
             }
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        //spinnerUpdFreq.setSelection(SessionProp.pIntervalSelectedItem);
+        spinnerUpdFreq.setSelection(SessionProp.pIntervalSelectedItem);
     }
 
     void minSpeedSpinnerSetup() {
@@ -496,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements Session{
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        SessionProp.pMinSpeedArray= getResources().getStringArray(R.array.speed_array);
+        //pMinSpeedArray= getResources().getStringArray(R.array.speed_array);
     }
 
     public static Boolean isMainActivityExist() {

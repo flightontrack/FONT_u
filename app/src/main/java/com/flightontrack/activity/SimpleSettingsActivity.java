@@ -66,14 +66,14 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 txtPsw.setVisibility(View.VISIBLE);
             }
         });
-        if((!AppConfig.pIsAppTypePublic)&& AppConfig.pIsOnRebootCheckBoxEnabled) {
+        if((!AppConfig.pIsAppTypePublic)) {
             chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
             if (null!=chBoxIsOnReboot) {
                 chBoxIsOnReboot.setChecked(SessionProp.pIsOnReboot);
                 chBoxIsOnReboot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        SessionProp.pIsOnReboot = true;
+                        SessionProp.pIsOnReboot = b;
                         //Util.setIsOnBoot(b);
                     }
                 });

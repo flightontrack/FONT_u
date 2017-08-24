@@ -61,7 +61,7 @@ public class Util {
         String[] spinnerUrls = ctxApp.getResources().getStringArray(R.array.url_array);
         FontLog.appendLog(TAG + "getTrackingUR : " + spinnerUrls[SessionProp.pSpinnerUrlsPos].trim(),'d');
         //return sharedPreferences.getString("trackingURL", spinnerUrls[getSpinnerUrlsPos()]).trim();
-        return spinnerUrls[SessionProp.pSpinnerUrlsPos].trim();
+        return "http://"+spinnerUrls[SessionProp.pSpinnerUrlsPos].trim();
     }
 
 //    static int getSpinnerUrlsPos() {
