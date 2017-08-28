@@ -20,14 +20,14 @@ public class Props {
     public static SharedPreferences.Editor editor;
 
     public static class AppConfig {
+        public static String pAppRelease = "1.74";
+        public static boolean pIsNFCEnabled =false;
         public static boolean pIsAppTypePublic=false;
         /// if false:   1. start healthcheckalarmreceiver
             ///             2. aicraft activity layout has no nfc
             ///             3. autostart (request flight) is true
             ///             4. app starts on reboot
         public static boolean pAutostart=!pIsAppTypePublic&&SessionProp.pIsStartedOnReboot;
-        public static boolean pIsNFCEnabled =false;
-        public static String pAppRelease = "1.73";
         public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
 
         /// these properties updated dynamically in run time
@@ -101,7 +101,7 @@ public class Props {
 
         }
         public static void set_pIntervalLocationUpdateSecPos(int pos) {
-            FontLog.appendLog(TAG + "set_pIntervalLocationUpdateSecPos:"+pos,'d');
+            //FontLog.appendLog(TAG + "set_pIntervalLocationUpdateSecPos:"+pos,'d');
             pIntervalSelectedItem =pos;
             pIntervalLocationUpdateSec =pUpdateIntervalSec[pos];
             MainActivity.spinnerUpdFreq.setSelection(pos);

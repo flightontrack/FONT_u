@@ -21,7 +21,7 @@ public class MyPhone {
     static int      codeSDK;
 
     public static String _myDeviceId = null;
-    public static String _myPhoneId = null;
+    public static String _myPhoneId = getMyPhoneID();
     public static String _phoneNumber = null;
 
     public MyPhone() {
@@ -49,11 +49,12 @@ public class MyPhone {
         return versionCode;
     }
 
-    static void getMyPhoneID() {
+    static String getMyPhoneID() {
         _phoneNumber = ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
         _myDeviceId = ((TelephonyManager) Props.ctxApp.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         String strId = (_phoneNumber == null||_phoneNumber.isEmpty()) ? _myDeviceId : _phoneNumber;
         _myPhoneId = strId.substring(strId.length() - 10); /// 10 digits number
+        return _myPhoneId;
     }
 
     public static String getMyAndroidID() {

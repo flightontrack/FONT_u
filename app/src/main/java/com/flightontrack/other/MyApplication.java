@@ -38,7 +38,7 @@ import static com.flightontrack.shared.Const.*;
 public class MyApplication extends Application {
     public static boolean productionRelease = false;
     //public static APPTYPE fontAppType = APPTYPE.PRIVATE;
-    public static APPTYPE fontAppType = APPTYPE.PUBLIC;
+    //public static APPTYPE fontAppType = APPTYPE.PUBLIC;
     //public static boolean productionRelease = true;
     @Override
     public void onCreate() {

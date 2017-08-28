@@ -4,7 +4,6 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.flightontrack.flight.Route;
-import com.flightontrack.shared.GetTime;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static com.flightontrack.pilot.MyPhone._myPhoneId;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 
@@ -63,7 +63,7 @@ public class FontLog{
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            File logFile = new File(dir, "FONT_LogFile.txt");
+            File logFile = new File(dir, "FONTLog_"+_myPhoneId+".txt");
             try {
                 if (!logFile.exists()) {
                     logFile.createNewFile();

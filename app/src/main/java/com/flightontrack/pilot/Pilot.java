@@ -20,7 +20,7 @@ public class Pilot extends MyPhone {
         return _userId;
     }
 
-    String getUserName() {
+    public static String getUserName() {
         _userName = _myPhoneId.substring(0,3)+deviceBrand.substring(0,4)+_myPhoneId.substring(8);
         return _userName;
     }

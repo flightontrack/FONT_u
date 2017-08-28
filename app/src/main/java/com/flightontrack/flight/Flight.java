@@ -144,15 +144,16 @@ public class Flight implements GetTime{
             _speedCurrent = speed + (float) 0.01;
         }
         else {
-            FontLog.appendLog(TAG + "set_speedCurrent: speed is ZERO", 'd');
+            FontLog.appendLog(TAG + "set_speedCurrent: Reported speed is ZERO", 'd');
         }
+        FontLog.appendLog(TAG + "set_speedCurrent: "+_speedCurrent, 'd');
     }
 
     boolean isDoubleSpeedAboveMin() {
         cutoffSpeed = get_cutoffSpeed();
         boolean isCurrSpeedAboveMin = (_speedCurrent > cutoffSpeed);
         boolean isPrevSpeedAboveMin = (speedPrev > cutoffSpeed);
-        //Util.appendLog(TAG + "cutoffSpeed:" + cutoffSpeed, 'd');
+        FontLog.appendLog(TAG + "isDoubleSpeedAboveMin: cutoffSpeed: " + cutoffSpeed, 'd');
         FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
         if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
         else if (Route.activeRoute.activeFlight.flightState == FLIGHTREQUEST.CHANGESTATE_INFLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
@@ -165,11 +166,11 @@ public class Flight implements GetTime{
         return false;
     }
 
-    boolean isCurrentSpeedAboveMin() {
-        cutoffSpeed = get_cutoffSpeed();
-        FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + (_speedCurrent > cutoffSpeed), 'd');
-        return _speedCurrent > cutoffSpeed;
-    }
+//    boolean isCurrentSpeedAboveMin() {
+//        cutoffSpeed = get_cutoffSpeed();
+//        FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + (_speedCurrent > cutoffSpeed), 'd');
+//        return _speedCurrent > cutoffSpeed;
+//    }
 
     public void getNewFlightID() {
         FontLog.appendLog(TAG + "getNewFlightID", 'd');
@@ -280,9 +281,9 @@ public class Flight implements GetTime{
     }
 
     public void onClock(final Location location) {
-        FontLog.appendLog(TAG + "onClock:", 'd');
 
         float speedCurrent = location.getSpeed();
+        FontLog.appendLog(TAG + "onClock: reported speed: "+ speedCurrent, 'd');
         set_speedCurrent(speedCurrent);
 
         isSpeedAboveMin = isDoubleSpeedAboveMin();
@@ -311,7 +312,7 @@ public class Flight implements GetTime{
             ContentValues values = new ContentValues();
             values.put(DBSchema.COLUMN_NAME_COL1, REQUEST_LOCATION_UPDATE); //rcode
             values.put(DBSchema.COLUMN_NAME_COL2, flightNumber); //flightid
-            values.put(DBSchema.COLUMN_NAME_COL3, !isCurrentSpeedAboveMin()); /// speed low
+            values.put(DBSchema.COLUMN_NAME_COL3, !isSpeedAboveMin); /// speed low
             //values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString(speedCurrentInt)); //speed
             values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString((int) location.getSpeed())); //speed
             values.put(DBSchema.COLUMN_NAME_COL6, Double.toString(location.getLatitude())); //latitude

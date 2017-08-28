@@ -23,6 +23,7 @@ import cz.msebera.android.httpclient.Header;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.AppConfig.pIsAppTypePublic;
 
 public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
     private static final String TAG = "ReceiverHealthCheckAlarm:";
@@ -42,7 +43,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
             return;
         }
 
-        if(!alarmDisable && MyApplication.fontAppType==APPTYPE.PRIVATE) {
+        if(!alarmDisable && !pIsAppTypePublic) {
             healthCheckComm(context);
 
             if (!SvcLocationClock.isInstanceCreated()) {
@@ -70,6 +71,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
         //requestParams.put("flightid", activeRoute.activeFlight==null?FLIGHT_NUMBER_DEFAULT : activeRoute.activeFlight.flightNumber);
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", SessionProp.pIsDebug);
+        requestParams.put("battery", ReceiverBatteryLevel.getBattery());
 
         new AsyncHttpClient().post(Util.getTrackingURL() + ctx.getString(R.string.aspx_communication), requestParams, new AsyncHttpResponseHandler() {
                     @Override

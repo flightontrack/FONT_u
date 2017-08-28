@@ -36,6 +36,7 @@ import com.flightontrack.flight.Route;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.receiver.ReceiverHealthCheckAlarm;
+import com.flightontrack.receiver.ReceiverBatteryLevel;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -134,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements Session{
                 registerReceiver(alarmReceiver, filter);
                 AlarmManagerCtrl.initAlarm();
                 AlarmManagerCtrl.setAlarm();
+                ReceiverBatteryLevel receiverBatteryLevel = new ReceiverBatteryLevel();
+                registerReceiver(receiverBatteryLevel, new IntentFilter("android.intent.action.BATTERY_LOW"));
             }
             updFreqSpinnerSetup();
             minSpeedSpinnerSetup();

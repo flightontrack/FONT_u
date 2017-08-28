@@ -26,7 +26,7 @@ public abstract class Const {
     public static final long MIN_TIME_BW_GPS_UPDATES = 3000;
     public static final int  MIN_TIME_BW_GPS_UPDATES_SEC = (int)MIN_TIME_BW_GPS_UPDATES/1000;
     public static final int  SPEEDLOW_TIME_BW_GPS_UPDATES_SEC = 5;
-    public static final int  ALARM_TIME_SEC = 10; //600;
+    public static final int  ALARM_TIME_SEC = 600;
 
     public static final long DEFAULT_TIME_BW_GPS_UPDATES = 10000; //... sec
     public static final long DEFAULT_DISTANCE_CHANGE_FOR_UPDATES = 10; //  meters
@@ -63,6 +63,10 @@ public abstract class Const {
     public static final int START_ACTIVITY_RESULT = 1;
     public static final int MAX_FAILURE_COUNT = 10;
     public static final int MAX_JSON_ERROR = 10;
+
+    public static final String SMS_RECEIPIENT_PHONE = "9784295693";
+    public static final String SMS_RECEIPIENT_PHONE_CC = "9784295693";
+    public static final String SMS_LOWBATTERY_TEXT = "Battery is low, please recharge.";
 
     public enum ROUTEREQUEST{
         OPEN_NEW_ROUTE,
