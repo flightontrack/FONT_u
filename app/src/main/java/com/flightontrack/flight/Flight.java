@@ -139,11 +139,13 @@ public class Flight implements GetTime{
 
     void set_speedCurrent(float speed) {
         /// gps can report speed equal 0 in flight  which should be ignored.
-        if (speed > 0 || SessionProp.pIsDebug) {
+        if ((speed > 0.0) | SessionProp.pIsDebug) {
             speedPrev = _speedCurrent;
+            /// this 0.1 is needed to start flight whe Flight min speed set to 0;
             _speedCurrent = speed + (float) 0.01;
         }
         else {
+            ///this condition never happen when writing a log file because SessionProp.pIsDebug == true
             FontLog.appendLog(TAG + "set_speedCurrent: Reported speed is ZERO", 'd');
         }
         FontLog.appendLog(TAG + "set_speedCurrent: "+_speedCurrent, 'd');
