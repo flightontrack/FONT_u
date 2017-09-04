@@ -48,6 +48,7 @@
     <!--<string name="user_name">User_name</string>-->
     <!--labels Settings-->
     <string name="label_trackingurl">Cloud URL:</string>
+    <string name="label_sendtextto">Text To:</string>
     <string name="label_website">Site:</string>
     <string name="label_website_user">User ID:</string>
     <string name="label_website_psw">User Psw:</string>
@@ -111,7 +112,7 @@
     <string name="unsentrecords_failed">Failed to send. The points will be lost.</string>
 
     <string name="backpressed_dialog"> Do you want to stop application or keep it running in background?</string>
-    <string name="backpressed_dialog_neg">keep it running</string>
+    <string name="backpressed_dialog_neg">Keep it running</string>
     <string name="backpressed_dialog_pos">Stop it</string>
 
     <string name="permiss_ask">FONT requires permission to read your phone number to uniquely identify a pilot. No phone calls will be made from your phone despite the next system message. </string>
@@ -142,7 +143,11 @@
     <!--<item>http://postnget.azurewebsites.net</item>-->
     <!--</string-array>-->
 
-    <!--This is public branch-->
+    <string-array name="textto_array">
+        <item>9784295693</item>
+        <item>9783949043</item>
+        <!--<item>5083448930</item>-->
+    </string-array>
     <string-array name="url_array">
         <item>postnget.azurewebsites.net</item>
         <item>postnget-test.azurewebsites.net</item>

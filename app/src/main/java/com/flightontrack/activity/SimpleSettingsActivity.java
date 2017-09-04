@@ -33,6 +33,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     Button resetButton;
     Button getPswButton;
     Spinner spinnerUrls;
+    Spinner spinnerTextTo;
     CheckBox chBoxIsDebug;
     CheckBox chBoxIsOnReboot;
     CheckBox chBoxIsRoad;
@@ -78,6 +79,11 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                     }
                 });
             }
+            spinnerTextTo = (Spinner) findViewById(R.id.spinnerTextTo);
+            ArrayAdapter<CharSequence> adapterTextTo = ArrayAdapter.createFromResource(this,R.array.textto_array, android.R.layout.simple_spinner_item);
+            adapterTextTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerTextTo.setAdapter(adapterTextTo);
+            spinnerTextTo.setOnItemSelectedListener(this);
         }
         chBoxIsDebug = (CheckBox) findViewById(R.id.isDebugCheckBoxCheckBox);
         //chBoxIsDebug.setChecked(SessionProp.pIsDebug);
@@ -109,8 +115,6 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         spinnerUrls.setAdapter(adapterUrl);
         spinnerUrls.setOnItemSelectedListener(this);
 
-        //spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
-
         updateUI();
     }
     @Override
@@ -138,13 +142,12 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,int pos, long id) {
-        //String item_selected = parent.getItemAtPosition(pos).toString();
         if (parent.getId()==R.id.spinnerUrlId) {
-            //spinnerUrlsPos=pos;
-            //Util.setSpinnerUrlsPos(pos);
             SessionProp.pSpinnerUrlsPos=pos;
-            //SessionProp.save();
-            }
+        }
+        if (parent.getId()==R.id.spinnerTextTo) {
+            SessionProp.pSpinnerTextToPos=pos;
+        }
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
@@ -193,6 +196,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
 
     private void updateUI(){
         spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
+        spinnerTextTo.setSelection(SessionProp.pSpinnerTextToPos);
         chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsRoad.setChecked(SessionProp.pIsRoad);
     }

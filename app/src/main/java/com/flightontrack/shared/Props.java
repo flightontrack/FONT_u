@@ -21,8 +21,8 @@ public class Props {
 
     public static class AppConfig {
         public static String pAppRelease = "1.74";
-        public static boolean pIsNFCEnabled =true;
-        public static boolean pIsAppTypePublic=true;
+        public static boolean pIsNFCEnabled =false;
+        public static boolean pIsAppTypePublic=false;
         /// if false:   1. start healthcheckalarmreceiver
             ///             2. aicraft activity layout has no nfc
             ///             3. autostart (request flight) is true
@@ -48,6 +48,7 @@ public class Props {
         public static int          pIntervalSelectedItem;
         public static boolean      pIsEmptyAcftOk;
         public static int          pSpinnerUrlsPos;
+        public static int          pSpinnerTextToPos;
         public static int          pSpinnerMinSpeedPos;
         public static double       pSpinnerMinSpeed;
         public static boolean      pIsRoad = false;
@@ -71,6 +72,7 @@ public class Props {
             //editor.putInt("pSpinnerMinSpeed", pSpinnerMinSpeed);
             editor.putBoolean("pIsEmptyAcftOk", pIsEmptyAcftOk);
             editor.putInt("pSpinnerUrlsPos", pSpinnerUrlsPos);
+            editor.putInt("pSpinnerTextToPos", pSpinnerTextToPos);
             editor.putString("pTextRed", pTextRed);
             editor.putBoolean("pIsOnReboot", pIsOnReboot);
             editor.commit();
@@ -83,7 +85,7 @@ public class Props {
             pIsEmptyAcftOk=sharedPreferences.getBoolean("pIsEmptyAcftOk", false);
             //pIntervalLocationUpdateSec=sharedPreferences.getInt("pIntervalLocationUpdateSec", MIN_TIME_BW_GPS_UPDATES_SEC);
             pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
-            //pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerMinSpeed", DEFAULT_SPEED_SPINNER_POS);
+            pSpinnerTextToPos=sharedPreferences.getInt("pSpinnerTextToPos", 0);
             pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
             pIsOnReboot=sharedPreferences.getBoolean("pIsOnReboot", false);
             pIsStartedOnReboot =sharedPreferences.getBoolean("pIsStartedOnReboot", false);
@@ -120,6 +122,7 @@ public class Props {
             editor.remove("pIntervalSelectedItem").commit();
             editor.remove("pIsEmptyAcftOk").commit();
             editor.remove("pSpinnerUrlsPos").commit();
+            editor.remove("pSpinnerTextToPos").commit();
             editor.remove("pSpinnerMinSpeedPos").commit();
             editor.remove("pTextRed").commit();
             pIsRoad = false;

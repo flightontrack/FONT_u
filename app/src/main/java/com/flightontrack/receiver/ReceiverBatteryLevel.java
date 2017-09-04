@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.BatteryManager;
 import android.telephony.SmsManager;
+
+import com.flightontrack.R;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.shared.Util;
@@ -27,14 +29,16 @@ public class ReceiverBatteryLevel extends BroadcastReceiver {
 
         if (intent.getAction().contains("BATTERY_LOW")) {
 
-            String message =    "Ed help !!!"+"\n"+
+            String message =    "Help !!!"+"\n"+
                     SMS_LOWBATTERY_TEXT+"\n"+
                     "Pilot : "+ Pilot.getPilotUserName()+"\n"+
                     "Aircraft : "+Util.getAcftNum(4)+"\n";
             FontLog.appendLog(TAG + "BatteryPct low: Level :"+level+" out of "+scale, 'd');
 
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(SMS_RECEIPIENT_PHONE, null, message, null, null);
+            String[] spinnerTextTo = ctxApp.getResources().getStringArray(R.array.textto_array);
+            smsManager.sendTextMessage(spinnerTextTo[SessionProp.pSpinnerTextToPos], null, message, null, null);
+            //smsManager.sendTextMessage(SMS_RECEIPIENT_PHONE, null, message, null, null);
             smsManager.sendTextMessage(SMS_RECEIPIENT_PHONE_CC, null, message, null, null);
         }
         if (intent.getAction().contains("BATTERY_OKAY")) {
