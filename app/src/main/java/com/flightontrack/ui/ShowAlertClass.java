@@ -177,7 +177,7 @@ public class ShowAlertClass implements Session{
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Util.setPointsUnsent(0);
-                        int j = sqlHelper.allLocationsDelete();
+                        //int j = sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
                         set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
                         ctxActivity.onBackPressed();

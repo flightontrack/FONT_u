@@ -19,6 +19,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,7 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 public class Flight implements GetTime{
     private static final String TAG = "Flight:";
     public String flightNumber;
+    public boolean isGetFlightNumber = true;
     public FSTATUS fStatus = FSTATUS.PASSIVE;
     FLIGHTREQUEST flightState;
     boolean isSpeedAboveMin;
@@ -51,7 +53,6 @@ public class Flight implements GetTime{
 
     public Flight(Route r) {
         route = r;
-        //Flight.ctx = ctx;
         flightTimeString = FLIGHT_TIME_ZERO;
         isElevationCheckDone = false;
         set_flightRequest(FLIGHTREQUEST.CHANGESTATE_REQUEST_FLIGHT);
@@ -89,12 +90,17 @@ public class Flight implements GetTime{
                         sqlHelper.flightLocationsDelete(flightNumber);
                         SessionProp.set_isMultileg(false);
                         route.set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
+                        break;
                     case CHANGESTATE_STATUSPASSIVE:
                         fStatus = FSTATUS.PASSIVE;
                         flightState = request;
                         //setFlightClosed();
                         ///rethrow and close flight if no locations left
                         set_flightRequest(FLIGHTREQUEST.CLOSE_FLIGHT);
+                        break;
+                    case REQUEST_FLIGHTNUMBER:
+                        /// request flight number if the flight on temp number
+                        if (isGetFlightNumber) getNewFlightID();
                         break;
                     case ON_SERVER_N0TIF:
                         route.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
@@ -153,8 +159,8 @@ public class Flight implements GetTime{
 
     boolean isDoubleSpeedAboveMin() {
         cutoffSpeed = get_cutoffSpeed();
-        boolean isCurrSpeedAboveMin = (_speedCurrent > cutoffSpeed);
-        boolean isPrevSpeedAboveMin = (speedPrev > cutoffSpeed);
+        boolean isCurrSpeedAboveMin = (_speedCurrent >= cutoffSpeed);
+        boolean isPrevSpeedAboveMin = (speedPrev >= cutoffSpeed);
         FontLog.appendLog(TAG + "isDoubleSpeedAboveMin: cutoffSpeed: " + cutoffSpeed, 'd');
         FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
         if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
@@ -210,8 +216,14 @@ public class Flight implements GetTime{
                             return;
                         }
                         if (response.responseFlightNum != null) {
-                            flightNumber = response.responseFlightNum;
-                            route._legCount++;
+                            if(flightNumber==null) {
+                                flightNumber = response.responseFlightNum;
+                            }
+                            else {
+                                replaceFlightNumber(response.responseFlightNum);
+                            }
+                            isGetFlightNumber = false;
+                            //route._legCount++;
                         }
                     }
 
@@ -220,18 +232,28 @@ public class Flight implements GetTime{
                         flightRequestCounter++;
                         FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
                         Toast.makeText(ctxApp, R.string.reachability_error, Toast.LENGTH_LONG).show();
+                        if(flightNumber==null) {
+                            try {
+                                String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
+                                flightNumber = sqlHelper.getNewTempFlightNum(flightNumber,route.routeNumber, dt );
+
+                            } catch (UnsupportedEncodingException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                         //if(SvcLocationClock.isInstanceCreated()) ctxApp.stopService(new Intent(ctxApp, SvcLocationClock.class));
                     }
 
                     @Override
                     public void onFinish() {
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
+                        route._legCount++;
                         //set_FlightNumber(flightNumber);
                         if (flightNumber == null)
-                            route.set_RouteRequest(ROUTEREQUEST.CLOSE_RECEIVEFLIGHT_FAILED);
+                            //it is never null now;
+                            route.set_RouteRequest(ROUTEREQUEST.RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER);
                         else
-                            route.set_RouteRequest(ROUTEREQUEST.SWITCH_TO_PENDING); //set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
-                        //set_flightRequest(FLIGHTREQUEST.ON_FLIGHTGET_FINISH);
+                            route.set_RouteRequest(ROUTEREQUEST.SWITCH_TO_PENDING);
                     }
 
                     @Override
@@ -313,17 +335,17 @@ public class Flight implements GetTime{
             int p = _wayPointsCount + 1;
             ContentValues values = new ContentValues();
             values.put(DBSchema.COLUMN_NAME_COL1, REQUEST_LOCATION_UPDATE); //rcode
-            values.put(DBSchema.COLUMN_NAME_COL2, flightNumber); //flightid
-            values.put(DBSchema.COLUMN_NAME_COL3, !isSpeedAboveMin); /// speed low
+            values.put(DBSchema.LOC_flightid, flightNumber); //flightid
+            values.put(DBSchema.LOC_speedlowflag, !isSpeedAboveMin); /// speed low
             //values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString(speedCurrentInt)); //speed
             values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString((int) location.getSpeed())); //speed
             values.put(DBSchema.COLUMN_NAME_COL6, Double.toString(location.getLatitude())); //latitude
             values.put(DBSchema.COLUMN_NAME_COL7, Double.toString(location.getLongitude())); //latitude
             values.put(DBSchema.COLUMN_NAME_COL8, Float.toString(location.getAccuracy())); //accuracy
             values.put(DBSchema.COLUMN_NAME_COL9, Math.round(location.getAltitude())); //extrainfo
-            values.put(DBSchema.COLUMN_NAME_COL10, p); //wpntnum
+            values.put(DBSchema.LOC_wpntnum, p); //wpntnum
             values.put(DBSchema.COLUMN_NAME_COL11, Integer.toString(Util.getSignalStregth())); //gsmsignal
-            values.put(DBSchema.COLUMN_NAME_COL12, URLEncoder.encode(getDateTimeNow(), "UTF-8")); //date
+            values.put(DBSchema.LOC_date, URLEncoder.encode(getDateTimeNow(), "UTF-8")); //date
             values.put(DBSchema.COLUMN_NAME_COL13, iselevecheck);
             long r = sqlHelper.rowLocationInsert(values);
             if (r > 0) {
@@ -346,5 +368,9 @@ public class Flight implements GetTime{
 
     private double get_cutoffSpeed(){
         return SessionProp.pSpinnerMinSpeed * (Route.activeRoute.activeFlight.flightState == FLIGHTREQUEST.CHANGESTATE_INFLIGHT ? 0.75 : 1.0);
+    }
+
+    void replaceFlightNumber(String pFlightNum){
+
     }
 }

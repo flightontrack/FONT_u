@@ -24,6 +24,7 @@ import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
@@ -67,7 +68,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 txtPsw.setVisibility(View.VISIBLE);
             }
         });
-        if((!AppConfig.pIsAppTypePublic)) {
+        if(!AppConfig.pIsAppTypePublic) {
             chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
             if (null!=chBoxIsOnReboot) {
                 chBoxIsOnReboot.setChecked(SessionProp.pIsOnReboot);
@@ -84,6 +85,11 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             adapterTextTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerTextTo.setAdapter(adapterTextTo);
             spinnerTextTo.setOnItemSelectedListener(this);
+
+        }
+        else{
+            findViewById(R.id.layoutTextTo).setVisibility(View.INVISIBLE);
+            findViewById(R.id.layoutStartOnReboot).setVisibility(View.INVISIBLE);
         }
         chBoxIsDebug = (CheckBox) findViewById(R.id.isDebugCheckBoxCheckBox);
         //chBoxIsDebug.setChecked(SessionProp.pIsDebug);
@@ -196,7 +202,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
 
     private void updateUI(){
         spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
-        spinnerTextTo.setSelection(SessionProp.pSpinnerTextToPos);
+        if(!AppConfig.pIsAppTypePublic) spinnerTextTo.setSelection(SessionProp.pSpinnerTextToPos);
         chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsRoad.setChecked(SessionProp.pIsRoad);
     }

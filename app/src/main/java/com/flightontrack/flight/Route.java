@@ -4,11 +4,12 @@ import android.content.Intent;
 import java.util.ArrayList;
 
 import com.flightontrack.locationclock.SvcLocationClock;
+//import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.log.FontLog;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
-import static com.flightontrack.shared.Props.SessionProp.*;
+
 public class Route implements Session{
 
     private final String TAG = "Route:";
@@ -30,35 +31,6 @@ public class Route implements Session{
     public static Boolean isRouteExist() {
         return activeRoute != null;
     }
-
-//    public static void set_isRoad(boolean b) {
-//        _isRoad = b;
-//        ///hard code true
-//        //_isRoad =true;
-//    }
-
-//    private String setTextRed() {
-//        String fid = SessionProp.pTextRed;
-//        String fTime = "";
-//
-//        if (activeFlight == null) {
-//            Util.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
-//        } else {
-//            String flightId = activeFlight.flightNumber;
-//            fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
-//            fTime = activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + Util.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeFlight.flightTimeString;
-//        }
-//        SessionProp.pTextRed = fid + fTime;
-//        return SessionProp.pTextRed;
-//    }
-//
-//    private String setTextGreen() {
-//        SessionProp.pTextGreen = "Flight: " + (activeFlight.flightNumber) + '\n' +
-//                "Point: " + activeFlight._wayPointsCount +
-//                ctxApp.getString(R.string.tracking_flight_time) + SPACE + activeFlight.flightTimeString + '\n'
-//                + "Alt: " + activeFlight.lastAltitudeFt + " ft";
-//        return SessionProp.pTextGreen;
-//    }
 
     public void set_RouteRequest(ROUTEREQUEST request) {
         FontLog.appendLog(TAG + "set_ROUTEREQUEST:" + request, 'd');
@@ -108,11 +80,11 @@ public class Route implements Session{
 //                set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
 //                break;
             case CLOSE_FLIGHT_DELETE_ALL_POINTS:
-                closeFlightDeleteAllPoints();
+                setFlightPassive();
                 //activeRoute =null;
                 break;
             case CLOSE_BUTTON_STOP_PRESSED:
-                closeFlightDeleteAllPoints();
+                setFlightPassive();
                 //activeRoute =null;
                 break;
 //            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
@@ -120,7 +92,7 @@ public class Route implements Session{
 //                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
 //                    Util.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
 //                } else {
-//                    closeFlightDeleteAllPoints();
+//                    setFlightPassive();
 //                    activeRoute =null;
 //                    mainactivityInstance.finishActivity();
 //                }
@@ -134,6 +106,17 @@ public class Route implements Session{
                     //set_routeStatus(RSTATUS.PASSIVE);
                     setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
                     //activeRoute =null;
+                break;
+            case RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER:
+//                _legCount++;
+//                int tempFlight = sqlHelper.getNewTempFlightNum();
+//
+//
+//                if (!(SvcLocationClock.instance == null))
+//                    SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
+//                    //set_routeStatus(RSTATUS.PASSIVE);
+//                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
+//                    //activeRoute =null;
                 break;
             case ON_CLOSE_FLIGHT:
                 /// to avoid ConcurrentModificationException making copy of the flightList
@@ -181,13 +164,12 @@ public class Route implements Session{
         }
     }
 
-    private void closeFlightDeleteAllPoints() {
+    private void setFlightPassive() {
         //set_routeStatus(RSTATUS.PASSIVE);
         setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
         if (!(activeFlight == null))
-            //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
-            activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
-        int i = sqlHelper.allLocationsDelete();
+        activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
+//        int i = sqlHelper.allLocationsDelete();
         FontLog.appendLog(TAG + "Deleted from database: " + i + " all locations", 'd');
         if (!(SvcLocationClock.instance == null))
             SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);

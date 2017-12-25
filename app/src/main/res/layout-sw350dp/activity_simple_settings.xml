@@ -161,6 +161,31 @@ android:weightSum="100">
             />
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/layoutTextTo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:weightSum="10"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="@string/label_sendtextto"
+            android:id="@+id/txtSendtextto"
+            style="@style/label_text"
+            />
+        <Spinner
+            android:id="@+id/spinnerTextTo"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            />
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -194,32 +219,6 @@ android:weightSum="100">
             android:scaleX="2"
             android:scaleY="2"/>
     </LinearLayout>
-    <!--<LinearLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:layout_weight="1"-->
-        <!--android:weightSum="10"-->
-        <!--&gt;-->
-        <!--<TextView-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_weight="5"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:inputType="text"-->
-            <!--android:text="@string/label_chbox_boot"-->
-            <!--android:id="@+id/txtOnRebootLabel"-->
-            <!--style="@style/label_text"-->
-            <!--/>-->
-
-        <!--<CheckBox-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/isOnRebootCheckBox"-->
-            <!--android:layout_weight="1.1"-->
-            <!--android:ellipsize="middle"-->
-            <!--android:scaleX="2"-->
-            <!--android:scaleY="2"/>-->
-    <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -247,6 +246,33 @@ android:weightSum="100">
             android:scaleY="2" />
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/layoutStartOnReboot"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:weightSum="10"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="@string/label_chbox_boot"
+            android:id="@+id/txtOnRebootLabel"
+            style="@style/label_text"
+            />
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/isOnRebootCheckBox"
+            android:layout_weight="1.1"
+            android:ellipsize="middle"
+            android:scaleX="2"
+            android:scaleY="2"/>
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -270,6 +296,12 @@ android:weightSum="100">
             android:layout_height="wrap_content"
             />
     </LinearLayout>
-
+    <View
+        android:id="@+id/TagView"
+        android:tag= "Comercial"
+        android:visibility="invisible"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
 </LinearLayout>
 

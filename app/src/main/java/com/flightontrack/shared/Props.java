@@ -20,9 +20,9 @@ public class Props {
     public static SharedPreferences.Editor editor;
 
     public static class AppConfig {
-        public static String pAppRelease = "1.74";
+        public static String pAppRelease = "1.75";
         public static boolean pIsNFCEnabled =false;
-        public static boolean pIsAppTypePublic=false;
+        public static boolean pIsAppTypePublic=true;
         /// if false:   1. start healthcheckalarmreceiver
             ///             2. aicraft activity layout has no nfc
             ///             3. autostart (request flight) is true
@@ -60,6 +60,7 @@ public class Props {
 
         public static SQLHelper sqlHelper;
         public static int dbLocationRecCount = 0;
+        public static int dbTempFlightRecCount = 0;
         public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
         public static String        pTextRed;
         public static String        pTextGreen;

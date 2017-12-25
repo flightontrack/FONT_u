@@ -107,7 +107,7 @@
 
     <string name="unsentrecords_toast"> Sending points left in cache.</string>
     <string name="unsentrecords_dialog"> points left in cache. Do you want to send them to cloud now?</string>
-    <string name="unsentrecords_dialog_neg">No, just cancel. The points will be lost.</string>
+    <string name="unsentrecords_dialog_neg">No, just cancel.</string>
     <string name="unsentrecords_dialog_pos">Yes, try it now.</string>
     <string name="unsentrecords_failed">Failed to send. The points will be lost.</string>
 
@@ -145,7 +145,7 @@
 
     <string-array name="textto_array">
         <item>9784295693</item>
-        <item>9783949043</item>
+        <item>5083448930</item>
         <!--<item>5083448930</item>-->
     </string-array>
     <string-array name="url_array">
