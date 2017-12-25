@@ -170,7 +170,7 @@ public class Route implements Session{
         if (!(activeFlight == null))
         activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
 //        int i = sqlHelper.allLocationsDelete();
-        FontLog.appendLog(TAG + "Deleted from database: " + i + " all locations", 'd');
+        //FontLog.appendLog(TAG + "Deleted from database: " + i + " all locations", 'd');
         if (!(SvcLocationClock.instance == null))
             SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
     }
