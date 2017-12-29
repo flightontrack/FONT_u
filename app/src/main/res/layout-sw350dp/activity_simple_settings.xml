@@ -292,10 +292,35 @@ android:weightSum="100">
             android:layout_width="0dp"
             android:layout_weight="3"
             android:text="@string/label_btnreset"
-            android:id="@+id/btnClear"
+            android:id="@+id/btnReset"
             android:layout_height="wrap_content"
             />
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:weightSum="10">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="@string/label_reset"
+            android:id="@+id/txtClearCache"
+            style="@style/label_text"
+            />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:text="@string/label_btnreset"
+            android:id="@+id/btnClearCache"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
     <View
         android:id="@+id/TagView"
         android:tag= "Comercial"

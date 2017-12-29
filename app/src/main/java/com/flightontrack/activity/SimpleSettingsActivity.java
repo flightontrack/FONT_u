@@ -19,12 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
-import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
@@ -32,6 +33,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     public static TextView txtPsw;
     public static TextView txtBuild;
     Button resetButton;
+    Button clearCacheButton;
     Button getPswButton;
     Spinner spinnerUrls;
     Spinner spinnerTextTo;
@@ -45,7 +47,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         setContentView(R.layout.activity_simple_settings);
         txtBuild= (TextView) findViewById((R.id.txtBuild));
         txtBuild.setText((getString(R.string.app_label)+" "+ AppConfig.pAppRelease+ AppConfig.pAppReleaseSuffix));
-        resetButton = (Button) findViewById(R.id.btnClear);
+        resetButton = (Button) findViewById(R.id.btnReset);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,6 +57,13 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 Util.setPsw(null);
                 getPswButton.setText(R.string.label_btnpsw_get);
                 //MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
+            }
+        });
+        clearCacheButton = (Button) findViewById(R.id.btnClearCache);
+        clearCacheButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONCLEARCACHE_CLICKED));
             }
         });
         getPswButton = (Button) findViewById(R.id.btnGetPsw);

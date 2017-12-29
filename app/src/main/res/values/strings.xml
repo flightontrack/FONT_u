@@ -53,7 +53,9 @@
     <string name="label_website_user">User ID:</string>
     <string name="label_website_psw">User Psw:</string>
     <string name="label_reset">Reset to Defaults</string>
+    <string name="label_clear_cache">Clear Locations Cache</string>
     <string name="label_btnreset">Reset</string>
+    <string name="label_clear">Clear</string>
     <string name="label_btnpsw_show">Show Psw</string>
     <string name="label_btnpsw_get">Get Passw</string>
     <string name="label_btnpsw_hide">Hide Psw</string>
@@ -86,7 +88,7 @@
     <string name="flight_has_ended">The flight has ended</string>
     <string name="flight_uknown_req">Unknown request. The flight has ended.</string>
     <string name="flight_db_error">Database error</string>
-    <string name="server_error">Server error</string>
+    <string name="toast_server_error">Server communication error</string>
     <string name="new_flight_id">You got a new flight id</string>
     <string name="start_flight">"Start Flight"</string>
     <string name="flight_notstarted">"Flight \n Not started"</string>
@@ -98,18 +100,18 @@
     <string name="driving">Looks like you are driving on road. The flight has been terminated.</string>
     <string name="toast_permiss_declined_1">The app cannot run without this permission.</string>
     <string name="toast_permiss_declined_2">The app cannot run in debug mode without this permission.</string>
-    <string name="toast_noconnectivity">FONT: Connectivity unavailable, cant send location.</string>
+    <string name="toast_noconnectivity">FONT: Connectivity unavailable, cannot send location.</string>
 
     <!--dialog-->
     <string name="acft_dialog">You do not have Aircraft N number populated. Is it OK?</string>
     <string name="acft_dialog_neg">No, go to Aircraft Settings</string>
     <string name="acft_dialog_pos">Yes, I will restart the flight</string>
 
-    <string name="unsentrecords_toast"> Sending points left in cache.</string>
-    <string name="unsentrecords_dialog"> points left in cache. Do you want to send them to cloud now?</string>
+    <string name="unsentrecords_toast"> Sending location points left in cache.</string>
+    <string name="unsentrecords_dialog"> location points left in cache. Do you want to send them to cloud now?</string>
     <string name="unsentrecords_dialog_neg">No, just cancel.</string>
     <string name="unsentrecords_dialog_pos">Yes, try it now.</string>
-    <string name="unsentrecords_failed">Failed to send. The points will be lost.</string>
+    <string name="unsentrecords_failed">Failed to send location points.</string>
 
     <string name="backpressed_dialog"> Do you want to stop application or keep it running in background?</string>
     <string name="backpressed_dialog_neg">Keep it running</string>

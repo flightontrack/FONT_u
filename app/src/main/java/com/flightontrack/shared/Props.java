@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
-import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.SQLHelper;
 
 import static com.flightontrack.shared.Const.*;
@@ -94,7 +93,8 @@ public class Props {
 
         public static void set_isMultileg(boolean isMultileg) {
             pIsMultileg=isMultileg;
-            MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
+            EventBus.distribute(new EventMessage(EVENT.PROP_CHANGED_MULTILEG).setEventMessageValueBool(isMultileg));
+            //MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
         }
         public static void set_pSpinnerMinSpeedPos(int pos) {
             pSpinnerMinSpeedPos = pos;
@@ -146,4 +146,12 @@ public class Props {
         //Toast.makeText(SessionProp.ctxApp, R.string.user_needs_to_restart_app, Toast.LENGTH_LONG).show();
         sharedPreferences.edit().clear().commit();
     }
+    public static void eventReceiver(EVENT event){
+        switch(event){
+            case MACT_BIGBUTTON_CLICKED_STOP:
+                SessionProp.set_isMultileg(false);
+                break;
+        }
+    }
+
 }

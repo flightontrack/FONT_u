@@ -6,8 +6,13 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
+import com.flightontrack.R;
 import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.Const;
+import com.flightontrack.shared.EventMessage;
+
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
@@ -48,7 +53,16 @@ public class SQLHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         onCreate(db);
     }
-
+    static void dropCreateDb(){
+        dbw = getWritableDatabase();
+        dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
+        dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT_NUMBER);
+        dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
+        dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
+        dbLocationRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
+        dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
+        dbw.close();
+    }
     public void rowLocationDelete(int id, String flightId) {
         String selection = DBSchema.LOC_wpntnum + "= ? AND "+DBSchema.LOC_flightid +"= ?";
         String[] selectionArgs = {String.valueOf(id),flightId};
@@ -217,5 +231,14 @@ public class SQLHelper extends SQLiteOpenHelper {
 //        }
 //        Cursor c = db.rawQuery("select max(ifnull(flightNumber,0)) from FlightNumber",new String[]{"0"});
 
+    }
+    public static void eventReceiver(EventMessage eventMessage){
+        Const.EVENT ev = eventMessage.event;
+        switch(ev){
+            case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
+                dropCreateDb();
+                break;
+
+        }
     }
 }

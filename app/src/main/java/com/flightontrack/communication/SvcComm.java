@@ -11,6 +11,8 @@ import com.flightontrack.R;
 import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -113,7 +115,8 @@ public class SvcComm extends Service implements Session{
                             }
                             if (response.responseNotif != null) {
                                 FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
-                                flight.set_flightRequest(FLIGHTREQUEST.ON_SERVER_N0TIF);
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIFICATION));
+                                // flight.set_flightRequest(FLIGHTREQUEST.ON_SERVER_N0TIF);
                             }
                             if (response.responseCommand != null) {
                                 FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
@@ -122,7 +125,7 @@ public class SvcComm extends Service implements Session{
                                     case COMMAND_CANCELFLIGHT:
                                         if (SessionProp.pIsRoad) break; /// just ignore the request
                                         else {
-                                            Toast.makeText(ctxApp, R.string.driving, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
                                             FontLog.appendLog(TAG + "COMMAND_CANCELFLIGHT request", 'd');
                                             flight.set_flightRequest(FLIGHTREQUEST.TERMINATE_FLIGHT);
 //                                            sqlHelper.flightLocationsDelete(response.responseFlightNum);

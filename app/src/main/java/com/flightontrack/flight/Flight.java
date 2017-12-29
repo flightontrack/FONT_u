@@ -12,6 +12,8 @@ import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.shared.Const;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.GetTime;
 import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
@@ -38,9 +40,9 @@ public class Flight implements GetTime{
     public FSTATUS fStatus = FSTATUS.PASSIVE;
     FLIGHTREQUEST flightState;
     boolean isSpeedAboveMin;
-    String flightTimeString;
-    int lastAltitudeFt;
-    int _wayPointsCount;
+    public String flightTimeString;
+    public int lastAltitudeFt;
+    public int _wayPointsCount;
     private Route route;
     private float _speedCurrent=0;
     private float speedPrev=0;
@@ -77,12 +79,12 @@ public class Flight implements GetTime{
                     case CHANGESTATE_SPEED_BELOW_MIN:
                         isSpeedAboveMin = false;
                         route.set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
-                        set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
+                        set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
                         break;
                     case CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
                         isLimitReached=true;
                         route.set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
-                        set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE);
+                        set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
                         break;
                     case TERMINATE_FLIGHT:
                         fStatus = FSTATUS.PASSIVE;
@@ -91,7 +93,7 @@ public class Flight implements GetTime{
                         SessionProp.set_isMultileg(false);
                         route.set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
                         break;
-                    case CHANGESTATE_STATUSPASSIVE:
+                    case CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT:
                         fStatus = FSTATUS.PASSIVE;
                         flightState = request;
                         //setFlightClosed();
@@ -102,9 +104,9 @@ public class Flight implements GetTime{
                         /// request flight number if the flight on temp number
                         if (isGetFlightNumber) getNewFlightID();
                         break;
-                    case ON_SERVER_N0TIF:
-                        route.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
-                        break;
+                    //case ON_SERVER_N0TIF:
+                        //route.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
+                       // break;
                 }
                 break;
             case PASSIVE:
@@ -181,7 +183,9 @@ public class Flight implements GetTime{
 //    }
 
     public void getNewFlightID() {
+
         FontLog.appendLog(TAG + "getNewFlightID", 'd');
+        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
@@ -231,7 +235,7 @@ public class Flight implements GetTime{
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                         flightRequestCounter++;
                         FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
-                        Toast.makeText(ctxApp, R.string.reachability_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                         if(flightNumber==null) {
                             try {
                                 String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
@@ -372,5 +376,24 @@ public class Flight implements GetTime{
 
     void replaceFlightNumber(String pFlightNum){
 
+    }
+
+    public void eventInit(EVENT event){
+        switch(event){
+//            case FLIGHT_GETNEWFLIGHT_STARTED:
+//                break;
+//            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+//                break;
+//            case FLIGHT_CLOSEFLIGHT_COMPLETED:
+//                break;
+        }
+    }
+    public void eventReceiver(EVENT event){
+        switch(event){
+            case CLOCK_TIK:
+                // onClock
+                break;
+
+        }
     }
 }

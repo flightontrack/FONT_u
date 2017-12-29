@@ -154,7 +154,7 @@ public class ShowAlertClass implements Session{
                                 dialog.cancel();
                                 set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
                                 if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
-                                set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
+                                //set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
 //                                int MaxTryCount = 5;
 //                                SvcComm.commBatchSize= SessionProp.dbLocationRecCount;
 //                                int counter =0;
@@ -176,12 +176,12 @@ public class ShowAlertClass implements Session{
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.unsentrecords_dialog_neg),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
                         //Util.setPointsUnsent(0);
                         //int j = sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
                         set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
-                        ctxActivity.onBackPressed();
-                        dialog.cancel();
+                        //ctxActivity.onBackPressed();
                     }
                 });
         AlertDialog alert = alertDialogBuilder.create();

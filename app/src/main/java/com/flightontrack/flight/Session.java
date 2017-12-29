@@ -28,6 +28,10 @@ public interface Session{
     default void set_SessionRequest(SESSIONREQUEST request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
+            case STOP_CLOCK:
+
+                break;
+
             case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
                 if (dbLocationRecCount > 0) {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
@@ -37,7 +41,7 @@ public interface Session{
                 }
                 break;
                 case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
-                    if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_DELETE_ALL_POINTS);
+                    if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
                     mainactivityInstance.finishActivity();
                 break;
             case BUTTON_STOP_PRESSED:
@@ -69,7 +73,7 @@ public interface Session{
 //                    }
                 } else {
                     FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-                    Toast.makeText(ctxApp, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -211,4 +215,83 @@ public interface Session{
             set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
         }
     }
+    static void set_InternalRequest(SESSIONREQUEST request) {
+        FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
+        switch (request) {
+            case STOP_CLOCK:
+
+                break;
+
+            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
+                if (dbLocationRecCount > 0) {
+                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
+                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
+                } else {
+                    set_InternalRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
+                }
+                break;
+            case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
+                if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
+                mainactivityInstance.finishActivity();
+                break;
+            case BUTTON_STOP_PRESSED:
+                if (dbLocationRecCount > 0) {
+                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+                }
+                // REPLACED Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                break;
+            case SEND_STORED_LOCATIONS:
+                ////   sendStoredLocations(); restore it back
+                break;
+            case ON_COMMUNICATION_SUCCESS:
+                break;
+            case START_COMMUNICATION:
+                for (Route r : Route.routeList) {
+                    r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
+                }
+                if (Util.isNetworkAvailable()) {
+                    if (dbLocationRecCount > 0) {
+                        startLocationCommService();
+                    }
+
+//                    if (dbTempFlightRecCount > 0) {
+//                        for (Route r : Route.routeList) {
+//                            for (Flight f:r.flightList){
+//                                f.set_flightRequest(FLIGHTREQUEST.REQUEST_FLIGHTNUMBER);
+//                            }
+//                        }
+//                    }
+                } else {
+                    FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
+                    Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    public static void eventReceiver(EVENT event) {
+        switch (event) {
+            case MACT_BIGBUTTON_CLICKED_STOP:
+                set_InternalRequest(SESSIONREQUEST.BUTTON_STOP_PRESSED);
+                break;
+        }
+    }
+    //session does react to events. it never initiate events
+
+    //events:
+    // button back pressed
+
+    // on clock:
+
+    // check location cache
+    // start normal communication service to send location
+    // request for all routew to check  if any passive flight need to be closed
+    //
+
+    // on special request:
+
+    // check cache of unsent location
+    // start communication service if cache is not empty
+
+
 }

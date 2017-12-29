@@ -13,16 +13,19 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+import com.flightontrack.R;
 import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
+import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.GetTime;
 import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.shared.Props.ctxApp;
+import static com.flightontrack.shared.Props.mainactivityInstance;
 
 public class SvcLocationClock extends Service implements LocationListener,GetTime,Session {
     private static final String TAG = "SvcLocationClock:";
@@ -209,7 +212,7 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
         }
         stopSelf();
     }
-    private void setToNull(){
+    void setToNull(){
         instance=null;
         //ctx=null;
         phStateListener=null;
@@ -217,5 +220,14 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
 
     void setClockNextTimeLocalMsec(int intervalSec) {
         alarmNextTimeUTCmsec = getTimeGMT()+ intervalSec*1000;
+    }
+
+    public static void eventReceiver(EventMessage eventMessage){
+        EVENT ev = eventMessage.event;
+        switch(ev){
+            case SVCCOMM_ONSUCCESS_NOTIFICATION:
+                instance.stopServiceSelf();
+                break;
+        }
     }
 }
