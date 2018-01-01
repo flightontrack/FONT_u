@@ -9,20 +9,22 @@ import android.provider.Settings;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.flight.Session;
 import com.flightontrack.activity.AircraftActivity;
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 
-import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
+import static com.flightontrack.flight.Session.SESSIONREQUEST;
 
-public class ShowAlertClass implements Session{
+public class ShowAlertClass{
 
     //MainActivity ctxActivity;
     Context ctx;
     Activity ctxActivity;
     private static final String TAG = "ShowAlertClass";
+
 //    ShowAlertClass(MainActivity mainact_this){
 //        ctxActivity=mainact_this;
 //    }
@@ -152,25 +154,9 @@ public class ShowAlertClass implements Session{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+                                EventBus.distribute(new EventMessage(EVENT.DIALOG_ONCLICK).setEventMessageValueSessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS_ON_YES));
+                                //set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
                                 if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
-                                //set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
-//                                int MaxTryCount = 5;
-//                                SvcComm.commBatchSize= SessionProp.dbLocationRecCount;
-//                                int counter =0;
-//                                while (SessionProp.dbLocationRecCount>0){
-//                                    if (counter >MaxTryCount) break;
-//                                    try {
-//                                        Thread.sleep(1000);
-//                                    } catch(InterruptedException ex) {
-//                                        Thread.currentThread().interrupt();
-//                                    }
-//                                    counter++;
-//                                    set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
-//                                }
-//                                int j = sqlHelper.allLocationsDelete();
-//                                FontLog.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-//                                set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.unsentrecords_dialog_neg),
@@ -180,7 +166,9 @@ public class ShowAlertClass implements Session{
                         //Util.setPointsUnsent(0);
                         //int j = sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                        set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
+                        //set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
+                        EventBus.distribute(new EventMessage(EVENT.DIALOG_ONCLICK).setEventMessageValueSessionRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK));
+
                         //ctxActivity.onBackPressed();
                     }
                 });
@@ -198,7 +186,8 @@ public class ShowAlertClass implements Session{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
+                                EventBus.distribute(new EventMessage(EVENT.DIALOG_ONCLICK).setEventMessageValueSessionRequest(SESSIONREQUEST.CHECK_CACHE_FIRST));
+                                //set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.backpressed_dialog_neg),

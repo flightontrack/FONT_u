@@ -53,14 +53,18 @@ public class SQLHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         onCreate(db);
     }
-    static void dropCreateDb(){
+    void dropCreateDb(){
         dbw = getWritableDatabase();
+        int lcount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT_NUMBER);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
         dbLocationRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
         dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
+        if(dbLocationRecCount==0){
+            Toast.makeText(ctxApp,"Deleted "+lcount+" location points",Toast.LENGTH_LONG).show();
+        }
         dbw.close();
     }
     public void rowLocationDelete(int id, String flightId) {
@@ -236,9 +240,8 @@ public class SQLHelper extends SQLiteOpenHelper {
         Const.EVENT ev = eventMessage.event;
         switch(ev){
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
-                dropCreateDb();
+                sqlHelper.dropCreateDb();
                 break;
-
         }
     }
 }

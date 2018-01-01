@@ -33,7 +33,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class Flight implements GetTime{
+public class Flight implements GetTime,EventBus{
     private static final String TAG = "Flight:";
     public String flightNumber;
     public boolean isGetFlightNumber = true;
@@ -68,14 +68,14 @@ public class Flight implements GetTime{
                     case CHANGESTATE_INFLIGHT:
                         /// reset Timer 1 to slower rate
                         _flightStartTimeGMT = getTimeGMT();
-                        SvcLocationClock.instance.requestLocationUpdate(SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+                        SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
                         route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
                         flightState = request;
                         break;
-                    case FLIGHTTIME_UPDATE:
-                        set_flightTimeSec();
-                        route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
-                        break;
+//                    case FLIGHTTIME_UPDATE:
+//                        set_flightTimeSec();
+//                        //route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
+//                        break;
                     case CHANGESTATE_SPEED_BELOW_MIN:
                         isSpeedAboveMin = false;
                         route.set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
@@ -119,7 +119,7 @@ public class Flight implements GetTime{
                         fStatus = FSTATUS.ACTIVE;
                         flightState = request;
                         if (SvcLocationClock.isInstanceCreated()) {
-                            SvcLocationClock.instance.set_mode(MODE.CLOCK_LOCATION);
+                            SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_LOCATION);
                         }
                         break;
                     case CLOSE_FLIGHT:
@@ -168,9 +168,9 @@ public class Flight implements GetTime{
         if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
         else if (Route.activeRoute.activeFlight.flightState == FLIGHTREQUEST.CHANGESTATE_INFLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
             if (isPrevSpeedAboveMin)
-                SvcLocationClock.instance.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+                SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             else if (isCurrSpeedAboveMin)
-                SvcLocationClock.instance.requestLocationUpdate(SvcLocationClock.intervalClockSecPrev, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+                SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SvcLocationClock.intervalClockSecPrev, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             return true;
         }
         return false;
@@ -326,7 +326,8 @@ public class Flight implements GetTime{
                     saveLocation(location, isElevationCheckDone);
                 } else saveLocation(location, false);
 
-                set_flightRequest(FLIGHTREQUEST.FLIGHTTIME_UPDATE);
+                //set_flightRequest(FLIGHTREQUEST.FLIGHTTIME_UPDATE);
+                set_flightTimeSec();
                 if (!isSpeedAboveMin) route.set_RouteRequest(ROUTEREQUEST.CHECK_IF_ROUTE_MULTILEG);
                 break;
         }
@@ -368,6 +369,7 @@ public class Flight implements GetTime{
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         flightTimeString = dateFormat.format(elapsedTime);
+        EventBus.distribute(new EventMessage(EVENT.FLIGHT_FLIGHTTIME_UPDATE_COMPLETED));
     }
 
     private double get_cutoffSpeed(){
@@ -388,10 +390,13 @@ public class Flight implements GetTime{
 //                break;
         }
     }
-    public void eventReceiver(EVENT event){
-        switch(event){
-            case CLOCK_TIK:
-                // onClock
+    @Override
+    public void eventReceiver(EventMessage eventMessage){
+        FontLog.appendLog(TAG + " eventReceiver Interface is called on Flight", 'd');
+        EVENT ev = eventMessage.event;
+        switch(ev){
+            case CLOCK_ONTICK:
+                onClock(eventMessage.eventMessageValueLocation);
                 break;
 
         }

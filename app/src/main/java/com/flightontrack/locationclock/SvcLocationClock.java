@@ -13,26 +13,24 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
-import com.flightontrack.R;
-import com.flightontrack.flight.Route;
-import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
+import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.GetTime;
 import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
+import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.ctxApp;
-import static com.flightontrack.shared.Props.mainactivityInstance;
 
-public class SvcLocationClock extends Service implements LocationListener,GetTime,Session {
+public class SvcLocationClock extends Service implements EventBus, LocationListener,GetTime {
     private static final String TAG = "SvcLocationClock:";
     //private static Context ctx;
     static LocationManager locationManager;
     public static PhoneListener phStateListener;
-    public static SvcLocationClock instance = null;
+    public static SvcLocationClock instanceSvcLocationClock = null;
     private static boolean isBound = false;
     private static int counter = 0;
     static MODE _mode;
@@ -44,7 +42,10 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
     }
 
     public static boolean isInstanceCreated() {
-        return instance != null;
+        return instanceSvcLocationClock != null;
+    }
+    public static SvcLocationClock getInstance() {
+        return instanceSvcLocationClock;
     }
 
     public static boolean isBound() {
@@ -52,9 +53,9 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
     }
 
     public static void stopLocationUpdates() {
-        FontLog.appendLog(TAG + "stopLocationUpdates : instance = " + instance, 'd');
+        FontLog.appendLog(TAG + "stopLocationUpdates : instanceSvcLocationClock = " + instanceSvcLocationClock, 'd');
         try {
-            locationManager.removeUpdates(instance);
+            locationManager.removeUpdates(instanceSvcLocationClock);
         }
         catch(SecurityException e ){
             FontLog.appendLog(TAG + e, 'e');
@@ -79,6 +80,7 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
         switch (_mode){
             case CLOCK_ONLY:
                 requestLocationUpdate(MIN_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+                EventBus.distribute(new EventMessage(EVENT.CLOCK_MODECLOCK_ONLY));
                 break;
             case CLOCK_LOCATION:
                 requestLocationUpdate(MIN_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_MIN);
@@ -105,13 +107,12 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
                 //Util.appendLog(TAG + "isClockTimeReached: ", 'd');
                 /// it is a protection
                 setClockNextTimeLocalMsec(_intervalClockSecCurrent);
-                if (_mode == MODE.CLOCK_LOCATION) {
-                    Route.activeRoute.activeFlight.onClock(location);
-                }
-
-                //Util.appendLog(TAG + "onLocationChanged: Route.dbLocationRecCount:" + dbLocationRecCount + " Route._openFlightsCount:" + Route.flightList.size() + " _mode:" + _mode, 'd');
-                //if (!(activeRoute==null)) activeRoute.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
-                set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
+                EventBus.distribute(new EventMessage(EVENT.CLOCK_ONTICK).setEventMessageValueClockMode(_mode).setEventMessageValueLocation(location));
+//                if (_mode == MODE.CLOCK_LOCATION) {
+//                    //EventBus.distribute(new EventMessage(EVENT.CLOCK_ONTICK).setEventMessageValueClockMode(_mode).setEventMessageValueLocation(location));
+//                }
+//
+//                set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
             }
         }
     }
@@ -152,8 +153,9 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
             return;
         }
         FontLog.appendLog(TAG + "onCreate",'d');
-        instance=this;
+        instanceSvcLocationClock =this;
         _mode = MODE.CLOCK_LOCATION;
+        EventBus.distribute(new EventMessage(EVENT.CLOCK_SERVICESTARTED_MODELOCATION));
         //ctx = getApplicationContext();
         alarmNextTimeUTCmsec = getTimeGMT();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -196,7 +198,7 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
         super.onTaskRemoved(rootIntent);
         setSignalStrengthListener(false);
         FontLog.appendLog(TAG + "onTaskRemoved: ",'d');
-        if(!(instance==null)){
+        if(!(instanceSvcLocationClock ==null)){
             stopLocationUpdates();
             setToNull();
         }
@@ -206,14 +208,14 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
     public void stopServiceSelf() {
         FontLog.appendLog(TAG + "stopServiceSelf",'d');
         setSignalStrengthListener(false);
-        if(!(instance==null)){
+        if(!(instanceSvcLocationClock ==null)){
             stopLocationUpdates();
             setToNull();
         }
         stopSelf();
     }
     void setToNull(){
-        instance=null;
+        instanceSvcLocationClock =null;
         //ctx=null;
         phStateListener=null;
     }
@@ -222,11 +224,13 @@ public class SvcLocationClock extends Service implements LocationListener,GetTim
         alarmNextTimeUTCmsec = getTimeGMT()+ intervalSec*1000;
     }
 
-    public static void eventReceiver(EventMessage eventMessage){
+    @Override
+    public void eventReceiver(EventMessage eventMessage){
+        FontLog.appendLog(TAG + " eventReceiver Interface is called on SvcLocationClock", 'd');
         EVENT ev = eventMessage.event;
         switch(ev){
             case SVCCOMM_ONSUCCESS_NOTIFICATION:
-                instance.stopServiceSelf();
+                instanceSvcLocationClock.stopServiceSelf();
                 break;
         }
     }

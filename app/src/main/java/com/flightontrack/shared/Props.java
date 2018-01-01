@@ -2,16 +2,27 @@ package com.flightontrack.shared;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.SQLHelper;
+
+import java.util.Arrays;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.AppConfig.*;
 
 
-public class Props {
+public final class Props implements EventBus{
+    private static Props propsInstance = null;
+    public static Props getInstance() {
+        if(propsInstance == null) {
+            propsInstance = new Props();
+        }
+        return propsInstance;
+    }
     private static final String TAG = "Props:";
     public static Context ctxApp;
     public static MainActivity mainactivityInstance;
@@ -41,7 +52,7 @@ public class Props {
         }
     }
 
-    public static class SessionProp {
+    public static class SessionProp implements EventBus{
         public static boolean       pIsMultileg;
         public static int          pIntervalLocationUpdateSec;
         public static int          pIntervalSelectedItem;
@@ -92,10 +103,13 @@ public class Props {
         }
 
         public static void set_isMultileg(boolean isMultileg) {
+            //String s = Arrays.toString(Thread.currentThread().getStackTrace());
+            //FontLog.appendLog(TAG + "StackTrace: "+s,'d');
             pIsMultileg=isMultileg;
             EventBus.distribute(new EventMessage(EVENT.PROP_CHANGED_MULTILEG).setEventMessageValueBool(isMultileg));
             //MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
         }
+
         public static void set_pSpinnerMinSpeedPos(int pos) {
             pSpinnerMinSpeedPos = pos;
             String[] minSpeedArray=ctxApp.getResources().getStringArray(R.array.speed_array);
@@ -146,12 +160,20 @@ public class Props {
         //Toast.makeText(SessionProp.ctxApp, R.string.user_needs_to_restart_app, Toast.LENGTH_LONG).show();
         sharedPreferences.edit().clear().commit();
     }
-    public static void eventReceiver(EVENT event){
-        switch(event){
+    @Override
+    public void eventReceiver(EventMessage eventMessage){
+        FontLog.appendLog(TAG + " eventReceiver Interface is called on Props", 'd');
+        EVENT ev = eventMessage.event;
+        switch(ev){
+            case MACT_MULTILEG_CLICKED:
+                SessionProp.set_isMultileg(eventMessage.eventMessageValueBool);
+                break;
             case MACT_BIGBUTTON_CLICKED_STOP:
                 SessionProp.set_isMultileg(false);
                 break;
+
         }
     }
+
 
 }

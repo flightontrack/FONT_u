@@ -15,6 +15,8 @@ import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.mysql.SQLHelper;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
@@ -23,63 +25,78 @@ import com.flightontrack.ui.ShowAlertClass;
  * Created by hotvk on 7/6/2017.
  */
 
-public interface Session{
-    static final String TAG = "Session:";
-    default void set_SessionRequest(SESSIONREQUEST request) {
-        FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
-        switch (request) {
-            case STOP_CLOCK:
-
-                break;
-
-            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
-                if (dbLocationRecCount > 0) {
-                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
-                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
-                } else {
-                    set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
-                }
-                break;
-                case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
-                    if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
-                    mainactivityInstance.finishActivity();
-                break;
-            case BUTTON_STOP_PRESSED:
-                if (dbLocationRecCount > 0) {
-                    set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
-                }
-                Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
-                break;
-            case SEND_STORED_LOCATIONS:
-                sendStoredLocations();
-                break;
-            case ON_COMMUNICATION_SUCCESS:
-                break;
-            case START_COMMUNICATION:
-                for (Route r : Route.routeList) {
-                    r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
-                }
-                if (Util.isNetworkAvailable()) {
-                    if (dbLocationRecCount > 0) {
-                        startLocationCommService();
-                    }
-
-//                    if (dbTempFlightRecCount > 0) {
-//                        for (Route r : Route.routeList) {
-//                            for (Flight f:r.flightList){
-//                                f.set_flightRequest(FLIGHTREQUEST.REQUEST_FLIGHTNUMBER);
-//                            }
-//                        }
-//                    }
-                } else {
-                    FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-                    Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
+public class Session implements EventBus{
+    public enum SESSIONREQUEST{
+        SEND_STORED_LOCATIONS,
+        START_COMMUNICATION,
+        STOP_CLOCK,
+        SEND_STORED_LOCATIONS_ON_YES,
+        CLOSEAPP_NO_CACHE_CHECK,
+        CHECK_CACHE_FIRST,
     }
+    private static Session sessionInstance = null;
+    public static Session getInstance() {
+        if(sessionInstance == null) {
+            sessionInstance = new Session();
+        }
+        return sessionInstance;
+    }
+    static final String TAG = "Session:";
+//    static void set_SessionRequest(SESSIONREQUEST request) {
+//        FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
+//        switch (request) {
+//            case STOP_CLOCK:
+//
+//                break;
+//
+//            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
+//                if (dbLocationRecCount > 0) {
+//                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
+//                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
+//                } else {
+//                    set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
+//                }
+//                break;
+//            case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
+//                if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
+//                mainactivityInstance.finishActivity();
+//            break;
+////            case BUTTON_STOP_PRESSED:
+////                if (dbLocationRecCount > 0) {
+////                    set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+////                }
+////                Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+////                break;
+//            case SEND_STORED_LOCATIONS:
+//                //sendStoredLocations();
+//                break;
+////            case ON_COMMUNICATION_SUCCESS:
+////                break;
+//            case START_COMMUNICATION:
+//                for (Route r : Route.routeList) {
+//                    r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
+//                }
+//                if (Util.isNetworkAvailable()) {
+//                    if (dbLocationRecCount > 0) {
+//                        startLocationCommService();
+//                    }
+//
+////                    if (dbTempFlightRecCount > 0) {
+////                        for (Route r : Route.routeList) {
+////                            for (Flight f:r.flightList){
+////                                f.set_flightRequest(FLIGHTREQUEST.REQUEST_FLIGHTNUMBER);
+////                            }
+////                        }
+////                    }
+//                } else {
+//                    FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
+//                    Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+//                }
+//                break;
+//        }
+//    }
 
-    default void initProp(Context ctx, MainActivity maInstance) {
+    public static void initProp(Context ctx, MainActivity maInstance) {
         ctxApp = ctx;
         sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -87,66 +104,6 @@ public interface Session{
         sqlHelper = new SQLHelper();
     }
 
-    default void setTrackingButtonState(BUTTONREQUEST request) {
-        //Util.appendLog(TAG+"trackingButtonState request:" +request,'d');
-        switch (request) {
-            case BUTTON_STATE_RED:
-                MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                MainActivity.trackingButton.setText(setTextRed());
-                break;
-            case BUTTON_STATE_YELLOW:
-                MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                MainActivity.trackingButton.setText("Flight " + (Route.activeRoute.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
-                //editor.putInt("trackingButtonState", BUTTON_STATE_YELLOW);
-                break;
-            case BUTTON_STATE_GREEN:
-                MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_green);
-                MainActivity.trackingButton.setText(setTextGreen());
-                //editor.putInt("trackingButtonState", BUTTON_STATE_GREEN);
-                break;
-            case BUTTON_STATE_GETFLIGHTID:
-                MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                MainActivity.trackingButton.setText(ctxApp.getString(R.string.tracking_gettingflight));
-                break;
-            case BUTTON_STATE_STOPPING:
-                //appendLog(LOGTAG+"BUTTON_STATE_STOPPING");
-                MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                //MainActivity.trackingButton.setText("Flight " + (Flight.get_ActiveFlightID()) + ctx.getString(R.string.tracking_stopping));
-                break;
-            default:
-                MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                // MainActivity.trackingButton.setText("Flight " + (Flight.get_ActiveFlightID()) + ctx.getString(R.string.tracking_is_off));
-        }
-        trackingButtonState = request;
-    }
-
-    static String setTextRed() {
-        String fid = SessionProp.pTextRed;
-        String fTime = "";
-        String flightId;
-
-        if (Route.activeRoute == null) {
-            FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
-        } else {
-            if (Route.activeRoute!=null && Route.activeRoute.activeFlight!=null) {
-                flightId = Route.activeRoute.activeFlight.flightNumber;
-                //fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + GetTime.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
-                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
-            }
-            else {flightId = FLIGHT_NUMBER_DEFAULT;}
-            fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
-        }
-        SessionProp.pTextRed = fid + fTime;
-        return SessionProp.pTextRed;
-    }
-
-    static String setTextGreen() {
-        SessionProp.pTextGreen = "Flight: " + (Route.activeRoute.activeFlight.flightNumber) + '\n' +
-                "Point: " + Route.activeRoute.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString + '\n'
-                + "Alt: " + Route.activeRoute.activeFlight.lastAltitudeFt + " ft";
-        return SessionProp.pTextGreen;
-    }
 
     static void startLocationCommService() {
 
@@ -185,18 +142,18 @@ public interface Session{
         }
     }
 
-    default Flight get_FlightInstance(String flightNumber){
-        for (Route r : Route.routeList) {
-            for (Flight f : r.flightList) {
-                if (f.flightNumber.equals(flightNumber)) {
-                    return f;
-                }
-            }
-        }
-        return Route.activeRoute.activeFlight;
-    }
+//    static Flight get_FlightInstance(String flightNumber){
+//        for (Route r : Route.routeList) {
+//            for (Flight f : r.flightList) {
+//                if (f.flightNumber.equals(flightNumber)) {
+//                    return f;
+//                }
+//            }
+//        }
+//        return Route.activeRoute.activeFlight;
+//    }
 
-    default void sendStoredLocations(){
+    static void sendStoredLocations(){
         int MaxTryCount = 5;
         SvcComm.commBatchSize= dbLocationRecCount;
         int counter =0;
@@ -212,7 +169,7 @@ public interface Session{
             }
             counter++;
             Toast.makeText(mainactivityInstance, R.string.unsentrecords_toast, Toast.LENGTH_SHORT).show();
-            set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
+            set_InternalRequest(SESSIONREQUEST.START_COMMUNICATION);
         }
     }
     static void set_InternalRequest(SESSIONREQUEST request) {
@@ -222,29 +179,29 @@ public interface Session{
 
                 break;
 
-            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
+            case CHECK_CACHE_FIRST:
                 if (dbLocationRecCount > 0) {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
                     FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
                 } else {
-                    set_InternalRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
+                    set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
                 }
                 break;
-            case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
+            case CLOSEAPP_NO_CACHE_CHECK:
                 if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
                 mainactivityInstance.finishActivity();
                 break;
-            case BUTTON_STOP_PRESSED:
-                if (dbLocationRecCount > 0) {
-                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
-                }
-                // REPLACED Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+//            case BUTTON_STOP_PRESSED:
+//                if (dbLocationRecCount > 0) {
+//                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+//                }
+//                // REPLACED Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+//                break;
+            case SEND_STORED_LOCATIONS_ON_YES:
+                //sendStoredLocations(); //restore it back
                 break;
-            case SEND_STORED_LOCATIONS:
-                ////   sendStoredLocations(); restore it back
-                break;
-            case ON_COMMUNICATION_SUCCESS:
-                break;
+//            case ON_COMMUNICATION_SUCCESS:
+//                break;
             case START_COMMUNICATION:
                 for (Route r : Route.routeList) {
                     r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
@@ -269,29 +226,25 @@ public interface Session{
         }
     }
 
-    public static void eventReceiver(EVENT event) {
-        switch (event) {
+    @Override
+    public void eventReceiver(EventMessage eventMessage){
+        FontLog.appendLog(TAG + " eventReceiver Interface is called on MainActivity", 'd');
+        EVENT ev = eventMessage.event;
+        switch (ev) {
             case MACT_BIGBUTTON_CLICKED_STOP:
-                set_InternalRequest(SESSIONREQUEST.BUTTON_STOP_PRESSED);
+                if (dbLocationRecCount > 0) {
+                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+                }
                 break;
+            case CLOCK_ONTICK:
+                set_InternalRequest(SESSIONREQUEST.START_COMMUNICATION);
+                break;
+            case DIALOG_ONCLICK:
+                set_InternalRequest(eventMessage.eventMessageValueSessionRequest);
+
+
         }
     }
     //session does react to events. it never initiate events
-
-    //events:
-    // button back pressed
-
-    // on clock:
-
-    // check location cache
-    // start normal communication service to send location
-    // request for all routew to check  if any passive flight need to be closed
-    //
-
-    // on special request:
-
-    // check cache of unsent location
-    // start communication service if cache is not empty
-
 
 }

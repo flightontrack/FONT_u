@@ -308,14 +308,14 @@ android:weightSum="100">
             android:layout_weight="7"
             android:layout_height="wrap_content"
             android:inputType="text"
-            android:text="@string/label_reset"
+            android:text="@string/label_clear_cache"
             android:id="@+id/txtClearCache"
             style="@style/label_text"
             />
         <Button
             android:layout_width="0dp"
             android:layout_weight="3"
-            android:text="@string/label_btnreset"
+            android:text="@string/label_btnclear"
             android:id="@+id/btnClearCache"
             android:layout_height="wrap_content"
             />

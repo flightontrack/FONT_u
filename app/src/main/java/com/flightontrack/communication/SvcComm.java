@@ -24,7 +24,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class SvcComm extends Service implements Session{
+public class SvcComm extends Service{
     public SvcComm() {}
     private static final String TAG = "SvcComm:";
     private RequestParams requestParams = new RequestParams();
@@ -106,12 +106,12 @@ public class SvcComm extends Service implements Session{
                             return;
                         }
                         try {
-                            Flight flight = get_FlightInstance(response.responseFlightNum);
+                            Flight flight = Route.get_FlightInstanceByNumber(response.responseFlightNum);
 
                             if (response.responseAckn != null) {
                                 FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');
                                 sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
-                                set_SessionRequest(SESSIONREQUEST.ON_COMMUNICATION_SUCCESS);
+                                ///set_SessionRequest(SESSIONREQUEST.ON_COMMUNICATION_SUCCESS);
                             }
                             if (response.responseNotif != null) {
                                 FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');

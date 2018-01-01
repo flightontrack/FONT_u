@@ -83,15 +83,7 @@ public abstract class Const {
         SET_FLIGHT_PASIVE_TIMER_CLOCKONLY,
         CHECK_IFANYFLIGHT_NEED_CLOSE
     }
-    public enum SESSIONREQUEST{
-        CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK,
-        CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK,
-        BUTTON_STOP_PRESSED,
-        SEND_STORED_LOCATIONS,
-        START_COMMUNICATION,
-        ON_COMMUNICATION_SUCCESS,
-        STOP_CLOCK
-    }
+
     public enum RSTATUS {
         PASSIVE,
         ACTIVE}
@@ -137,22 +129,5 @@ public abstract class Const {
         PUBLIC,
         PRIVATE}
 
-    public enum EVENT {
-        MACT_BIGBUTTON_CLICKED_START,
-        MACT_BIGBUTTON_CLICKED_STOP,
-        MACT_BACKBUTTON_CLICKED,
-        FLIGHT_GETNEWFLIGHT_STARTED, /// receiver: MA
-        FLIGHT_GETNEWFLIGHT_COMPLETED, /// receivers: MA,route
-        FLIGHT_FLIGHTTIME_STARTED, /// receiver: MA
-        FLIGHT_FLIGHTTIME_UPDATE_COMPLETED, ///MA
-        FLIGHT_CLOSEFLIGHT_COMPLETED, ///MA,route
-        CLOCK_STARTED,
-        CLOCK_TIK, /// receivers: session, flight
-        PROP_CHANGED_MULTILEG,
-        ROUTE_ONNEW,
-        SVCCOMM_ONSUCCESS_NOTIFICATION,
-        SETTINGACT_BUTTONCLEARCACHE_CLICKED
-
-    }
 
 }

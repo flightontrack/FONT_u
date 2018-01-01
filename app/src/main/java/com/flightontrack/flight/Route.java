@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import com.flightontrack.locationclock.SvcLocationClock;
 //import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.log.FontLog;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 
 import static com.flightontrack.shared.Const.*;
 //import static com.flightontrack.shared.Const.EVENT.MACT_BIGBUTTON_CLICKED_START;
 import static com.flightontrack.shared.Props.*;
 
-public class Route implements Session{
+public class Route implements EventBus{
 
     private final String TAG = "Route:";
     public static Route activeRoute;
@@ -44,22 +46,22 @@ public class Route implements Session{
                 if (!SvcLocationClock.isInstanceCreated())
                     ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 set_ActiveFlightID(flightList.get(flightList.size() - 1));
-                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                //setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
                 activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
                 break;
-            case ON_FLIGHTTIME_CHANGED:
-                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
-                break;
+//            case ON_FLIGHTTIME_CHANGED:
+//                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
+//                break;
             case CHECK_IF_ROUTE_MULTILEG:
                 //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
                 if (SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
                     /// ignore request to close route
                     flightList.add(new Flight(this));
-                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
+                    ////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
                 } else {
-                    SvcLocationClock.stopLocationUpdates();
-                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
-                    SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
+                    ////SvcLocationClock.stopLocationUpdates();
+                    /////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
+                    SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
                 }
                 break;
             case SET_FLIGHT_PASIVE_TIMER_CLOCKONLY:
@@ -70,17 +72,17 @@ public class Route implements Session{
                 break;
             case CLOSE_RECEIVEFLIGHT_FAILED:
                 flightList.remove(flightList.size() - 1);  /// remove the latest flight added
-                if (!(SvcLocationClock.instance == null))
-                    SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
-                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
+                if (!(SvcLocationClock.instanceSvcLocationClock == null))
+                    SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
+                    ////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
                 break;
             case RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER:
 //                _legCount++;
 //                int tempFlight = sqlHelper.getNewTempFlightNum();
 //
 //
-//                if (!(SvcLocationClock.instance == null))
-//                    SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
+//                if (!(SvcLocationClock.instanceSvcLocationClock == null))
+//                    SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
 //                    //set_routeStatus(RSTATUS.PASSIVE);
 //                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
 //                    //activeRoute =null;
@@ -137,10 +139,19 @@ public class Route implements Session{
         activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
 //        int i = sqlHelper.allLocationsDelete();
         //FontLog.appendLog(TAG + "Deleted from database: " + i + " all locations", 'd');
-        if (!(SvcLocationClock.instance == null))
-            SvcLocationClock.instance.set_mode(MODE.CLOCK_ONLY);
+        if (!(SvcLocationClock.instanceSvcLocationClock == null))
+            SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
     }
-
+    public static Flight get_FlightInstanceByNumber(String flightNumber){
+        for (Route r : Route.routeList) {
+            for (Flight f : r.flightList) {
+                if (f.flightNumber.equals(flightNumber)) {
+                    return f;
+                }
+            }
+        }
+        return Route.activeRoute.activeFlight;
+    }
 //    private void set_routeStatus(RSTATUS status) {
 //        _routeStatus = status;
 //        switch (status) {
@@ -172,20 +183,25 @@ public class Route implements Session{
 //            editor.remove("pTextRed").commit();
 //        }
 //    }
-    public static void eventReceiver(EVENT event){
-        switch(event){
+@Override
+public void eventReceiver(EventMessage eventMessage){
+    FontLog.appendLog(TAG + " eventReceiver Interface is called on Route", 'd');
+    EVENT ev = eventMessage.event;
+            switch(ev){
             case MACT_BIGBUTTON_CLICKED_START:
                 routeList.add(new Route());
                 break;
             case MACT_BIGBUTTON_CLICKED_STOP:
                 activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 //check if success/failure
                 //get temp flight if fail
                 //start clock service in clock mode?
                 //command flight to start receiving locations FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE
-            case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                /// check is multileg
+                break;
+                case CLOCK_ONTICK:
+
                 break;
 
         }

@@ -20,7 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,8 +46,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
+import static com.flightontrack.flight.Session.*;
 
-public class MainActivity extends AppCompatActivity implements Session{
+public class MainActivity extends AppCompatActivity implements EventBus{
     private static final String TAG = "MainActivity:";
     //public static Context ctxApp;
     static TextView txtUserName;
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements Session{
 
         SessionProp.get();
         Util.setAcftNum(Util.getAcftNum(4));
-        setTrackingButtonState(trackingButtonState);
+        setTrackingButton(trackingButtonState);
 
         init_listeners();
         int permissionCheckPhone = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
@@ -298,7 +298,11 @@ public class MainActivity extends AppCompatActivity implements Session{
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+    public void onCheckboxClicked(View view) {
+        FontLog.appendLog(TAG+ "!!!!! CheckBox clicked !!!!!", 'd');
+        EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_CLICKED).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
 
+    }
     void init_listeners() {
 
         trackingButton.setOnClickListener(new View.OnClickListener() {
@@ -349,13 +353,13 @@ public class MainActivity extends AppCompatActivity implements Session{
 
             }
         });
-        chBoxIsMultiLeg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                //AppConfig.pIsMultileg=b;
-                SessionProp.set_isMultileg(b);
-            }
-        });
+//        chBoxIsMultiLeg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                /// do nothing for now SessionProp.set_isMultileg(b);
+//                FontLog.appendLog(TAG+ "!!!!! onCheckedChanged !!!!!", 'd');
+//            }
+//        });
 
 //        txtUserName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 //            @Override
@@ -511,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements Session{
     }
 
     public void finishActivity() {
-        if (SvcLocationClock.isInstanceCreated()) SvcLocationClock.instance.stopServiceSelf();
+        if (SvcLocationClock.isInstanceCreated()) SvcLocationClock.instanceSvcLocationClock.stopServiceSelf();
         if (alarmReceiver!=null) {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
@@ -621,12 +625,13 @@ public class MainActivity extends AppCompatActivity implements Session{
         SessionProp.pTextRed = fid + fTime;
         return SessionProp.pTextRed;
     }
-    public static void eventReceiver(EventMessage eventMessage){
+    @Override
+    public void eventReceiver(EventMessage eventMessage){
+        FontLog.appendLog(TAG + " eventReceiver Interface is called on MainActivity", 'd');
         EVENT ev = eventMessage.event;
         switch(ev){
             case PROP_CHANGED_MULTILEG:
                 chBoxIsMultiLeg.setChecked(eventMessage.eventMessageValueBool);
-                //switch it to Request flight
                 break;
             case FLIGHT_GETNEWFLIGHT_STARTED:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
@@ -634,11 +639,17 @@ public class MainActivity extends AppCompatActivity implements Session{
             case SVCCOMM_ONSUCCESS_NOTIFICATION:
                 Toast.makeText(mainactivityInstance,R.string.toast_server_error, Toast.LENGTH_LONG).show();
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+            case CLOCK_MODECLOCK_ONLY:
+                setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+                break;
             case FLIGHT_FLIGHTTIME_STARTED:
-                //swithch to green
+            //swithch to green
+            break;
+            case CLOCK_SERVICESTARTED_MODELOCATION:
+                setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
-                //update green time
+                setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GREEN);
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
                 /// swithch to red
                 break;

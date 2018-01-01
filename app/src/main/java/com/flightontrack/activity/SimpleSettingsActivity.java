@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
+import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
@@ -26,6 +27,7 @@ import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.SessionProp.sqlHelper;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
@@ -214,5 +216,13 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         if(!AppConfig.pIsAppTypePublic) spinnerTextTo.setSelection(SessionProp.pSpinnerTextToPos);
         chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsRoad.setChecked(SessionProp.pIsRoad);
+    }
+    public static void eventReceiver(EventMessage eventMessage){
+        Const.EVENT ev = eventMessage.event;
+//        switch(ev){
+//            case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
+//                sqlHelper.dropCreateDb();
+//                break;
+//        }
     }
 }
