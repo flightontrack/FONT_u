@@ -69,7 +69,7 @@ public class Flight implements GetTime,EventBus{
                         /// reset Timer 1 to slower rate
                         _flightStartTimeGMT = getTimeGMT();
                         SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
-                        route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
+                        //route.set_RouteRequest(ROUTEREQUEST.ON_FLIGHTTIME_CHANGED);
                         flightState = request;
                         break;
 //                    case FLIGHTTIME_UPDATE:
@@ -131,7 +131,8 @@ public class Flight implements GetTime,EventBus{
                         break;
                     case CLOSED:
                         flightState = request;
-                        route.set_RouteRequest(ROUTEREQUEST.ON_CLOSE_FLIGHT);
+                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED));
+                        //route.set_RouteRequest(ROUTEREQUEST.ON_CLOSE_FLIGHT);
                         break;
                 }
                 break;

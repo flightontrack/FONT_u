@@ -12,10 +12,10 @@ import static com.flightontrack.shared.Props.*;
 
 public interface EventBus {
     enum EVENT {
-        MACT_BIGBUTTON_CLICKED_START,
-        MACT_BIGBUTTON_CLICKED_STOP,
-        MACT_BACKBUTTON_CLICKED,
-        MACT_MULTILEG_CLICKED,
+        MACT_BIGBUTTON_ONCLICK_START,
+        MACT_BIGBUTTON_ONCLICK_STOP,
+        MACT_BACKBUTTON_ONCLICK,
+        MACT_MULTILEG_ONCLICK,
         FLIGHT_GETNEWFLIGHT_STARTED,
         FLIGHT_GETNEWFLIGHT_COMPLETED,
         FLIGHT_FLIGHTTIME_STARTED,
@@ -28,7 +28,8 @@ public interface EventBus {
         ROUTE_ONNEW,
         SVCCOMM_ONSUCCESS_NOTIFICATION,
         SETTINGACT_BUTTONCLEARCACHE_CLICKED,
-        DIALOG_ONCLICK
+        ALERT_SENTPOINTS,
+        ALERT_STOPAPP
     }
 //    enum REQUEST {
 //        SEND_STORED_LOCATIONS_ON_YES,
@@ -42,12 +43,13 @@ public interface EventBus {
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + ev, 'd');
         switch(ev){
-            case MACT_BIGBUTTON_CLICKED_START:
+            case MACT_BIGBUTTON_ONCLICK_START:
                 interfaceList.add(Route.activeRoute);
                 break;
-            case MACT_BIGBUTTON_CLICKED_STOP:
+            case MACT_BIGBUTTON_ONCLICK_STOP:
                 interfaceList.add(Props.getInstance());
                 interfaceList.add(Route.activeRoute);
+                interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case PROP_CHANGED_MULTILEG:
                 interfaceList.add(mainactivityInstance);
@@ -62,7 +64,7 @@ public interface EventBus {
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
                 SQLHelper.eventReceiver(eventMessage);
                 break;
-            case MACT_MULTILEG_CLICKED:
+            case MACT_MULTILEG_ONCLICK:
                 interfaceList.add(Props.getInstance());
                 break;
             case CLOCK_MODECLOCK_ONLY:
@@ -75,14 +77,26 @@ public interface EventBus {
                 if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
                     interfaceList.add(Route.activeRoute.activeFlight);
                 }
+                interfaceList.add(Route.activeRoute); /// passing acive route which calling static mrthod
                 interfaceList.add(Session.getInstance());
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 interfaceList.add(mainactivityInstance);
                 break;
-            case DIALOG_ONCLICK:
+            case ALERT_SENTPOINTS:
+                interfaceList.add(Route.activeRoute);
                 interfaceList.add(Session.getInstance());
                 break;
+            case MACT_BACKBUTTON_ONCLICK:
+                interfaceList.add(Session.getInstance());
+                break;
+            case ALERT_STOPAPP:
+                interfaceList.add(Session.getInstance());
+                break;
+            case FLIGHT_CLOSEFLIGHT_COMPLETED:
+                interfaceList.add(Route.activeRoute);
+                break;
+
         }
         for( EventBus i : interfaceList) {
             i.eventReceiver(eventMessage);

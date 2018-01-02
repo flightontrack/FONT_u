@@ -30,7 +30,6 @@ public class Session implements EventBus{
         SEND_STORED_LOCATIONS,
         START_COMMUNICATION,
         STOP_CLOCK,
-        SEND_STORED_LOCATIONS_ON_YES,
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
     }
@@ -175,10 +174,8 @@ public class Session implements EventBus{
     static void set_InternalRequest(SESSIONREQUEST request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
-            case STOP_CLOCK:
-
-                break;
-
+//            case STOP_CLOCK:
+//                break;
             case CHECK_CACHE_FIRST:
                 if (dbLocationRecCount > 0) {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
@@ -188,7 +185,7 @@ public class Session implements EventBus{
                 }
                 break;
             case CLOSEAPP_NO_CACHE_CHECK:
-                if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
+                //if (!(Route.activeRoute ==null)) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
                 mainactivityInstance.finishActivity();
                 break;
 //            case BUTTON_STOP_PRESSED:
@@ -197,15 +194,15 @@ public class Session implements EventBus{
 //                }
 //                // REPLACED Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
 //                break;
-            case SEND_STORED_LOCATIONS_ON_YES:
+            case SEND_STORED_LOCATIONS:
                 //sendStoredLocations(); //restore it back
                 break;
 //            case ON_COMMUNICATION_SUCCESS:
 //                break;
             case START_COMMUNICATION:
-                for (Route r : Route.routeList) {
-                    r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
-                }
+//                for (Route r : Route.routeList) {
+//                    r.set_RouteRequest(ROUTEREQUEST.CHECK_IFANYFLIGHT_NEED_CLOSE);
+//                }
                 if (Util.isNetworkAvailable()) {
                     if (dbLocationRecCount > 0) {
                         startLocationCommService();
@@ -231,17 +228,19 @@ public class Session implements EventBus{
         FontLog.appendLog(TAG + " eventReceiver Interface is called on MainActivity", 'd');
         EVENT ev = eventMessage.event;
         switch (ev) {
-            case MACT_BIGBUTTON_CLICKED_STOP:
-                if (dbLocationRecCount > 0) {
-                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
-                }
+            case MACT_BACKBUTTON_ONCLICK:
+                set_InternalRequest(SESSIONREQUEST.CHECK_CACHE_FIRST);
                 break;
             case CLOCK_ONTICK:
                 set_InternalRequest(SESSIONREQUEST.START_COMMUNICATION);
                 break;
-            case DIALOG_ONCLICK:
-                set_InternalRequest(eventMessage.eventMessageValueSessionRequest);
-
+            case ALERT_SENTPOINTS:
+                if(eventMessage.eventMessageValueAlertResponse==RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+                if(eventMessage.eventMessageValueAlertResponse==RESPONSE.NEG) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                break;
+            case ALERT_STOPAPP:
+                if(eventMessage.eventMessageValueAlertResponse==RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                break;
 
         }
     }

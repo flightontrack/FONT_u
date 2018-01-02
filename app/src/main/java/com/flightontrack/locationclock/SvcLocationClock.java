@@ -232,6 +232,10 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
             case SVCCOMM_ONSUCCESS_NOTIFICATION:
                 instanceSvcLocationClock.stopServiceSelf();
                 break;
+            case MACT_BIGBUTTON_ONCLICK_STOP:
+                set_mode(MODE.CLOCK_ONLY);
+                break;
+
         }
     }
 }

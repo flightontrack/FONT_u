@@ -2,14 +2,11 @@ package com.flightontrack.shared;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.SQLHelper;
-
-import java.util.Arrays;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.AppConfig.*;
@@ -165,10 +162,10 @@ public final class Props implements EventBus{
         FontLog.appendLog(TAG + " eventReceiver Interface is called on Props", 'd');
         EVENT ev = eventMessage.event;
         switch(ev){
-            case MACT_MULTILEG_CLICKED:
+            case MACT_MULTILEG_ONCLICK:
                 SessionProp.set_isMultileg(eventMessage.eventMessageValueBool);
                 break;
-            case MACT_BIGBUTTON_CLICKED_STOP:
+            case MACT_BIGBUTTON_ONCLICK_STOP:
                 SessionProp.set_isMultileg(false);
                 break;
 

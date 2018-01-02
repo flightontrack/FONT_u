@@ -24,7 +24,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
@@ -300,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
     }
     public void onCheckboxClicked(View view) {
         FontLog.appendLog(TAG+ "!!!!! CheckBox clicked !!!!!", 'd');
-        EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_CLICKED).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
+        EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_ONCLICK).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
 
     }
     void init_listeners() {
@@ -323,11 +322,11 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                             if (!SessionProp.pIsEmptyAcftOk) return;
                         }
                         //Route.routeList.add(new Route());
-                        EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_CLICKED_START));
+                        EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_START));
                         //activeRoute = new Route();
                         break;
                     default:
-                        EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_CLICKED_STOP));
+                        EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
 //                        SessionProp.set_isMultileg(false);
 //                        set_SessionRequest(SESSIONREQUEST.BUTTON_STOP_PRESSED);
                         break;

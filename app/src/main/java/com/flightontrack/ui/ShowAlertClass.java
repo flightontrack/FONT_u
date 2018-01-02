@@ -14,6 +14,7 @@ import com.flightontrack.activity.MainActivity;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 
+import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.flight.Session.SESSIONREQUEST;
@@ -154,8 +155,7 @@ public class ShowAlertClass{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                EventBus.distribute(new EventMessage(EVENT.DIALOG_ONCLICK).setEventMessageValueSessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS_ON_YES));
-                                //set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+                                EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(RESPONSE.POS));
                                 if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -166,10 +166,7 @@ public class ShowAlertClass{
                         //Util.setPointsUnsent(0);
                         //int j = sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                        //set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
-                        EventBus.distribute(new EventMessage(EVENT.DIALOG_ONCLICK).setEventMessageValueSessionRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK));
-
-                        //ctxActivity.onBackPressed();
+                        EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(RESPONSE.NEG));
                     }
                 });
         AlertDialog alert = alertDialogBuilder.create();
@@ -186,8 +183,7 @@ public class ShowAlertClass{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                EventBus.distribute(new EventMessage(EVENT.DIALOG_ONCLICK).setEventMessageValueSessionRequest(SESSIONREQUEST.CHECK_CACHE_FIRST));
-                                //set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK);
+                                EventBus.distribute(new EventMessage(EVENT.ALERT_STOPAPP).setEventMessageValueAlertResponse(RESPONSE.POS));
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.backpressed_dialog_neg),

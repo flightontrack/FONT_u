@@ -68,21 +68,10 @@ public abstract class Const {
     public static final String SMS_RECEIPIENT_PHONE_CC = "9784295693";
     public static final String SMS_LOWBATTERY_TEXT = "Battery is low, please recharge.";
 
-    public enum ROUTEREQUEST{
-        OPEN_NEW_ROUTE,
-        SWITCH_TO_PENDING,
-        ON_FLIGHTTIME_CHANGED,
-        CLOSE_BUTTON_STOP_PRESSED,
-        CLOSE_RECEIVEFLIGHT_FAILED,
-        RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER,
-        CHECK_IF_ROUTE_MULTILEG,
-        CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST,
-        CLOSE_POINTS_LIMIT_REACHED,
-        CLOSE_FLIGHT_CANCELED,
-        ON_CLOSE_FLIGHT,
-        SET_FLIGHT_PASIVE_TIMER_CLOCKONLY,
-        CHECK_IFANYFLIGHT_NEED_CLOSE
-    }
+    public enum RESPONSE {
+        POS,
+        NEG,
+        CANCEL}
 
     public enum RSTATUS {
         PASSIVE,
