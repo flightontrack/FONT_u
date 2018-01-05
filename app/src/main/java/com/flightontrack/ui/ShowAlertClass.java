@@ -17,7 +17,6 @@ import com.flightontrack.shared.EventMessage;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
-import static com.flightontrack.flight.Session.SESSIONREQUEST;
 
 public class ShowAlertClass{
 
@@ -155,7 +154,7 @@ public class ShowAlertClass{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(RESPONSE.POS));
+                                EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(ALERT_RESPONSE.POS));
                                 if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -166,7 +165,7 @@ public class ShowAlertClass{
                         //Util.setPointsUnsent(0);
                         //int j = sqlHelper.allLocationsDelete();
                         //Util.appendLog(TAG + "Deleted from database: " + j + " all locations", 'd');
-                        EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(RESPONSE.NEG));
+                        EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(ALERT_RESPONSE.NEG));
                     }
                 });
         AlertDialog alert = alertDialogBuilder.create();
@@ -183,7 +182,7 @@ public class ShowAlertClass{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                EventBus.distribute(new EventMessage(EVENT.ALERT_STOPAPP).setEventMessageValueAlertResponse(RESPONSE.POS));
+                                EventBus.distribute(new EventMessage(EVENT.ALERT_STOPAPP).setEventMessageValueAlertResponse(ALERT_RESPONSE.POS));
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.backpressed_dialog_neg),

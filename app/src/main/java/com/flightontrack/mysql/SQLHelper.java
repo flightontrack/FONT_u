@@ -13,11 +13,15 @@ import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventMessage;
 
+import static com.flightontrack.shared.Const.COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED;
+import static com.flightontrack.shared.Const.COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN;
+import static com.flightontrack.shared.Const.COMMAND_TERMINATEFLIGHT;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
+import com.flightontrack.shared.EventBus;
 
 
-public class SQLHelper extends SQLiteOpenHelper {
+public class SQLHelper extends SQLiteOpenHelper implements EventBus{
     private static final String TAG = "SQLHelper:";
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "FONTLOCATION.dbw";
@@ -236,11 +240,15 @@ public class SQLHelper extends SQLiteOpenHelper {
 //        Cursor c = db.rawQuery("select max(ifnull(flightNumber,0)) from FlightNumber",new String[]{"0"});
 
     }
-    public static void eventReceiver(EventMessage eventMessage){
-        Const.EVENT ev = eventMessage.event;
+    @Override
+    public void eventReceiver(EventMessage eventMessage){
+        EVENT ev = eventMessage.event;
         switch(ev){
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
                 sqlHelper.dropCreateDb();
+                break;
+            case SVCCOMM_ONSUCCESS_COMMAND:
+                if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) flightLocationsDelete(eventMessage.eventMessageValueString);
                 break;
         }
     }

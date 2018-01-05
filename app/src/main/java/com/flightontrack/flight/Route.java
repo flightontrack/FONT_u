@@ -59,12 +59,12 @@ public class Route implements EventBus{
                 flightList.add(new Flight(activeRoute));
                 break;
             case SWITCH_TO_PENDING:
-                if (!SvcLocationClock.isInstanceCreated())
-                    ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
-                set_ActiveFlightID(flightList.get(flightList.size() - 1));
+//                if (!SvcLocationClock.isInstanceCreated())
+//                    ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
+                //set_ActiveFlightID(flightList.get(flightList.size() - 1));
                 //setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-                activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
-                break;
+                //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
+                ////break;
 //            case ON_FLIGHTTIME_CHANGED:
 //                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
 //                break;
@@ -137,21 +137,21 @@ public class Route implements EventBus{
         }
     }
 
-    static void checkIfAnyFlightNeedClose() {
-        try {
-            for (Route r : Route.routeList) {
-                for (Flight f : r.flightList) {
-                    if (f.flightState == FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT) {
-                        f.set_flightRequest(FLIGHTREQUEST.CLOSE_FLIGHT);
-                    }
-                    //String flights ="-";
-                    //flights=flights+f.flightNumber+"-"+f.flightState+"-";
-                }
-            }
-        } catch (Exception e) {
-            //FontLog.appendLog(TAG + "checkIfAnyFlightNeedClose: " + e.getMessage() + "\n" + e.getCause(), 'e');
-        }
-    }
+//    static void checkIfAnyFlightNeedClose() {
+//        try {
+//            for (Route r : Route.routeList) {
+//                for (Flight f : r.flightList) {
+//                    if (f.flightState == FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT) {
+//                        f.set_flightRequest(FLIGHTREQUEST.CLOSE_FLIGHT);
+//                    }
+//                    //String flights ="-";
+//                    //flights=flights+f.flightNumber+"-"+f.flightState+"-";
+//                }
+//            }
+//        } catch (Exception e) {
+//            //FontLog.appendLog(TAG + "checkIfAnyFlightNeedClose: " + e.getMessage() + "\n" + e.getCause(), 'e');
+//        }
+//    }
 
     private void setFlightPassive() {
         if (!(activeFlight == null))
@@ -181,6 +181,7 @@ public void eventReceiver(EventMessage eventMessage){
                 activeRoute.set_RouteRequest(ROUTEREQUEST.SET_FLIGHT_PASIVE);
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
+                if(eventMessage.eventMessageValueBool) set_ActiveFlightID(flightList.get(flightList.size() - 1)); //TODO flight number is passed in the message - get flight from the number
                 //check if success/failure
                 //get temp flight if fail
                 //start clock service in clock mode?

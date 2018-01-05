@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.flight.Flight;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.SQLHelper;
 
@@ -168,7 +169,18 @@ public final class Props implements EventBus{
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 SessionProp.set_isMultileg(false);
                 break;
-
+            case SVCCOMM_ONSUCCESS_COMMAND:
+                int server_command = eventMessage.eventMessageValueInt;
+                switch (server_command) {
+                    case COMMAND_TERMINATEFLIGHT:
+                        SessionProp.set_isMultileg(false);
+                        break;
+                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
+                        break;
+                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
+                        break;
+                }
+                break;
         }
     }
 

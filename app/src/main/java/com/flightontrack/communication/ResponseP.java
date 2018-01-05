@@ -19,7 +19,7 @@ public class ResponseP {
     public ResponseP(String responseBody) {
         //String response = responseBody;
         //String responseData = responseBody.substring(2, responseBody.length());
-        Log.w("RESPONSE: ",responseBody);
+        Log.w("ALERT_RESPONSE: ",responseBody);
         try {
             responseJsonArray = new JSONArray(responseBody);
             ///getting response type and load on it

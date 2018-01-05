@@ -1,11 +1,11 @@
 package com.flightontrack.shared;
 import android.location.Location;
 
-import com.flightontrack.flight.Route;
-
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.flight.Route.*;
+import static com.flightontrack.communication.SvcComm.*;
+
 /**
  * Created by hotvk on 12/28/2017.
  */
@@ -13,12 +13,14 @@ import static com.flightontrack.flight.Route.*;
 public class EventMessage implements EventBus {
 public EVENT event;
 public boolean eventMessageValueBool;
+public String eventMessageValueString;
+public int eventMessageValueInt;
 public Location eventMessageValueLocation;
 public MODE eventMessageValueClockMode;
 public SESSIONREQUEST eventMessageValueSessionRequest;
 public ROUTEREQUEST eventMessageValueRouteRequest;
-public RESPONSE eventMessageValueAlertResponse;
-public String eventMessageValue;
+public ALERT_RESPONSE eventMessageValueAlertResponse;
+public SVCCOMM_SUCCESS_TYPE eventMessageValueSvcCommSuccessType;
 
 public  EventMessage(EVENT eventMessage ){
     this.event = eventMessage;
@@ -44,8 +46,20 @@ public EventMessage setEventMessageValueRouteRequest(ROUTEREQUEST val){
     this.eventMessageValueRouteRequest = val;
     return this;
 }
-public EventMessage setEventMessageValueAlertResponse(RESPONSE val){
+public EventMessage setEventMessageValueAlertResponse(ALERT_RESPONSE val){
     this.eventMessageValueAlertResponse = val;
+    return this;
+}
+public EventMessage setEventMessageValueInt(int val){
+    this.eventMessageValueInt= val;
+    return this;
+}
+public EventMessage setEventMessageValueSvcCommSuccessType(SVCCOMM_SUCCESS_TYPE val){
+    this.eventMessageValueSvcCommSuccessType= val;
+    return this;
+}
+public EventMessage setEventMessageValueString(String val){
+    this.eventMessageValueString= val;
     return this;
 }
 }

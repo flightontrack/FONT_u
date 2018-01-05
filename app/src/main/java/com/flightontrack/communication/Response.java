@@ -21,7 +21,7 @@ public class Response {
     public int     jsonErrorCount  = 0;
 
     public Response(String responseBody) {
-        Log.w("RESPONSE: ", responseBody);
+        Log.w("ALERT_RESPONSE: ", responseBody);
         ResponseJson(responseBody);
     }
 

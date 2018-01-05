@@ -14,10 +14,12 @@ public abstract class Const {
     public static final String RESPONSE_TYPE_NOTIF_WITHLOAD = "2";
     public static final String RESPONSE_TYPE_DATA_PSW = "aP";
 
+
+
     public static final int COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN = -10;
     public static final int COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED = -9;
     public static final int COMMAND_FLIGHT_STATE_PENDING = -7;
-    public static final int COMMAND_CANCELFLIGHT = -6;
+    public static final int COMMAND_TERMINATEFLIGHT = -6;
 
     public static final long DISTANCE_CHANGE_FOR_UPDATES_MIN = 0; //20; //  meters
     public static final long DISTANCE_CHANGE_FOR_UPDATES_ZERO = 0; //  meters
@@ -68,7 +70,7 @@ public abstract class Const {
     public static final String SMS_RECEIPIENT_PHONE_CC = "9784295693";
     public static final String SMS_LOWBATTERY_TEXT = "Battery is low, please recharge.";
 
-    public enum RESPONSE {
+    public enum ALERT_RESPONSE {
         POS,
         NEG,
         CANCEL}
@@ -85,22 +87,22 @@ public abstract class Const {
         CLOCK_LOCATION,
         CLOCK_ONLY}
 
-    public enum FLIGHTREQUEST {
-        CHANGESTATE_REQUEST_FLIGHT,
-        CHANGESTATE_STATUSACTIVE,
-        CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT,
-        CHANGESTATE_INFLIGHT,
-        CHANGESTATE_SPEED_BELOW_MIN,
-        CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED,
-        GET_LOCATIONSERVICE,
-        CLOSE_FLIGHT,
-        TERMINATE_FLIGHT,
-        CLOSED,
-        CLOSED_FAILURE,
-        FLIGHTTIME_UPDATE,
-        REQUEST_FLIGHTNUMBER,
-        ON_FLIGHTGET_FINISH,
-        ON_SERVER_N0TIF}
+//    public enum FLIGHTREQUEST {
+//        CHANGESTATE_REQUEST_FLIGHT,
+//        CHANGESTATE_STATUSACTIVE,
+//        CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT,
+//        CHANGESTATE_INFLIGHT,
+//        CHANGESTATE_SPEED_BELOW_MIN,
+//        CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED,
+//        GET_LOCATIONSERVICE,
+//        CLOSE_FLIGHT,
+//        TERMINATE_FLIGHT,
+//        CLOSED,
+//        CLOSED_FAILURE,
+//        FLIGHTTIME_UPDATE,
+//        REQUEST_FLIGHTNUMBER,
+//        ON_FLIGHTGET_FINISH,
+//        ON_SERVER_N0TIF}
 
     public enum BUTTONREQUEST{
         BUTTON_STATE_RED,

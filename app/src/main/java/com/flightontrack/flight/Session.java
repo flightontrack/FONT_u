@@ -235,11 +235,11 @@ public class Session implements EventBus{
                 set_InternalRequest(SESSIONREQUEST.START_COMMUNICATION);
                 break;
             case ALERT_SENTPOINTS:
-                if(eventMessage.eventMessageValueAlertResponse==RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
-                if(eventMessage.eventMessageValueAlertResponse==RESPONSE.NEG) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
                 break;
             case ALERT_STOPAPP:
-                if(eventMessage.eventMessageValueAlertResponse==RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
                 break;
 
         }

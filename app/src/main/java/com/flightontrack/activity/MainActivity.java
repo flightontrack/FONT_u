@@ -635,7 +635,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             case FLIGHT_GETNEWFLIGHT_STARTED:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
                 break;
-            case SVCCOMM_ONSUCCESS_NOTIFICATION:
+            case SVCCOMM_ONSUCCESS_NOTIF:
                 Toast.makeText(mainactivityInstance,R.string.toast_server_error, Toast.LENGTH_LONG).show();
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
             case CLOCK_MODECLOCK_ONLY:

@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.flightontrack.flight.Flight;
 import com.flightontrack.R;
 import com.flightontrack.flight.Route;
-import com.flightontrack.flight.Session;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -25,6 +24,7 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class SvcComm extends Service{
+
     public SvcComm() {}
     private static final String TAG = "SvcComm:";
     private RequestParams requestParams = new RequestParams();
@@ -102,7 +102,12 @@ public class SvcComm extends Service{
                         Response response = new Response(new String(responseBody));
                         //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
                         if (response.jsonErrorCount>0) {
-                            if (response.jsonErrorCount>MAX_JSON_ERROR) Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                            FontLog.appendLog(TAG + "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount,'d');
+                            if (response.jsonErrorCount>MAX_JSON_ERROR) {
+                                /// raise this event as NOTIF
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                                //Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                            }
                             return;
                         }
                         try {
@@ -115,47 +120,37 @@ public class SvcComm extends Service{
                             }
                             if (response.responseNotif != null) {
                                 FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIFICATION));
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
                                 // flight.set_flightRequest(FLIGHTREQUEST.ON_SERVER_N0TIF);
                             }
                             if (response.responseCommand != null) {
                                 FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
-                                // TBD
-                                switch (response.iresponseCommand) {
-                                    case COMMAND_CANCELFLIGHT:
-                                        if (SessionProp.pIsRoad) break; /// just ignore the request
-                                        else {
-                                            Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
-                                            FontLog.appendLog(TAG + "COMMAND_CANCELFLIGHT request", 'd');
-                                            flight.set_flightRequest(FLIGHTREQUEST.TERMINATE_FLIGHT);
-//                                            sqlHelper.flightLocationsDelete(response.responseFlightNum);
-//                                            MainActivity.set_isMultileg(false);
-//                                            activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_FLIGHT_CANCELED);
-                                            break;
-                                        }
-                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
-                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN request",'d');
-                                        flight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_SPEED_BELOW_MIN);
-//                                        for (Flight f : flightList) {
-//                                            if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
-//                                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_SPEED_BELOW_MIN_SERVER_REQUEST);
-//                                            }
+                                if (response.iresponseCommand==COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad) return;
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_COMMAND)
+                                        .setEventMessageValueInt(response.iresponseCommand)
+                                        .setEventMessageValueString(response.responseFlightNum));
+//                                switch (response.iresponseCommand) {
+//                                    case COMMAND_TERMINATEFLIGHT:
+//                                        if (SessionProp.pIsRoad) break; /// just ignore the request
+//                                        else {
+//                                            Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
+//                                            FontLog.appendLog(TAG + "COMMAND_TERMINATEFLIGHT request", 'd');
+//                                            flight.set_flightRequest(FLIGHTREQUEST.TERMINATE_FLIGHT);
+//                                            break;
 //                                        }
-                                        break;
-                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
-                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED request",'d');
-                                        flight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED);
-//                                        for (Flight f : flightList) {
-//                                            if (f.flightNumber.equals(response.responseFlightNum)&&f.fStatus.equals(FSTATUS.ACTIVE)) {
-//                                                activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_POINTS_LIMIT_REACHED);
-//                                            }
-//                                        }
-                                        break;
-                                    case COMMAND_FLIGHT_STATE_PENDING:
-                                        break;
-                                    case -1:
-                                        break;
-                                }
+//                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
+//                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN request",'d');
+//                                        flight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_SPEED_BELOW_MIN);
+//                                        break;
+//                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
+//                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED request",'d');
+//                                        flight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED);
+//                                        break;
+//                                    case COMMAND_FLIGHT_STATE_PENDING:
+//                                        break;
+//                                    case -1:
+//                                        break;
+//                                }
                             }
                             if (response.responseDataLoad!=null){
                                 FontLog.appendLog(TAG + "Data response : "+response.responseDataLoad,'d');

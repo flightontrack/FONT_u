@@ -22,7 +22,6 @@ import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
-import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.shared.Props.ctxApp;
 
 public class SvcLocationClock extends Service implements EventBus, LocationListener,GetTime {
@@ -229,13 +228,18 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
         FontLog.appendLog(TAG + " eventReceiver Interface is called on SvcLocationClock", 'd');
         EVENT ev = eventMessage.event;
         switch(ev){
-            case SVCCOMM_ONSUCCESS_NOTIFICATION:
+            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+                if (!SvcLocationClock.isInstanceCreated()) ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
+                break;
+            case SVCCOMM_ONSUCCESS_NOTIF:
                 instanceSvcLocationClock.stopServiceSelf();
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 set_mode(MODE.CLOCK_ONLY);
                 break;
-
+            case SVCCOMM_ONSUCCESS_COMMAND:
+                if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) set_mode(MODE.CLOCK_ONLY);
+                break;
         }
     }
 }
