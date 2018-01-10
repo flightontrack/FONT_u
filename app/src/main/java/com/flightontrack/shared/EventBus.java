@@ -14,6 +14,7 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 
 public interface EventBus {
     enum EVENT {
+        DEFAULT_EVENT,
         MACT_BIGBUTTON_ONCLICK_START,
         MACT_BIGBUTTON_ONCLICK_STOP,
         MACT_BACKBUTTON_ONCLICK,
@@ -24,6 +25,8 @@ public interface EventBus {
         FLIGHT_FLIGHTTIME_STARTED,
         FLIGHT_FLIGHTTIME_UPDATE_COMPLETED,
         FLIGHT_CLOSEFLIGHT_COMPLETED,
+        FLIGHT_ONSPEEDLOW,
+        FLIGHT_ONPOINTSLIMITREACHED,
 
         CLOCK_SERVICESTARTED_MODELOCATION,
         CLOCK_ONTICK,
@@ -31,6 +34,7 @@ public interface EventBus {
 
         PROP_CHANGED_MULTILEG,
         ROUTE_ONNEW,
+        ROUTE_ONLEGLIMITREACHED,
 
         SVCCOMM_ONSUCCESS_NOTIF,
         SVCCOMM_ONSUCCESS_ACKN,
@@ -49,11 +53,11 @@ public interface EventBus {
         FontLog.appendLog(TAG + ev, 'd');
         switch(ev){
             case MACT_BIGBUTTON_ONCLICK_START:
-                interfaceList.add(Route.activeRoute);
+                interfaceList.add(new Route());
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 interfaceList.add(Props.getInstance());
-                interfaceList.add(Route.activeRoute);
+                interfaceList.add(Route.activeRoute.activeFlight); // set the active flight to passive
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case PROP_CHANGED_MULTILEG:
@@ -64,10 +68,27 @@ public interface EventBus {
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(eventMessage.eventMessageValueBool){
-                    interfaceList.add(new SvcLocationClock()); //start clock service
-                    interfaceList.add(Route.activeRoute); // update the active flight field
-                    interfaceList.add(Route.activeRoute.activeFlight); // bounce back to active flight to switch it to active
+                    interfaceList.add(new SvcLocationClock()); //start clock service in location mode
+                    //interfaceList.add(Route.activeRoute); // update the active flight field
+                    //interfaceList.add(Route.activeRoute.activeFlight); // bounce back to active flight to switch it to active
                 }
+                else interfaceList.add(mainactivityInstance);
+                break;
+            case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
+                interfaceList.add(mainactivityInstance);
+                break;
+            case FLIGHT_CLOSEFLIGHT_COMPLETED:
+                interfaceList.add(Route.activeRoute);
+                break;
+            case FLIGHT_ONSPEEDLOW:
+                if(!SessionProp.pIsMultileg) interfaceList.add(SvcLocationClock.getInstance());
+                interfaceList.add(Route.activeRoute);
+                break;
+            case FLIGHT_ONPOINTSLIMITREACHED:
+                ///TODO
+                break;
+            case ROUTE_ONLEGLIMITREACHED:
+                ///TODO
                 break;
             case SVCCOMM_ONSUCCESS_NOTIF:
                 interfaceList.add(Props.getInstance());
@@ -114,9 +135,6 @@ public interface EventBus {
                 }
                 interfaceList.add(Session.getInstance()); ///start communication service
                 break;
-            case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
-                interfaceList.add(mainactivityInstance);
-                break;
             case ALERT_SENTPOINTS:
                 interfaceList.add(Route.activeRoute);
                 interfaceList.add(Session.getInstance());
@@ -127,11 +145,6 @@ public interface EventBus {
             case ALERT_STOPAPP:
                 interfaceList.add(Session.getInstance());
                 break;
-            case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                interfaceList.add(Route.activeRoute);
-
-                break;
-
         }
         for( EventBus i : interfaceList) {
             i.eventReceiver(eventMessage);

@@ -29,7 +29,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.sqlHelper;
 
-public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener {
+public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener,EventBus {
 
     TextView txtUser;
     public static TextView txtPsw;
@@ -217,8 +217,9 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsRoad.setChecked(SessionProp.pIsRoad);
     }
-    public static void eventReceiver(EventMessage eventMessage){
-        Const.EVENT ev = eventMessage.event;
+@Override
+    public void eventReceiver(EventMessage eventMessage){
+        EVENT ev = eventMessage.event;
 //        switch(ev){
 //            case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
 //                sqlHelper.dropCreateDb();

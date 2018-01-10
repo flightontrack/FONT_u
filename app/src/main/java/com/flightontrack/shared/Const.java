@@ -88,7 +88,7 @@ public abstract class Const {
         CLOCK_ONLY}
 
 //    public enum FLIGHTREQUEST {
-//        CHANGESTATE_REQUEST_FLIGHT,
+//        REQUEST_FLIGHT,
 //        CHANGESTATE_STATUSACTIVE,
 //        CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT,
 //        CHANGESTATE_INFLIGHT,

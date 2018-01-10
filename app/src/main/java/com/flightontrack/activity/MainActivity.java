@@ -643,6 +643,9 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                 break;
             case FLIGHT_FLIGHTTIME_STARTED:
             //swithch to green
+                break;
+            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+                if(!eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
             break;
             case CLOCK_SERVICESTARTED_MODELOCATION:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);

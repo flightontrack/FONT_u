@@ -20,7 +20,7 @@ public MODE eventMessageValueClockMode;
 public SESSIONREQUEST eventMessageValueSessionRequest;
 public ROUTEREQUEST eventMessageValueRouteRequest;
 public ALERT_RESPONSE eventMessageValueAlertResponse;
-public SVCCOMM_SUCCESS_TYPE eventMessageValueSvcCommSuccessType;
+//public SVCCOMM_SUCCESS_TYPE eventMessageValueSvcCommSuccessType;
 
 public  EventMessage(EVENT eventMessage ){
     this.event = eventMessage;
@@ -54,10 +54,10 @@ public EventMessage setEventMessageValueInt(int val){
     this.eventMessageValueInt= val;
     return this;
 }
-public EventMessage setEventMessageValueSvcCommSuccessType(SVCCOMM_SUCCESS_TYPE val){
-    this.eventMessageValueSvcCommSuccessType= val;
-    return this;
-}
+//public EventMessage setEventMessageValueSvcCommSuccessType(SVCCOMM_SUCCESS_TYPE val){
+//    this.eventMessageValueSvcCommSuccessType= val;
+//    return this;
+//}
 public EventMessage setEventMessageValueString(String val){
     this.eventMessageValueString= val;
     return this;
