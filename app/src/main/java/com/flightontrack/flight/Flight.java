@@ -237,12 +237,12 @@ public class Flight implements GetTime,EventBus {
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", SessionProp.pIsDebug);
         if (!(route.routeNumber == null)) requestParams.put("routeid", route.routeNumber);
+        isGetFlightNumber = false;
 //        requestParams.setUseJsonStreamer(true);
         new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         FontLog.appendLog(TAG + "getNewFlightID OnSuccess", 'd');
-                        isGetFlightCallSuccess = true;
                         //String responseText = new String(responseBody);
                         Response response = new Response(new String(responseBody));
                         //char responseType = response.responseType;
@@ -255,10 +255,12 @@ public class Flight implements GetTime,EventBus {
                         if (response.responseFlightNum != null) {
                             if (flightNumber == null) {
                                 flightNumber = response.responseFlightNum;
+                                isGetFlightCallSuccess = true;
+                                set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
                             } else {
                                 replaceFlightNumber(response.responseFlightNum);
                             }
-                            isGetFlightNumber = false;
+                            //isGetFlightNumber = false;
                             //route._legCount++;
                         }
                     }
@@ -282,11 +284,11 @@ public class Flight implements GetTime,EventBus {
 
                     @Override
                     public void onFinish() {
+
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
                         EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
                             .setEventMessageValueBool(isGetFlightCallSuccess)
                             .setEventMessageValueString(flightNumber));
-                        set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
                         route._legCount++;
                         //set_FlightNumber(flightNumber);
 //                        if (flightNumber == null)
@@ -422,8 +424,8 @@ public class Flight implements GetTime,EventBus {
 
     @Override
     public void eventReceiver(EventMessage eventMessage) {
-        FontLog.appendLog(TAG + " eventReceiver Interface is called on Flight", 'd');
         EVENT ev = eventMessage.event;
+        FontLog.appendLog(TAG + " eventReceiver:"+ev, 'd');
         switch (ev) {
             case CLOCK_ONTICK:
                 if (!(eventMessage.eventMessageValueLocation==null)) onClock(eventMessage.eventMessageValueLocation);

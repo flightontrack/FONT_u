@@ -147,7 +147,7 @@ public interface EventBus {
                 break;
         }
         for( EventBus i : interfaceList) {
-            i.eventReceiver(eventMessage);
+            if(!(null==i))i.eventReceiver(eventMessage);
         }
     }
 

@@ -171,8 +171,8 @@ public class Route implements EventBus{
     }
 @Override
 public void eventReceiver(EventMessage eventMessage){
-    FontLog.appendLog(TAG + " eventReceiver Interface is called on Route", 'd');
     EVENT ev = eventMessage.event;
+    FontLog.appendLog(TAG + " eventReceiver:"+ev, 'd');
             switch(ev){
             case MACT_BIGBUTTON_ONCLICK_START:
                 //routeList.add(new Route());

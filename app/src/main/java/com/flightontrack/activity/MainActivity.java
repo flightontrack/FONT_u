@@ -626,8 +626,9 @@ public class MainActivity extends AppCompatActivity implements EventBus{
     }
     @Override
     public void eventReceiver(EventMessage eventMessage){
-        FontLog.appendLog(TAG + " eventReceiver Interface is called on MainActivity", 'd');
         EVENT ev = eventMessage.event;
+        FontLog.appendLog(TAG + " eventReceiver : "+ev, 'd');
+
         switch(ev){
             case PROP_CHANGED_MULTILEG:
                 chBoxIsMultiLeg.setChecked(eventMessage.eventMessageValueBool);
