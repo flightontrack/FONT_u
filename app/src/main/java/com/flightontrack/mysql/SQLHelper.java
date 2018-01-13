@@ -19,9 +19,14 @@ import static com.flightontrack.shared.Const.COMMAND_TERMINATEFLIGHT;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.GetTime;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 
-public class SQLHelper extends SQLiteOpenHelper implements EventBus{
+public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
+
     private static final String TAG = "SQLHelper:";
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "FONTLOCATION.dbw";
@@ -32,6 +37,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus{
         super(ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
         FontLog.appendLog(TAG + "SQLHelper:SQLHelper", 'd');
         dbw = getWritableDatabase();
+        dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
         dbLocationRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
@@ -141,6 +147,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus{
                 DBSchema._ID,
                 DBSchema.COLUMN_NAME_COL1,
                 DBSchema.LOC_flightid,
+                DBSchema.LOC_isTempFlight,
                 DBSchema.LOC_speedlowflag,
                 DBSchema.COLUMN_NAME_COL4,
                 DBSchema.COLUMN_NAME_COL6,
@@ -153,8 +160,10 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus{
                 DBSchema.COLUMN_NAME_COL13
         };
         String sortOrder = DBSchema._ID;
-        String selection = null; //DBSchema._ID + "= ?";
-        String[] selectionArgs = null; // { String.valueOf(newRowId) };
+        //String selection = null; //DBSchema._ID + "= ?";
+        String selection = DBSchema.LOC_isTempFlight + "= ?";
+        //String[] selectionArgs = null; // { String.valueOf(newRowId) };
+        String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
         dbw = getWritableDatabase();
         cl = dbw.query(
                 DBSchema.TABLE_LOCATION,  // The table to query
@@ -197,14 +206,15 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus{
 
         return (int) numRows;
     }
-    public String getNewTempFlightNum(String flightNumber,String routeNumber, String dateTime){
+    public String getNewTempFlightNum(String dateTime){
         dbw = getWritableDatabase();
+
         Cursor c = dbw.rawQuery("select max(ifnull(flightNumber,0)) from FlightNumber" ,new String[]{});
         c.moveToFirst();
         int f= c.getCount()<=0?1:c.getInt(0)+1;
         ContentValues values = new ContentValues();
         values.put(DBSchema.FLIGHTNUM_FlightNumber, f); //flightid
-        values.put(DBSchema.FLIGHTNUM_RouteNumber, routeNumber); //flightid
+        values.put(DBSchema.FLIGHTNUM_RouteNumber, 0);
         values.put(DBSchema.FLIGHTNUM_FlightTimeStart, dateTime); //date
 
         long r = 0;
@@ -249,6 +259,16 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus{
                 break;
             case SVCCOMM_ONSUCCESS_COMMAND:
                 if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) flightLocationsDelete(eventMessage.eventMessageValueString);
+                break;
+            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+                if(!eventMessage.eventMessageValueBool)
+                    try {
+                        String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
+                        EventBus.distribute(new EventMessage(EVENT.SQL_TEMPFLIGHTNUM_ALLOCATED).setEventMessageValueString(getNewTempFlightNum(dt)));
+
+                    } catch (UnsupportedEncodingException e1) {
+                        e1.printStackTrace();
+                    }
                 break;
         }
     }

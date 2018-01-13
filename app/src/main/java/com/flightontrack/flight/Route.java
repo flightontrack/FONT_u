@@ -34,7 +34,7 @@ public class Route implements EventBus{
     public static Route activeRoute;
     public static ArrayList<Route> routeList = new ArrayList<>();
 
-    public Flight activeFlight;
+    public static Flight activeFlight;
     public ArrayList<Flight> flightList = new ArrayList<>();
     String routeNumber = null;
     int _legCount = 0;
@@ -61,13 +61,13 @@ public class Route implements EventBus{
 //                    ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 //set_ActiveFlightID(flightList.get(flightList.size() - 1));
                 //setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-                //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSACTIVE);
+                //activeFlight.set_fAction(F_ACTION.CHANGESTATE_STATUSACTIVE);
                 ////break;
 //            case ON_FLIGHTTIME_CHANGED:
 //                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
 //                break;
             case CHECK_IF_LEG_LIMIT_REACHED:
-                //activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
+                //activeFlight.set_fAction(F_ACTION.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
                 //if (SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
                 if (_legCount < LEG_COUNT_HARD_LIMIT) {
                     /// ignore request to close route
@@ -107,7 +107,7 @@ public class Route implements EventBus{
                 /// to avoid ConcurrentModificationException making copy of the flightList
                 FontLog.appendLog(TAG + "ON_CLOSE_FLIGHT: flightList: size before: " + flightList.size(), 'd');
                 for (Flight f : new ArrayList<>(flightList)) {
-                    if (f.lastInternalRequest == FLIGHTREQUEST.CLOSED) {
+                    if (f.lastAction == F_ACTION.CLOSED) {
 
                         if (activeFlight == f) activeFlight = null;
                         flightList.remove(f);
@@ -141,11 +141,11 @@ public class Route implements EventBus{
 //        try {
 //            for (Route r : Route.routeList) {
 //                for (Flight f : r.flightList) {
-//                    if (f.lastInternalRequest == FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT) {
-//                        f.set_flightRequest(FLIGHTREQUEST.CLOSE_FLIGHT);
+//                    if (f.lastAction == F_ACTION.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT) {
+//                        f.set_fAction(F_ACTION.CLOSE_FLIGHT);
 //                    }
 //                    //String flights ="-";
-//                    //flights=flights+f.flightNumber+"-"+f.lastInternalRequest+"-";
+//                    //flights=flights+f.flightNumber+"-"+f.lastAction+"-";
 //                }
 //            }
 //        } catch (Exception e) {
@@ -155,7 +155,7 @@ public class Route implements EventBus{
 
 //    private void setFlightPassive() {
 //        if (!(activeFlight == null))
-//        activeFlight.set_flightRequest(FLIGHTREQUEST.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
+//        activeFlight.set_fAction(F_ACTION.CHANGESTATE_STATUSPASSIVE_AND_CLOSEFLIGHT);
 ////        if (!(SvcLocationClock.instanceSvcLocationClock == null))
 ////            SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
 //    }

@@ -27,6 +27,7 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS =    "CREATE TABLE 
      public static final String COLUMN_NAME_ENTRY_ID = "id";
      public static final String COLUMN_NAME_COL1 = "rcode";
      public static final String LOC_flightid = "flightid";
+     public static final String LOC_isTempFlight = "istempflightnum";
      public static final String LOC_speedlowflag = "speedlowflag";
      public static final String COLUMN_NAME_COL4 = "speed";
     // public static final String COLUMN_NAME_COL5 = "deviceid";
@@ -60,6 +61,7 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS =    "CREATE TABLE 
             //COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
             COLUMN_NAME_COL1 + INT_TYPE + COMMA_SEP +
              LOC_flightid + TEXT_TYPE + COMMA_SEP +
+             LOC_isTempFlight + BOOLEAN_TYPE + COMMA_SEP +
              LOC_speedlowflag + BOOLEAN_TYPE + COMMA_SEP +
             COLUMN_NAME_COL4 + TEXT_TYPE + COMMA_SEP +
             COLUMN_NAME_COL6 + TEXT_TYPE + COMMA_SEP +

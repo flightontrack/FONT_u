@@ -606,22 +606,20 @@ public class MainActivity extends AppCompatActivity implements EventBus{
         return SessionProp.pTextGreen;
     }
     static String setTextRed() {
-        String fid = SessionProp.pTextRed;
+        String fText = SessionProp.pTextRed;
         String fTime = "";
-        String flightId;
+        String flightN = FLIGHT_NUMBER_DEFAULT;
 
         if (Route.activeRoute == null) {
             FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
         } else {
-            if (Route.activeRoute!=null && Route.activeRoute.activeFlight!=null) {
-                flightId = Route.activeRoute.activeFlight.flightNumber;
-                //fTime = Route.activeRoute.activeFlight.flightTimeString.equals(FLIGHT_TIME_ZERO) ? ctxApp.getString(R.string.time) + SPACE + GetTime.getTimeLocal() : ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
+            if (Route.activeRoute.activeFlight!=null) {
+                flightN = Route.activeRoute.activeFlight.flightNumber;
                 fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
             }
-            else {flightId = FLIGHT_NUMBER_DEFAULT;}
-            fid = "Flight " + flightId + '\n' + "Stopped"; // + '\n';
+            fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
         }
-        SessionProp.pTextRed = fid + fTime;
+        SessionProp.pTextRed = fText + fTime;
         return SessionProp.pTextRed;
     }
     @Override
@@ -646,7 +644,8 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             //swithch to green
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
-                if(!eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+                if(eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                else setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
             break;
             case CLOCK_SERVICESTARTED_MODELOCATION:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);

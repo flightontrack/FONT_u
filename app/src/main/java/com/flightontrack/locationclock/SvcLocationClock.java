@@ -225,8 +225,8 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
 
     @Override
     public void eventReceiver(EventMessage eventMessage){
-        FontLog.appendLog(TAG + " eventReceiver Interface is called on SvcLocationClock", 'd');
         EVENT ev = eventMessage.event;
+        FontLog.appendLog(TAG + " eventReceiver:"+ev, 'd');
         switch(ev){
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if (!SvcLocationClock.isInstanceCreated()) ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));

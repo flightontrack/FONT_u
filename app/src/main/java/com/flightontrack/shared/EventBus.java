@@ -43,7 +43,9 @@ public interface EventBus {
         SETTINGACT_BUTTONCLEARCACHE_CLICKED,
 
         ALERT_SENTPOINTS,
-        ALERT_STOPAPP
+        ALERT_STOPAPP,
+
+        SQL_TEMPFLIGHTNUM_ALLOCATED
     }
     String TAG = "Bus:";
 
@@ -57,7 +59,7 @@ public interface EventBus {
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 interfaceList.add(Props.getInstance());
-                interfaceList.add(Route.activeRoute.activeFlight); // set the active flight to passive
+                interfaceList.add(Route.activeRoute.activeFlight); // set the active flight to fail
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case PROP_CHANGED_MULTILEG:
@@ -69,10 +71,13 @@ public interface EventBus {
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(eventMessage.eventMessageValueBool){
                     interfaceList.add(new SvcLocationClock()); //start clock service in location mode
-                    //interfaceList.add(Route.activeRoute); // update the active flight field
-                    //interfaceList.add(Route.activeRoute.activeFlight); // bounce back to active flight to switch it to active
+                    interfaceList.add(mainactivityInstance);
                 }
-                else interfaceList.add(mainactivityInstance);
+                else
+                {
+                    interfaceList.add(sqlHelper);
+                }
+                    //interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 interfaceList.add(mainactivityInstance);
@@ -121,7 +126,7 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_SERVICESTARTED_MODELOCATION:
-                interfaceList.add(mainactivityInstance);
+                //interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
                 if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
@@ -144,6 +149,9 @@ public interface EventBus {
                 break;
             case ALERT_STOPAPP:
                 interfaceList.add(Session.getInstance());
+                break;
+            case SQL_TEMPFLIGHTNUM_ALLOCATED:
+                interfaceList.add(Route.activeRoute.activeFlight);
                 break;
         }
         for( EventBus i : interfaceList) {

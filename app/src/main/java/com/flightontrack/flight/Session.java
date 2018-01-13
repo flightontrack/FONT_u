@@ -83,7 +83,7 @@ public class Session implements EventBus{
 ////                    if (dbTempFlightRecCount > 0) {
 ////                        for (Route r : Route.routeList) {
 ////                            for (Flight f:r.flightList){
-////                                f.set_flightRequest(FLIGHTREQUEST.REQUEST_FLIGHTNUMBER);
+////                                f.set_fAction(F_ACTION.REQUEST_FLIGHTNUMBER);
 ////                            }
 ////                        }
 ////                    }
@@ -211,7 +211,7 @@ public class Session implements EventBus{
 //                    if (dbTempFlightRecCount > 0) {
 //                        for (Route r : Route.routeList) {
 //                            for (Flight f:r.flightList){
-//                                f.set_flightRequest(FLIGHTREQUEST.REQUEST_FLIGHTNUMBER);
+//                                f.set_fAction(F_ACTION.REQUEST_FLIGHTNUMBER);
 //                            }
 //                        }
 //                    }
