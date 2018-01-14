@@ -197,12 +197,13 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
         super.onTaskRemoved(rootIntent);
         setSignalStrengthListener(false);
         FontLog.appendLog(TAG + "onTaskRemoved: ",'d');
-        if(!(instanceSvcLocationClock ==null)){
-            stopLocationUpdates();
-            setToNull();
-        }
-        stopSelf();
-        //Util.getLogcat();
+//        if(!(instanceSvcLocationClock ==null)){
+//            stopLocationUpdates();
+//            setToNull();
+//        }
+//        stopSelf();
+        stopServiceSelf();
+
     }
     public void stopServiceSelf() {
         FontLog.appendLog(TAG + "stopServiceSelf",'d');
@@ -211,6 +212,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
             stopLocationUpdates();
             setToNull();
         }
+        EventBus.distribute(new EventMessage(EVENT.CLOCK_SERVICESELFSTOPPED));
         stopSelf();
     }
     void setToNull(){

@@ -106,7 +106,7 @@ public class SvcComm extends Service{
                             if (response.jsonErrorCount>MAX_JSON_ERROR) {
                                 /// raise this event as NOTIF
                                 EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
-                                //Route.activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+                                //Route.activeRoute.set_rAction(rACTION.CLOSE_BUTTON_STOP_PRESSED);
                             }
                             return;
                         }

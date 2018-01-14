@@ -29,6 +29,7 @@ public interface EventBus {
         FLIGHT_ONPOINTSLIMITREACHED,
 
         CLOCK_SERVICESTARTED_MODELOCATION,
+        CLOCK_SERVICESELFSTOPPED,
         CLOCK_ONTICK,
         CLOCK_MODECLOCK_ONLY,
 
@@ -70,6 +71,7 @@ public interface EventBus {
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(eventMessage.eventMessageValueBool){
+                    interfaceList.add(Route.activeRoute); // set route number
                     interfaceList.add(new SvcLocationClock()); //start clock service in location mode
                     interfaceList.add(mainactivityInstance);
                 }
@@ -83,10 +85,10 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                interfaceList.add(Route.activeRoute);
+                interfaceList.add(Route.activeRoute); //remove flight
                 break;
             case FLIGHT_ONSPEEDLOW:
-                if(!SessionProp.pIsMultileg) interfaceList.add(SvcLocationClock.getInstance());
+                if(!SessionProp.pIsMultileg) interfaceList.add(SvcLocationClock.getInstance());//TODO doing nothing
                 interfaceList.add(Route.activeRoute);
                 break;
             case FLIGHT_ONPOINTSLIMITREACHED:
@@ -125,12 +127,12 @@ public interface EventBus {
             case CLOCK_MODECLOCK_ONLY:
                 interfaceList.add(mainactivityInstance);
                 break;
-            case CLOCK_SERVICESTARTED_MODELOCATION:
-                //interfaceList.add(mainactivityInstance);
+            case CLOCK_SERVICESELFSTOPPED:
+                interfaceList.add(Route.activeRoute); // set to null flightlist and routelist
                 break;
             case CLOCK_ONTICK:
                 if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
-                    interfaceList.add(Route.activeRoute.activeFlight);
+                    interfaceList.add(Route.activeFlight);
                 }
                 interfaceList.add(Route.activeRoute); /// passing acive route which calling static mrthod
                 for (Route r : Route.routeList) {

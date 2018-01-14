@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
 //
 //                } else {
 //                    set_isMultileg(false);
-//                    activeRoute.set_RouteRequest(ROUTEREQUEST.CLOSE_BUTTON_STOP_PRESSED);
+//                    activeRoute.set_rAction(rACTION.CLOSE_BUTTON_STOP_PRESSED);
 //                }
 
             }

@@ -4,7 +4,6 @@ import android.location.Location;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Session.*;
 import static com.flightontrack.flight.Route.*;
-import static com.flightontrack.communication.SvcComm.*;
 
 /**
  * Created by hotvk on 12/28/2017.
@@ -18,7 +17,7 @@ public int eventMessageValueInt;
 public Location eventMessageValueLocation;
 public MODE eventMessageValueClockMode;
 public SESSIONREQUEST eventMessageValueSessionRequest;
-public ROUTEREQUEST eventMessageValueRouteRequest;
+public rACTION eventMessageValueRouteRequest;
 public ALERT_RESPONSE eventMessageValueAlertResponse;
 //public SVCCOMM_SUCCESS_TYPE eventMessageValueSvcCommSuccessType;
 
@@ -42,7 +41,7 @@ public EventMessage setEventMessageValueSessionRequest(SESSIONREQUEST val){
     this.eventMessageValueSessionRequest = val;
     return this;
 }
-public EventMessage setEventMessageValueRouteRequest(ROUTEREQUEST val){
+public EventMessage setEventMessageValueRouteRequest(rACTION val){
     this.eventMessageValueRouteRequest = val;
     return this;
 }
