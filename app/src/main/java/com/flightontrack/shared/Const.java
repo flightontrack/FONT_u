@@ -40,7 +40,7 @@ public abstract class Const {
     public static final int DEFAULT_INTERVAL_SELECTED_ITEM = 6;
 
     public static final String FLIGHT_NUMBER_DEFAULT = "00";
-    //public static final String ROUTE_NUMBER_DEFAULT = "00";
+    /public static final String ROUTE_NUMBER_DEFAULT = "00";
 
     public static final int COMM_BATCH_SIZE_MAX = 50;
     public static final int COMM_BATCH_SIZE_MIN = 1;

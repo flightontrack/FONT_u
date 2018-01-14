@@ -35,6 +35,7 @@ public class Route implements EventBus{
 
     public Route() {
         routeList.add(activeRoute = this);
+        CHECK_IF_LEG_LIMIT_REACHED;
         //activeRoute = this;
     }
 
@@ -176,7 +177,7 @@ public void eventReceiver(EventMessage eventMessage){
 //                activeRoute.set_rAction(rACTION.SET_FLIGHT_PASIVE);
 //                break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
-                if (routeNumber == null) routeNumber =eventMessage.eventMessageValueString;
+                if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
                 //if(eventMessage.eventMessageValueBool) set_ActiveFlightID(flightList.get(flightList.size() - 1)); //TODO flight number is passed in the message - get flight from the number
                 break;
             case CLOCK_ONTICK:
