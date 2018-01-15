@@ -40,7 +40,7 @@ public abstract class Const {
     public static final int DEFAULT_INTERVAL_SELECTED_ITEM = 6;
 
     public static final String FLIGHT_NUMBER_DEFAULT = "00";
-    /public static final String ROUTE_NUMBER_DEFAULT = "00";
+    public static final String ROUTE_NUMBER_DEFAULT = "00";
 
     public static final int COMM_BATCH_SIZE_MAX = 50;
     public static final int COMM_BATCH_SIZE_MIN = 1;
@@ -87,7 +87,7 @@ public abstract class Const {
         CLOCK_LOCATION,
         CLOCK_ONLY}
 
-//    public enum F_ACTION {
+//    public enum FACTION {
 //        REQUEST_FLIGHT,
 //        CHANGE_IN_PENDING,
 //        CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
@@ -95,7 +95,7 @@ public abstract class Const {
 //        CHANGESTATE_SPEED_BELOW_MIN,
 //        CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED,
 //        GET_LOCATIONSERVICE,
-//        CLOSE_FLIGHT,
+//        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
 //        TERMINATE_FLIGHT,
 //        CLOSED,
 //        CLOSED_FAILURE,

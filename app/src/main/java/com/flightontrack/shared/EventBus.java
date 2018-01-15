@@ -29,13 +29,15 @@ public interface EventBus {
         FLIGHT_ONPOINTSLIMITREACHED,
 
         CLOCK_SERVICESTARTED_MODELOCATION,
+
         CLOCK_SERVICESELFSTOPPED,
         CLOCK_ONTICK,
         CLOCK_MODECLOCK_ONLY,
-
         PROP_CHANGED_MULTILEG,
+
         ROUTE_ONNEW,
         ROUTE_ONLEGLIMITREACHED,
+        ROUTE_NOACTIVEROUTE,
 
         SVCCOMM_ONSUCCESS_NOTIF,
         SVCCOMM_ONSUCCESS_ACKN,
@@ -97,6 +99,9 @@ public interface EventBus {
             case ROUTE_ONLEGLIMITREACHED:
                 ///TODO
                 break;
+            case ROUTE_NOACTIVEROUTE:
+                interfaceList.add(SvcLocationClock.getInstance());
+                break;
             case SVCCOMM_ONSUCCESS_NOTIF:
                 interfaceList.add(Props.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
@@ -129,11 +134,12 @@ public interface EventBus {
                 break;
             case CLOCK_SERVICESELFSTOPPED:
                 interfaceList.add(Route.activeRoute); // set to null flightlist and routelist
+                interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
-                if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
-                    interfaceList.add(Route.activeFlight);
-                }
+//                if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
+//                    interfaceList.add(Route.activeFlight);
+//                }
                 interfaceList.add(Route.activeRoute); /// passing acive route which calling static mrthod
                 for (Route r : Route.routeList) {
                     for (Flight f : r.flightList) {
@@ -141,6 +147,7 @@ public interface EventBus {
                     }
                 }
                 interfaceList.add(Session.getInstance()); ///start communication service
+                //FontLog.appendLog(TAG + interfaceList, 'd');
                 break;
             case ALERT_SENTPOINTS:
                 interfaceList.add(Route.activeRoute);

@@ -49,22 +49,22 @@ public class Session implements EventBus{
 //                break;
 //
 //            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
-//                if (dbLocationRecCount > 0) {
-//                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
-//                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
+//                if (dbLocationRecCountTotal > 0) {
+//                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountTotal);
+//                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountTotal, 'd');
 //                } else {
 //                    set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
 //                }
 //                break;
 //            case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
-//                if (!(Route.activeRoute ==null)) Route.activeRoute.set_rAction(rACTION.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
+//                if (!(Route.activeRoute ==null)) Route.activeRoute.set_rAction(RACTION.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
 //                mainactivityInstance.finishActivity();
 //            break;
 ////            case BUTTON_STOP_PRESSED:
-////                if (dbLocationRecCount > 0) {
+////                if (dbLocationRecCountTotal > 0) {
 ////                    set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
 ////                }
-////                Route.activeRoute.set_rAction(rACTION.CLOSE_BUTTON_STOP_PRESSED);
+////                Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
 ////                break;
 //            case SEND_STORED_LOCATIONS:
 //                //sendStoredLocations();
@@ -73,17 +73,17 @@ public class Session implements EventBus{
 ////                break;
 //            case START_COMMUNICATION:
 //                for (Route r : Route.routeList) {
-//                    r.set_rAction(rACTION.CHECK_IFANYFLIGHT_NEED_CLOSE);
+//                    r.set_rAction(RACTION.CHECK_IFANYFLIGHT_NEED_CLOSE);
 //                }
 //                if (Util.isNetworkAvailable()) {
-//                    if (dbLocationRecCount > 0) {
+//                    if (dbLocationRecCountTotal > 0) {
 //                        startLocationCommService();
 //                    }
 //
 ////                    if (dbTempFlightRecCount > 0) {
 ////                        for (Route r : Route.routeList) {
 ////                            for (Flight f:r.flightList){
-////                                f.set_fAction(F_ACTION.REQUEST_FLIGHTNUMBER);
+////                                f.set_fAction(FACTION.REQUEST_FLIGHTNUMBER);
 ////                            }
 ////                        }
 ////                    }
@@ -154,9 +154,9 @@ public class Session implements EventBus{
 
     static void sendStoredLocations(){
         int MaxTryCount = 5;
-        SvcComm.commBatchSize= dbLocationRecCount;
+        SvcComm.commBatchSize= dbLocationRecCountTotal;
         int counter =0;
-        while (dbLocationRecCount>0){
+        while (dbLocationRecCountTotal >0){
             if (counter >MaxTryCount) {
                 Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                 break;
@@ -175,22 +175,22 @@ public class Session implements EventBus{
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
             case CHECK_CACHE_FIRST:
-                if (dbLocationRecCount > 0) {
-                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCount);
-                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCount, 'd');
+                if (dbLocationRecCountTotal > 0) {
+                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountTotal);
+                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountTotal, 'd');
                 } else {
                     set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
                 }
                 break;
             case CLOSEAPP_NO_CACHE_CHECK:
-                //if (!(Route.activeRoute ==null)) Route.activeRoute.set_rAction(rACTION.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
+                //if (!(Route.activeRoute ==null)) Route.activeRoute.set_rAction(RACTION.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
                 mainactivityInstance.finishActivity();
                 break;
 //            case BUTTON_STOP_PRESSED:
-//                if (dbLocationRecCount > 0) {
+//                if (dbLocationRecCountTotal > 0) {
 //                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
 //                }
-//                // REPLACED Route.activeRoute.set_rAction(rACTION.CLOSE_BUTTON_STOP_PRESSED);
+//                // REPLACED Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
 //                break;
             case SEND_STORED_LOCATIONS:
                 //sendStoredLocations(); //restore it back
@@ -198,24 +198,21 @@ public class Session implements EventBus{
 //            case ON_COMMUNICATION_SUCCESS:
 //                break;
             case START_COMMUNICATION:
-//                for (Route r : Route.routeList) {
-//                    r.set_rAction(rACTION.CHECK_IFANYFLIGHT_NEED_CLOSE);
-//                }
-                if (Util.isNetworkAvailable()) {
-                    if (dbLocationRecCount > 0) {
-                        startLocationCommService();
-                    }
-
 //                    if (dbTempFlightRecCount > 0) {
 //                        for (Route r : Route.routeList) {
 //                            for (Flight f:r.flightList){
-//                                f.set_fAction(F_ACTION.REQUEST_FLIGHTNUMBER);
+//                                f.set_fAction(FACTION.REQUEST_FLIGHTNUMBER);
 //                            }
 //                        }
 //                    }
-                } else {
-                    FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-                    Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                FontLog.appendLog(TAG + "dbLocationRecCountTotal:"+dbLocationRecCountTotal+"dbLocationRecCountTemp:"+dbLocationRecCountTemp, 'd');
+                if (dbLocationRecCountTotal - dbLocationRecCountTemp> 0) {
+                    if (Util.isNetworkAvailable()) {
+                        startLocationCommService();
+                    } else {
+                        FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
+                        Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
         }

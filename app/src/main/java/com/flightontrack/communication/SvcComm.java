@@ -106,7 +106,7 @@ public class SvcComm extends Service{
                             if (response.jsonErrorCount>MAX_JSON_ERROR) {
                                 /// raise this event as NOTIF
                                 EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
-                                //Route.activeRoute.set_rAction(rACTION.CLOSE_BUTTON_STOP_PRESSED);
+                                //Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
                             }
                             return;
                         }
@@ -121,7 +121,7 @@ public class SvcComm extends Service{
                             if (response.responseNotif != null) {
                                 FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
                                 EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
-                                // flight.set_fAction(F_ACTION.ON_SERVER_N0TIF);
+                                // flight.set_fAction(FACTION.ON_SERVER_N0TIF);
                             }
                             if (response.responseCommand != null) {
                                 FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
@@ -135,16 +135,16 @@ public class SvcComm extends Service{
 //                                        else {
 //                                            Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
 //                                            FontLog.appendLog(TAG + "COMMAND_TERMINATEFLIGHT request", 'd');
-//                                            flight.set_fAction(F_ACTION.TERMINATE_FLIGHT);
+//                                            flight.set_fAction(FACTION.TERMINATE_FLIGHT);
 //                                            break;
 //                                        }
 //                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
 //                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN request",'d');
-//                                        flight.set_fAction(F_ACTION.CHANGESTATE_SPEED_BELOW_MIN);
+//                                        flight.set_fAction(FACTION.CHANGESTATE_SPEED_BELOW_MIN);
 //                                        break;
 //                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
 //                                        FontLog.appendLog(TAG + "COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED request",'d');
-//                                        flight.set_fAction(F_ACTION.CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED);
+//                                        flight.set_fAction(FACTION.CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED);
 //                                        break;
 //                                    case COMMAND_FLIGHT_STATE_PENDING:
 //                                        break;

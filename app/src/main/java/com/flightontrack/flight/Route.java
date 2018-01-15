@@ -13,7 +13,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Flight.*;
 
 public class Route implements EventBus{
-    public enum rACTION {
+    public enum RACTION {
         OPEN_NEW_FLIGHT,
         SWITCH_TO_PENDING,
         ON_FLIGHTTIME_CHANGED,
@@ -21,21 +21,20 @@ public class Route implements EventBus{
         CLOSE_RECEIVEFLIGHT_FAILED,
         RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER,
         RESTART_NEW_FLIGHT,
-        REMOVE_FLIGHT,
+        REMOVE_FLIGHT_IF_CLOSED,
     }
 
     private final String TAG = "Route:";
     public static Route activeRoute;
     public static ArrayList<Route> routeList = new ArrayList<>();
+    String routeNumber=ROUTE_NUMBER_DEFAULT;
 
     public static Flight activeFlight;
     public ArrayList<Flight> flightList = new ArrayList<>();
-    String routeNumber;
     int _legCount = 0;
 
     public Route() {
         routeList.add(activeRoute = this);
-        CHECK_IF_LEG_LIMIT_REACHED;
         //activeRoute = this;
     }
 
@@ -43,7 +42,7 @@ public class Route implements EventBus{
         return activeRoute != null;
     }
 
-    void set_rAction(rACTION request) {
+    void set_rAction(RACTION request) {
         FontLog.appendLog(TAG + "set_ROUTEREQUEST:" + request, 'd');
         switch (request) {
             case OPEN_NEW_FLIGHT:
@@ -54,13 +53,13 @@ public class Route implements EventBus{
 //                    ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 //set_ActiveFlightID(flightList.get(flightList.size() - 1));
                 //setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-                //activeFlight.set_fAction(F_ACTION.CHANGE_IN_PENDING);
+                //activeFlight.set_fAction(FACTION.CHANGE_IN_PENDING);
                 ////break;
 //            case ON_FLIGHTTIME_CHANGED:
 //                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
 //                break;
             case RESTART_NEW_FLIGHT:
-                //activeFlight.set_fAction(F_ACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT);
+                //activeFlight.set_fAction(FACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT);
                 if (Props.SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
                 //if (_legCount < LEG_COUNT_HARD_LIMIT) {
                     /// ignore request to close route
@@ -96,20 +95,24 @@ public class Route implements EventBus{
 //                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
 //                    //activeRoute =null;
                 break;
-            case REMOVE_FLIGHT:
+            case REMOVE_FLIGHT_IF_CLOSED:
                 /// to avoid ConcurrentModificationException making copy of the flightList
-                FontLog.appendLog(TAG + "REMOVE_FLIGHT: flightList: size before: " + flightList.size(), 'd');
-                for (Flight f : new ArrayList<>(flightList)) {
-                    if (f.lastAction == F_ACTION.CLOSED||f.lastAction == F_ACTION.TERMINATE_GETFLIGHTNUM) {
-                        if (activeFlight == f) activeFlight = null;
-                        flightList.remove(f);
+                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
+                for(Route r:new ArrayList<>(routeList)) {
+                    for (Flight f : new ArrayList<>(r.flightList)) {
+                        FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
+                        if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
+                            //if (activeFlight == f) activeFlight = null;
+                            flightList.remove(f);
+                        }
+                        if (flightList.isEmpty()) {
+                            //if (activeRoute == this) activeRoute = null;
+                            routeList.remove(this);
+                        }
                     }
-//                    if (flightList.isEmpty()) {
-//                        if (activeRoute == this) activeRoute = null;
-//                        routeList.remove(this);
-//                    }
                 }
-
+                if(routeList.isEmpty()) EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
+                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size after: " + flightList.size(), 'd');
                 break;
 //            case CHECK_IFANYFLIGHT_NEED_CLOSE:
 //                //FontLog.appendLog(TAG + "ROUTE.CHECK_IFANYFLIGHT_NEED_CLOSE", 'd');
@@ -124,8 +127,8 @@ public class Route implements EventBus{
 //        try {
 //            for (Route r : Route.routeList) {
 //                for (Flight f : r.flightList) {
-//                    if (f.lastAction == F_ACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT) {
-//                        f.set_fAction(F_ACTION.CLOSE_FLIGHT);
+//                    if (f.lastAction == FACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT) {
+//                        f.set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
 //                    }
 //                    //String flights ="-";
 //                    //flights=flights+f.flightNumber+"-"+f.lastAction+"-";
@@ -138,7 +141,7 @@ public class Route implements EventBus{
 
 //    private void setFlightPassive() {
 //        if (!(activeFlight == null))
-//        activeFlight.set_fAction(F_ACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT);
+//        activeFlight.set_fAction(FACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT);
 ////        if (!(SvcLocationClock.instanceSvcLocationClock == null))
 ////            SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
 //    }
@@ -171,23 +174,23 @@ public void eventReceiver(EventMessage eventMessage){
                 //routeList.add(new Route());
 //                routeList.add(this);
 //                activeRoute = this;
-                set_rAction(rACTION.OPEN_NEW_FLIGHT);
+                set_rAction(RACTION.OPEN_NEW_FLIGHT);
                 break;
 //            case MACT_BIGBUTTON_ONCLICK_STOP:
-//                activeRoute.set_rAction(rACTION.SET_FLIGHT_PASIVE);
+//                activeRoute.set_rAction(RACTION.SET_FLIGHT_PASIVE);
 //                break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
                 //if(eventMessage.eventMessageValueBool) set_ActiveFlightID(flightList.get(flightList.size() - 1)); //TODO flight number is passed in the message - get flight from the number
                 break;
             case CLOCK_ONTICK:
-                set_rAction(rACTION.REMOVE_FLIGHT);
+                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
             case FLIGHT_ONSPEEDLOW:
-                set_rAction(rACTION.RESTART_NEW_FLIGHT);
+                set_rAction(RACTION.RESTART_NEW_FLIGHT);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                set_rAction(rACTION.REMOVE_FLIGHT);
+                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
             case CLOCK_SERVICESELFSTOPPED:
                 setToNull();

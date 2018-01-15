@@ -311,19 +311,14 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                 //if (Route._routeStatus == RSTATUS.PASSIVE) {
                 switch (trackingButtonState) {
                     case BUTTON_STATE_RED:
-                        //Util.setUserName(txtUserName.getText().toString());
                         Util.setAcftNum(txtAcftNum.getText().toString());
-                        //set_pIntervalLocationUpdateSecPos(spinnerUpdFreq.getSelectedItemPosition());
-                        if (!AppConfig.pAutostart && !is_services_available()) return;
-                        //if (!isAircraftPopulated() && !Util.isEmptyAcftOk()) {
+                        /// /// if (!AppConfig.pAutostart && !is_services_available()) return;
                         if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
 
                             new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
                             if (!SessionProp.pIsEmptyAcftOk) return;
                         }
-                        //Route.routeList.add(new Route());
                         EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_START));
-                        //activeRoute = new Route();
                         break;
                     default:
                         EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
@@ -347,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
 //
 //                } else {
 //                    set_isMultileg(false);
-//                    activeRoute.set_rAction(rACTION.CLOSE_BUTTON_STOP_PRESSED);
+//                    activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
 //                }
 
             }
@@ -599,10 +594,10 @@ public class MainActivity extends AppCompatActivity implements EventBus{
         trackingButtonState = request;
     }
     static String setTextGreen() {
-        SessionProp.pTextGreen = "Flight: " + (Route.activeRoute.activeFlight.flightNumber) + '\n' +
-                "Point: " + Route.activeRoute.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString + '\n'
-                + "Alt: " + Route.activeRoute.activeFlight.lastAltitudeFt + " ft";
+        SessionProp.pTextGreen = "Flight: " + (Route.activeFlight.flightNumber) + '\n' +
+                "Point: " + Route.activeFlight._wayPointsCount +
+                ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeFlight.flightTimeString + '\n'
+                + "Alt: " + Route.activeFlight.lastAltitudeFt + " ft";
         return SessionProp.pTextGreen;
     }
     static String setTextRed() {
@@ -613,9 +608,9 @@ public class MainActivity extends AppCompatActivity implements EventBus{
         if (Route.activeRoute == null) {
             FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
         } else {
-            if (Route.activeRoute.activeFlight!=null) {
-                flightN = Route.activeRoute.activeFlight.flightNumber;
-                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeRoute.activeFlight.flightTimeString;
+            if (Route.activeFlight!=null) {
+                flightN = Route.activeFlight.flightNumber;
+                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeFlight.flightTimeString;
             }
             fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
         }
@@ -637,18 +632,21 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             case SVCCOMM_ONSUCCESS_NOTIF:
                 Toast.makeText(mainactivityInstance,R.string.toast_server_error, Toast.LENGTH_LONG).show();
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+            case FLIGHT_FLIGHTTIME_STARTED:
+            //swithch to green
+            break;
+            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+            if(eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                else setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+            break;
             case CLOCK_MODECLOCK_ONLY:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
                 break;
-            case FLIGHT_FLIGHTTIME_STARTED:
-            //swithch to green
-                break;
-            case FLIGHT_GETNEWFLIGHT_COMPLETED:
-                if(eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-                else setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
-            break;
             case CLOCK_SERVICESTARTED_MODELOCATION:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                break;
+            case CLOCK_SERVICESELFSTOPPED:
+                setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GREEN);

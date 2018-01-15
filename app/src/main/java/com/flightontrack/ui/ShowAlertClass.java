@@ -155,7 +155,7 @@ public class ShowAlertClass{
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                                 EventBus.distribute(new EventMessage(EVENT.ALERT_SENTPOINTS).setEventMessageValueAlertResponse(ALERT_RESPONSE.POS));
-                                if(dbLocationRecCount>0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
+                                if(dbLocationRecCountTotal >0) Toast.makeText(ctxActivity, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                             }
                         });
         alertDialogBuilder.setNegativeButton(ctxActivity.getString(R.string.unsentrecords_dialog_neg),

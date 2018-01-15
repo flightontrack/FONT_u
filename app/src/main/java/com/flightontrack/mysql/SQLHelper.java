@@ -8,13 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-import com.flightontrack.R;
 import com.flightontrack.log.FontLog;
-import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventMessage;
 
-import static com.flightontrack.shared.Const.COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED;
-import static com.flightontrack.shared.Const.COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN;
 import static com.flightontrack.shared.Const.COMMAND_TERMINATEFLIGHT;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -40,15 +36,15 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
-        dbLocationRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
-        if (dbLocationRecCount == 0) {
+        dbLocationRecCountTotal = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
+        if (dbLocationRecCountTotal == 0) {
             dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
             dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT_NUMBER);
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
         }
         dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
-        FontLog.appendLog(TAG + "Unsent Locations from Previous Session :  " + dbLocationRecCount, 'd');
+        FontLog.appendLog(TAG + "Unsent Locations from Previous Session :  " + dbLocationRecCountTotal, 'd');
         FontLog.appendLog(TAG + "Temp Flights Previous Session :  " + dbTempFlightRecCount, 'd');
         dbw.close();
     }
@@ -70,9 +66,9 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT_NUMBER);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
         dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
-        dbLocationRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
+        dbLocationRecCountTotal = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
         dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
-        if(dbLocationRecCount==0){
+        if(dbLocationRecCountTotal ==0){
             Toast.makeText(ctxApp,"Deleted "+lcount+" location points",Toast.LENGTH_LONG).show();
         }
         dbw.close();
@@ -92,7 +88,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = getLocationTableCount();
+        dbLocationRecCountTotal = getLocationTableCountTotal();
     }
     public void flightLocationsDelete(String flightId) {
         String selection = DBSchema.LOC_flightid +"= ?";
@@ -109,7 +105,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = getLocationTableCount();
+        dbLocationRecCountTotal = getLocationTableCountTotal();
     }
     public int allLocationsDelete() {
         int i =0;
@@ -122,7 +118,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = 0;
+        dbLocationRecCountTotal = 0;
         return i;
     }
     public long  rowLocationInsert(ContentValues values) {
@@ -137,7 +133,8 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCount = getLocationTableCount();
+        dbLocationRecCountTotal = getLocationTableCountTotal();
+        dbLocationRecCountTemp = getLocationTableCountTemp();
         return r;
     }
 
@@ -185,9 +182,17 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 //        return cf.getCount();
 //    }
 
-    int getLocationTableCount() {
+    int getLocationTableCountTotal() {
         dbw = getWritableDatabase();
         long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
+        dbw.close();
+        return (int) numRows;
+    }
+    int getLocationTableCountTemp() {
+        dbw = getWritableDatabase();
+        Cursor c = dbw.rawQuery("select _id from Location where istempflightnum =1" ,new String[]{});
+        c.moveToFirst();
+        int numRows = c.getCount();
         dbw.close();
         return (int) numRows;
     }
@@ -245,7 +250,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 //        values.put(DBSchema.FLIGHT_COLUMN_NAME_COL2, dateTime); //date
 //        long r = sqlHelper.rowLocationInsert(values);
 //        if (r > 0) {
-//            FontLog.appendLog(TAG + "saveLocation: dbLocationRecCount: " + Props.SessionProp.dbLocationRecCount, 'd');
+//            FontLog.appendLog(TAG + "saveLocation: dbLocationRecCountTotal: " + Props.SessionProp.dbLocationRecCountTotal, 'd');
 //        }
 //        Cursor c = db.rawQuery("select max(ifnull(flightNumber,0)) from FlightNumber",new String[]{"0"});
 

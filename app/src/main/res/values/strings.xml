@@ -84,6 +84,7 @@
     <string name="user_needs_to_restart_tracking">Please restart tracking to change the time interval</string>
     <string name="user_needs_to_restart_app">Please restart the application</string>
     <string name="reachability_error">Cannot reach the URL. Try again.</string>
+    <string name="temp_flight_alloc">Cannot reach the URL. Temp flight number assigned.</string>
     <string name="max_number_reached">You reached maximum allowed number of waypoints</string>
     <string name="flight_has_ended">The flight has ended</string>
     <string name="flight_uknown_req">Unknown request. The flight has ended.</string>

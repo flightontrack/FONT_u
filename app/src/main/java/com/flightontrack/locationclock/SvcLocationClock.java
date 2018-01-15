@@ -94,7 +94,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     @Override
     public void onLocationChanged(final Location location) {
         counter++;
-        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCount<1){
+        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCountTotal <1){
             stopServiceSelf();
             return;
         }
@@ -241,6 +241,9 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
                 break;
             case SVCCOMM_ONSUCCESS_COMMAND:
                 if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) set_mode(MODE.CLOCK_ONLY);
+                break;
+            case ROUTE_NOACTIVEROUTE:
+                set_mode(MODE.CLOCK_ONLY);
                 break;
         }
     }
