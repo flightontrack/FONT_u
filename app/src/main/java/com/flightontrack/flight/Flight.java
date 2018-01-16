@@ -356,7 +356,7 @@ public class Flight implements GetTime,EventBus {
             if (r > 0) {
                 lastAltitudeFt = (int) (Math.round(location.getAltitude() * 3.281));
                 set_wayPointsCount(p);
-                FontLog.appendLog(TAG + "saveLocation: dbLocationRecCountTotal: " + SessionProp.dbLocationRecCountTotal, 'd');
+                FontLog.appendLog(TAG + "saveLocation: dbLocationRecCountNormal: " + SessionProp.dbLocationRecCountNormal, 'd');
             }
         } catch (Exception e) {
             FontLog.appendLog(TAG + "SQLite Exception Placeholder", 'e');

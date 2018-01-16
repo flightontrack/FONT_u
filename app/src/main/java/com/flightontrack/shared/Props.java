@@ -67,8 +67,8 @@ public final class Props implements EventBus{
         public static boolean       pIsStartedOnReboot =false;
 
         public static SQLHelper sqlHelper;
-        public static int dbLocationRecCountTotal = 0;
-        public static int dbLocationRecCountTemp = 0;
+        public static int dbLocationRecCountNormal = 0;
+        //public static int dbLocationRecCountTemp = 0;
         public static int dbTempFlightRecCount = 0;
         public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
         public static String        pTextRed;

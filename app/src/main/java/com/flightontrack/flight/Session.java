@@ -49,9 +49,9 @@ public class Session implements EventBus{
 //                break;
 //
 //            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
-//                if (dbLocationRecCountTotal > 0) {
-//                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountTotal);
-//                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountTotal, 'd');
+//                if (dbLocationRecCountNormal > 0) {
+//                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountNormal);
+//                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountNormal, 'd');
 //                } else {
 //                    set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
 //                }
@@ -61,7 +61,7 @@ public class Session implements EventBus{
 //                mainactivityInstance.finishActivity();
 //            break;
 ////            case BUTTON_STOP_PRESSED:
-////                if (dbLocationRecCountTotal > 0) {
+////                if (dbLocationRecCountNormal > 0) {
 ////                    set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
 ////                }
 ////                Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
@@ -76,7 +76,7 @@ public class Session implements EventBus{
 //                    r.set_rAction(RACTION.CHECK_IFANYFLIGHT_NEED_CLOSE);
 //                }
 //                if (Util.isNetworkAvailable()) {
-//                    if (dbLocationRecCountTotal > 0) {
+//                    if (dbLocationRecCountNormal > 0) {
 //                        startLocationCommService();
 //                    }
 //
@@ -107,12 +107,11 @@ public class Session implements EventBus{
     static void startLocationCommService() {
 
         sqlHelper.setCursorDataLocation();
-        int count = sqlHelper.getCursorCountLocation();
-        //Util.appendLog(TAG+ "getCursorCountLocation :" + count,'d');
+//        int count = sqlHelper.getCursorCountLocation();
 
         FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + SvcComm.commBatchSize, 'd');
-        if (count >= 1) {
-            for (int i = 0; i < count; i++) {
+        if (dbLocationRecCountNormal >= 1) {
+            for (int i = 0; i < dbLocationRecCountNormal; i++) {
                 if (i >= SvcComm.commBatchSize) break;
                 Intent intentComm = new Intent(ctxApp, SvcComm.class);
                 //Intent intentComm = new Intent(context, SvcIntentComm.class);
@@ -154,9 +153,9 @@ public class Session implements EventBus{
 
     static void sendStoredLocations(){
         int MaxTryCount = 5;
-        SvcComm.commBatchSize= dbLocationRecCountTotal;
+        SvcComm.commBatchSize= dbLocationRecCountNormal;
         int counter =0;
-        while (dbLocationRecCountTotal >0){
+        while (dbLocationRecCountNormal >0){
             if (counter >MaxTryCount) {
                 Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
                 break;
@@ -175,9 +174,9 @@ public class Session implements EventBus{
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
             case CHECK_CACHE_FIRST:
-                if (dbLocationRecCountTotal > 0) {
-                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountTotal);
-                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountTotal, 'd');
+                if (dbLocationRecCountNormal > 0) {
+                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountNormal);
+                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountNormal, 'd');
                 } else {
                     set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
                 }
@@ -187,7 +186,7 @@ public class Session implements EventBus{
                 mainactivityInstance.finishActivity();
                 break;
 //            case BUTTON_STOP_PRESSED:
-//                if (dbLocationRecCountTotal > 0) {
+//                if (dbLocationRecCountNormal > 0) {
 //                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
 //                }
 //                // REPLACED Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
@@ -205,8 +204,8 @@ public class Session implements EventBus{
 //                            }
 //                        }
 //                    }
-                FontLog.appendLog(TAG + "dbLocationRecCountTotal:"+dbLocationRecCountTotal+"dbLocationRecCountTemp:"+dbLocationRecCountTemp, 'd');
-                if (dbLocationRecCountTotal - dbLocationRecCountTemp> 0) {
+                //FontLog.appendLog(TAG + "dbLocationRecCountNormal:"+ dbLocationRecCountNormal, 'd');
+                if (dbLocationRecCountNormal > 0) {
                     if (Util.isNetworkAvailable()) {
                         startLocationCommService();
                     } else {

@@ -38,6 +38,7 @@ public interface EventBus {
         ROUTE_ONNEW,
         ROUTE_ONLEGLIMITREACHED,
         ROUTE_NOACTIVEROUTE,
+        ROUTE_ONRESTART,
 
         SVCCOMM_ONSUCCESS_NOTIF,
         SVCCOMM_ONSUCCESS_ACKN,
@@ -100,6 +101,9 @@ public interface EventBus {
                 ///TODO
                 break;
             case ROUTE_NOACTIVEROUTE:
+                interfaceList.add(SvcLocationClock.getInstance());
+                break;
+            case ROUTE_ONRESTART:
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case SVCCOMM_ONSUCCESS_NOTIF:

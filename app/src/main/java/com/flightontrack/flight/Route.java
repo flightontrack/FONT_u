@@ -3,7 +3,6 @@ package com.flightontrack.flight;
 import java.util.ArrayList;
 
 import com.flightontrack.locationclock.SvcLocationClock;
-//import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -66,6 +65,7 @@ public class Route implements EventBus{
                     flightList.add(new Flight(this));
                     ////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
                 } else {
+                    EventBus.distribute(new EventMessage(EVENT.ROUTE_ONRESTART).setEventMessageValueBool(false));
                     ////SvcLocationClock.stopLocationUpdates();
                     /////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
                     //SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
@@ -156,8 +156,8 @@ public class Route implements EventBus{
         return Route.activeRoute.activeFlight;
     }
     void setToNull(){
-        for (Route r : Route.routeList) {
-            for (Flight f : r.flightList) {
+        for(Route r:new ArrayList<>(routeList)) {
+            for (Flight f : new ArrayList<>(r.flightList)) {
                 flightList.remove(f);
                 if (flightList.isEmpty()) routeList.remove(r);
             }

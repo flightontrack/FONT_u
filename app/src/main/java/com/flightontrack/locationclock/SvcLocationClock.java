@@ -94,7 +94,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     @Override
     public void onLocationChanged(final Location location) {
         counter++;
-        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCountTotal <1){
+        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCountNormal <1){
             stopServiceSelf();
             return;
         }
@@ -231,10 +231,11 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
         FontLog.appendLog(TAG + " eventReceiver:"+ev, 'd');
         switch(ev){
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
-                if (!SvcLocationClock.isInstanceCreated()) ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
+                //if (!SvcLocationClock.isInstanceCreated()) ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
+                ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 break;
             case SVCCOMM_ONSUCCESS_NOTIF:
-                instanceSvcLocationClock.stopServiceSelf();
+                stopServiceSelf();
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 set_mode(MODE.CLOCK_ONLY);
@@ -244,6 +245,9 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
                 break;
             case ROUTE_NOACTIVEROUTE:
                 set_mode(MODE.CLOCK_ONLY);
+                break;
+            case ROUTE_ONRESTART:
+                if (!eventMessage.eventMessageValueBool) set_mode(MODE.CLOCK_ONLY);
                 break;
         }
     }
