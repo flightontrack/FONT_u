@@ -3,10 +3,12 @@ package com.flightontrack.flight;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.ArraySet;
 import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
+
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -20,18 +22,21 @@ import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
+import java.util.ArrayList;
+
 
 /**
  * Created by hotvk on 7/6/2017.
  */
 
 public class Session implements EventBus{
-    public enum SESSIONREQUEST{
+    public enum SACTION {
         SEND_STORED_LOCATIONS,
         START_COMMUNICATION,
         STOP_CLOCK,
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
+        GET_OFFLINE_FLIGHTS
     }
     private static Session sessionInstance = null;
     public static Session getInstance() {
@@ -41,59 +46,6 @@ public class Session implements EventBus{
         return sessionInstance;
     }
     static final String TAG = "Session:";
-//    static void set_SessionRequest(SESSIONREQUEST request) {
-//        FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
-//        switch (request) {
-//            case STOP_CLOCK:
-//
-//                break;
-//
-//            case CLOSEAPP_BUTTON_BACK_PRESSED_WITH_CACHE_CHECK:
-//                if (dbLocationRecCountNormal > 0) {
-//                    new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountNormal);
-//                    FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountNormal, 'd');
-//                } else {
-//                    set_SessionRequest(SESSIONREQUEST.CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK);
-//                }
-//                break;
-//            case CLOSEAPP_BUTTON_BACK_PRESSED_NO_CACHE_CHECK:
-//                if (!(Route.activeRoute ==null)) Route.activeRoute.set_rAction(RACTION.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
-//                mainactivityInstance.finishActivity();
-//            break;
-////            case BUTTON_STOP_PRESSED:
-////                if (dbLocationRecCountNormal > 0) {
-////                    set_SessionRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
-////                }
-////                Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
-////                break;
-//            case SEND_STORED_LOCATIONS:
-//                //sendStoredLocations();
-//                break;
-////            case ON_COMMUNICATION_SUCCESS:
-////                break;
-//            case START_COMMUNICATION:
-//                for (Route r : Route.routeList) {
-//                    r.set_rAction(RACTION.CHECK_IFANYFLIGHT_NEED_CLOSE);
-//                }
-//                if (Util.isNetworkAvailable()) {
-//                    if (dbLocationRecCountNormal > 0) {
-//                        startLocationCommService();
-//                    }
-//
-////                    if (dbTempFlightRecCount > 0) {
-////                        for (Route r : Route.routeList) {
-////                            for (Flight f:r.flightList){
-////                                f.set_fAction(FACTION.REQUEST_FLIGHTNUMBER);
-////                            }
-////                        }
-////                    }
-//                } else {
-//                    FontLog.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-//                    Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
-//                }
-//                break;
-//        }
-//    }
 
     public static void initProp(Context ctx, MainActivity maInstance) {
         ctxApp = ctx;
@@ -102,7 +54,7 @@ public class Session implements EventBus{
         mainactivityInstance = maInstance;
         sqlHelper = new SQLHelper();
     }
-
+    static ArrayList<FlightOffline> flightOfflineList = new ArrayList<>();
 
     static void startLocationCommService() {
 
@@ -167,10 +119,11 @@ public class Session implements EventBus{
             }
             counter++;
             Toast.makeText(mainactivityInstance, R.string.unsentrecords_toast, Toast.LENGTH_SHORT).show();
-            set_InternalRequest(SESSIONREQUEST.START_COMMUNICATION);
+            set_sAction(SACTION.START_COMMUNICATION);
         }
+
     }
-    static void set_InternalRequest(SESSIONREQUEST request) {
+    static void set_sAction(SACTION request) {
         FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
         switch (request) {
             case CHECK_CACHE_FIRST:
@@ -178,24 +131,27 @@ public class Session implements EventBus{
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountNormal);
                     FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountNormal, 'd');
                 } else {
-                    set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                    set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 }
                 break;
             case CLOSEAPP_NO_CACHE_CHECK:
-                //if (!(Route.activeRoute ==null)) Route.activeRoute.set_rAction(RACTION.SET_FLIGHT_PASIVE_TIMER_CLOCKONLY);
                 mainactivityInstance.finishActivity();
                 break;
 //            case BUTTON_STOP_PRESSED:
 //                if (dbLocationRecCountNormal > 0) {
-//                    set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
+//                    set_sAction(SACTION.SEND_STORED_LOCATIONS);
 //                }
 //                // REPLACED Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
 //                break;
             case SEND_STORED_LOCATIONS:
-                //sendStoredLocations(); //restore it back
+                sendStoredLocations();
+                for(FlightOffline f: new ArrayList<>(flightOfflineList)) {
+                    if (f.getLocationFlightCount() == 0){
+                        f.getCloseFlight();
+                        flightOfflineList.remove(f);
+                    }
+                }
                 break;
-//            case ON_COMMUNICATION_SUCCESS:
-//                break;
             case START_COMMUNICATION:
 //                    if (dbTempFlightRecCount > 0) {
 //                        for (Route r : Route.routeList) {
@@ -214,28 +170,42 @@ public class Session implements EventBus{
                     }
                 }
                 break;
+            case GET_OFFLINE_FLIGHTS:
+                sqlHelper.setCursorTempFlights();
+                for (int i = 0; i < sqlHelper.ctf.getCount(); i++) {
+                    new FlightOffline(sqlHelper.ctf.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.FLIGHTNUM_FlightNumber)));
+                }
+                break;
+
         }
     }
 
     @Override
     public void eventReceiver(EventMessage eventMessage){
+        //Array eventReaction[EVENT];
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + ":eventReceiver:"+ev, 'd');
         switch (ev) {
             case MACT_BACKBUTTON_ONCLICK:
-                set_InternalRequest(SESSIONREQUEST.CHECK_CACHE_FIRST);
+                set_sAction(SACTION.CHECK_CACHE_FIRST);
                 break;
             case CLOCK_ONTICK:
-                set_InternalRequest(SESSIONREQUEST.START_COMMUNICATION);
+                set_sAction(SACTION.START_COMMUNICATION);
                 break;
             case ALERT_SENTPOINTS:
-                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.SEND_STORED_LOCATIONS);
-                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.SEND_STORED_LOCATIONS);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 break;
             case ALERT_STOPAPP:
-                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_InternalRequest(SESSIONREQUEST.CLOSEAPP_NO_CACHE_CHECK);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 break;
-
+            case SETTINGACT_BUTTONSENDCACHE_CLICKED:
+                set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
+                break;
+            case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+                flightOfflineList.add((FlightOffline) eventMessage.eventMessageValueObject);
+                set_sAction(SACTION.SEND_STORED_LOCATIONS);
+                break;
         }
     }
     //session does react to events. it never initiate events

@@ -70,6 +70,8 @@ public class Flight implements GetTime,EventBus {
     boolean isGetFlightCallSuccess = false;
     boolean isTempFlightNum = false;
 
+    public Flight(){}
+
     public Flight(Route r) {
         route = r;
         flightTimeString = FLIGHT_TIME_ZERO;
@@ -216,7 +218,7 @@ public class Flight implements GetTime,EventBus {
                                 isGetFlightCallSuccess = true;
                                 route._legCount++;
                             } else {
-                                replaceFlightNumber(response.responseFlightNum);
+                                //replaceFlightNumber(response.responseFlightNum);
                             }
                         }
                     }
@@ -376,9 +378,6 @@ public class Flight implements GetTime,EventBus {
         return SessionProp.pSpinnerMinSpeed * (Route.activeRoute.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT ? 0.75 : 1.0);
     }
 
-    void replaceFlightNumber(String pFlightNum) {
-
-    }
 
     @Override
     public void eventReceiver(EventMessage eventMessage) {

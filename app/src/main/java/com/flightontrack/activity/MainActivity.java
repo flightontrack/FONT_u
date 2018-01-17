@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                     default:
                         EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
 //                        SessionProp.set_isMultileg(false);
-//                        set_SessionRequest(SESSIONREQUEST.BUTTON_STOP_PRESSED);
+//                        set_SessionRequest(SACTION.BUTTON_STOP_PRESSED);
                         break;
                 }
 //                if (activeRoute == null) {

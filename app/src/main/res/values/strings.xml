@@ -53,9 +53,12 @@
     <string name="label_website_user">User ID:</string>
     <string name="label_website_psw">User Psw:</string>
     <string name="label_reset">Reset to Defaults</string>
-    <string name="label_clear_cache">Clear Locations Cache</string>
+    <string name="label_cache">Cache</string>
+    <string name="label_clear_cache">Clear Location Cache</string>
+    <string name="label_send_cache">Send Location Cache</string>
     <string name="label_btnreset">Reset</string>
     <string name="label_btnclear">Clear</string>
+    <string name="label_btnsend">Send</string>
     <string name="label_btnpsw_show">Show Psw</string>
     <string name="label_btnpsw_get">Get Passw</string>
     <string name="label_btnpsw_hide">Hide Psw</string>
@@ -63,6 +66,8 @@
     <string name="label_chbox_boot">Start on Reboot</string>
     <string name="label_chbox_road">Is Road</string>
     <string name="label_build">Build:</string>
+    <string name="label_cachenumber">Cached locations:</string>
+
 
     <!--labels MainActivity-->
     <string name="label_pilotphone">Pilot</string>
@@ -84,7 +89,7 @@
     <string name="user_needs_to_restart_tracking">Please restart tracking to change the time interval</string>
     <string name="user_needs_to_restart_app">Please restart the application</string>
     <string name="reachability_error">Cannot reach the URL. Try again.</string>
-    <string name="temp_flight_alloc">Cannot reach the URL. Temp flight number assigned.</string>
+    <string name="temp_flight_alloc">Cannot reach the URL. \n Temp flight number is assigned.</string>
     <string name="max_number_reached">You reached maximum allowed number of waypoints</string>
     <string name="flight_has_ended">The flight has ended</string>
     <string name="flight_uknown_req">Unknown request. The flight has ended.</string>

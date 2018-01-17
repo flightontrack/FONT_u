@@ -14,9 +14,10 @@ public EVENT event;
 public boolean eventMessageValueBool;
 public String eventMessageValueString;
 public int eventMessageValueInt;
+public Object eventMessageValueObject;
 public Location eventMessageValueLocation;
 public MODE eventMessageValueClockMode;
-public SESSIONREQUEST eventMessageValueSessionRequest;
+public SACTION eventMessageValueSessionRequest;
 public RACTION eventMessageValueRouteRequest;
 public ALERT_RESPONSE eventMessageValueAlertResponse;
 //public SVCCOMM_SUCCESS_TYPE eventMessageValueSvcCommSuccessType;
@@ -37,7 +38,7 @@ public EventMessage setEventMessageValueClockMode(MODE val){
         this.eventMessageValueClockMode = val;
         return this;
     }
-public EventMessage setEventMessageValueSessionRequest(SESSIONREQUEST val){
+public EventMessage setEventMessageValueSessionRequest(SACTION val){
     this.eventMessageValueSessionRequest = val;
     return this;
 }
@@ -59,6 +60,10 @@ public EventMessage setEventMessageValueInt(int val){
 //}
 public EventMessage setEventMessageValueString(String val){
     this.eventMessageValueString= val;
+    return this;
+}
+public EventMessage setEventMessageValueObject(Object val){
+    this.eventMessageValueObject= val;
     return this;
 }
 }

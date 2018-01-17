@@ -116,7 +116,7 @@ public class SvcComm extends Service{
                             if (response.responseAckn != null) {
                                 FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');
                                 sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
-                                ///set_SessionRequest(SESSIONREQUEST.ON_COMMUNICATION_SUCCESS);
+                                ///set_SessionRequest(SACTION.ON_COMMUNICATION_SUCCESS);
                             }
                             if (response.responseNotif != null) {
                                 FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');

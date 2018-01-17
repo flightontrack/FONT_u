@@ -36,6 +36,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     public static TextView txtBuild;
     Button resetButton;
     Button clearCacheButton;
+    Button sendCacheButton;
     Button getPswButton;
     Spinner spinnerUrls;
     Spinner spinnerTextTo;
@@ -66,6 +67,13 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             @Override
             public void onClick(View view) {
                 EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONCLEARCACHE_CLICKED));
+            }
+        });
+        sendCacheButton = (Button) findViewById(R.id.btnSendCache);
+        sendCacheButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONSENDCACHE_CLICKED));
             }
         });
         getPswButton = (Button) findViewById(R.id.btnGetPsw);

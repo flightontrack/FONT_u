@@ -14,7 +14,7 @@ public abstract class DBSchema implements BaseColumns {
 
 
 static final String TABLE_FLIGHTNUMBER = "FlightNumber";
-static final String FLIGHTNUM_FlightNumber = "FlightNumber";
+static public final String FLIGHTNUM_FlightNumber = "FlightNumber";
 static final String FLIGHTNUM_RouteNumber = "RouteNumber";
 static final String FLIGHTNUM_FlightTimeStart = "FlightTimeStart";
 static final String SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS =    "CREATE TABLE IF NOT EXISTS " + TABLE_FLIGHTNUMBER + " (" +

@@ -111,7 +111,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
 //                    //EventBus.distribute(new EventMessage(EVENT.CLOCK_ONTICK).setEventMessageValueClockMode(_mode).setEventMessageValueLocation(location));
 //                }
 //
-//                set_SessionRequest(SESSIONREQUEST.START_COMMUNICATION);
+//                set_SessionRequest(SACTION.START_COMMUNICATION);
             }
         }
     }

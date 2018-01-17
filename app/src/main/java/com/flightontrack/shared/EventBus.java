@@ -4,7 +4,6 @@ import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLog;
-import com.flightontrack.mysql.SQLHelper;
 
 import java.util.ArrayList;
 
@@ -45,11 +44,14 @@ public interface EventBus {
         SVCCOMM_ONSUCCESS_COMMAND,
 
         SETTINGACT_BUTTONCLEARCACHE_CLICKED,
+        SETTINGACT_BUTTONSENDCACHE_CLICKED,
 
         ALERT_SENTPOINTS,
         ALERT_STOPAPP,
 
-        SQL_TEMPFLIGHTNUM_ALLOCATED
+        SQL_TEMPFLIGHTNUM_ALLOCATED,
+
+        FLIGHT_OFFLINE_DBUPDATE_COMPLETED
     }
     String TAG = "Bus:";
 
@@ -130,6 +132,9 @@ public interface EventBus {
                 interfaceList.add(sqlHelper);
                 //SQLHelper.eventReceiver(eventMessage);
                 break;
+            case SETTINGACT_BUTTONSENDCACHE_CLICKED:
+                interfaceList.add(Session.getInstance());
+                break;
             case MACT_MULTILEG_ONCLICK:
                 interfaceList.add(Props.getInstance());
                 break;
@@ -165,6 +170,9 @@ public interface EventBus {
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
                 interfaceList.add(Route.activeRoute.activeFlight);
+                break;
+            case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+                interfaceList.add(Session.getInstance());
                 break;
         }
         for( EventBus i : interfaceList) {

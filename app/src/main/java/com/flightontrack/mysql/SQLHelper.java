@@ -28,6 +28,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
     private static final String DATABASE_NAME = "FONTLOCATION.dbw";
     public SQLiteDatabase dbw;
     public static Cursor cl;
+    public static Cursor ctf;
 
     public SQLHelper() {
         super(ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
@@ -180,6 +181,27 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         cl.moveToFirst();
         dbw.close();
     }
+    public void setCursorTempFlights() {
+
+        String[] projection = {
+                DBSchema._ID,
+                DBSchema.FLIGHTNUM_FlightNumber
+
+        };
+        String sortOrder = DBSchema._ID;
+        dbw = getReadableDatabase();
+        ctf = dbw.query(
+                DBSchema.TABLE_FLIGHTNUMBER,  // The table to query
+                projection,                               // The columns to return
+                null,                               // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+        ctf.moveToFirst();
+        dbw.close();
+    }
 
     public static int getCursorCountLocation() {
         return cl.getCount();
@@ -199,6 +221,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         Cursor c = dbw.rawQuery("select _id from Location where istempflightnum =1" ,new String[]{});
         c.moveToFirst();
         int numRows = c.getCount();
+        c.close();
         dbw.close();
         return (int) numRows;
     }
@@ -207,6 +230,16 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         Cursor c = dbw.rawQuery("select _id from Location where istempflightnum =0" ,new String[]{});
         c.moveToFirst();
         int numRows = c.getCount();
+        c.close();
+        dbw.close();
+        return (int) numRows;
+    }
+    public int get_dbLocationRecCountFlight(String fn){
+        dbw = getReadableDatabase();
+        Cursor c = dbw.rawQuery("select _id from Location where flightid ="+fn ,new String[]{});
+        c.moveToFirst();
+        int numRows = c.getCount();
+        c.close();
         dbw.close();
         return (int) numRows;
     }
@@ -254,20 +287,38 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         }
         return (String.valueOf(f));
     }
-    public String getMinTempFlightNum(){
-        return "1";
-    }
-    public void insertTempFlight(SQLiteDatabase db,String flightNumber,String routeNumber, String dateTime){
-//        ContentValues values = new ContentValues();
-//        values.put(DBSchema.FLIGHT_COLUMN_NAME_COL1, flightNumber); //flightid
-//        values.put(DBSchema.FLIGHT_COLUMN_NAME_COL1, routeNumber); //flightid
-//        values.put(DBSchema.FLIGHT_COLUMN_NAME_COL2, dateTime); //date
-//        long r = sqlHelper.rowLocationInsert(values);
-//        if (r > 0) {
-//            FontLog.appendLog(TAG + "saveLocation: dbLocationRecCountNormal: " + Props.SessionProp.dbLocationRecCountNormal, 'd');
-//        }
-//        Cursor c = db.rawQuery("select max(ifnull(flightNumber,0)) from FlightNumber",new String[]{"0"});
+    public int updateTempFlightNum(String temp_fn,String replace_fn){
+        int rn=0;
+        try {
+            dbw = getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(DBSchema.LOC_flightid, replace_fn);
+            values.put(DBSchema.LOC_isTempFlight, 0);
+            rn = dbw.update(
+                    DBSchema.TABLE_LOCATION,
+                    values,
+                    DBSchema.LOC_flightid + "=" + temp_fn,
+                    null
+            );
+            dbLocationRecCountNormal+=rn;
+            if (rn > 0) {
+                rn=0;
+                FontLog.appendLog(TAG + "updateTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd');
+                rn = dbw.delete(
+                        DBSchema.TABLE_FLIGHTNUMBER,
+                        DBSchema.FLIGHTNUM_FlightNumber+"="+temp_fn,
+                        null
 
+                );
+                dbTempFlightRecCount -=1;
+            }
+        } catch (Exception e) {
+            FontLog.appendLog(TAG + e.getMessage(), 'e');
+        }
+        finally {
+            dbw.close();
+        }
+        return rn;
     }
     @Override
     public void eventReceiver(EventMessage eventMessage){
