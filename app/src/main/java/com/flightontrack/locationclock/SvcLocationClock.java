@@ -100,7 +100,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
         }
         else {
             long currTime = getTimeGMT();
-            FontLog.appendLog(TAG + "___TIMER-onLocationChanged :  Counter:" + counter, 'd');
+            FontLog.appendLog(TAG + "_TIMER :  Count:" + counter, 'd');
 
             if (currTime + TIME_RESERVE >= alarmNextTimeUTCmsec) {
                 //Util.appendLog(TAG + "isClockTimeReached: ", 'd');

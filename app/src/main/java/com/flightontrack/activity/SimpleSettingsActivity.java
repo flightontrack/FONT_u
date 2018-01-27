@@ -34,6 +34,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     TextView txtUser;
     public static TextView txtPsw;
     public static TextView txtBuild;
+    TextView txtCached;
     Button resetButton;
     Button clearCacheButton;
     Button sendCacheButton;
@@ -139,6 +140,8 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         adapterUrl.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrls.setAdapter(adapterUrl);
         spinnerUrls.setOnItemSelectedListener(this);
+        txtCached= (TextView) findViewById((R.id.txtCached));
+        txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
 
         updateUI();
     }

@@ -36,14 +36,14 @@ public class FlightOffline {
     //public FSTATUS fStatus = FSTATUS.PASSIVE;
 //    FACTION lastAction = FACTION.DEFAULT_REQUEST;
 //    EVENT lastEvent =EVENT.DEFAULT_EVENT;
-    boolean isSpeedAboveMin;
+    boolean isSpeedAboveMin=false;
     public String flightTimeString;
     public int lastAltitudeFt;
     public int _wayPointsCount;
     private Route route;
     private float _speedCurrent = 0;
     private float speedPrev = 0;
-    private boolean isLimitReached;
+    private boolean isLimitReached  = false;
     private long _flightStartTimeGMT;
     private int _flightTimeSec;
     //private int flightRequestCounter;
@@ -54,14 +54,14 @@ public class FlightOffline {
 
     FlightOffline(String fn) {
         tempFlightNumber = fn;
-        //getOfflineFlightID();
+        getOfflineFlightID();
     }
 
     ;
 
     void getOfflineFlightID() {
 
-        FontLog.appendLog(TAG + "getNewOfflineFlightID", 'd');
+        FontLog.appendLog(TAG + "getNewOfflineFlightID for temp flight " +tempFlightNumber, 'd');
         //EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
 
@@ -75,12 +75,12 @@ public class FlightOffline {
         requestParams.put("AcftNum", Util.getAcftNum(4));
         requestParams.put("AcftTagId", Util.getAcftNum(5));
         requestParams.put("AcftName", Util.getAcftNum(6));
-//        requestParams.put("isFlyingPattern", Props.SessionProp.pIsMultileg);
-//        requestParams.put("freq", Integer.toString(Props.SessionProp.pIntervalLocationUpdateSec));
-//        long speed_thresh = Math.round(Props.SessionProp.pSpinnerMinSpeed);
-//        requestParams.put("speed_thresh", String.valueOf(speed_thresh));
+        requestParams.put("isFlyingPattern", Props.SessionProp.pIsMultileg);
+        requestParams.put("freq", Integer.toString(Props.SessionProp.pIntervalLocationUpdateSec));
+        long speed_thresh = Math.round(Props.SessionProp.pSpinnerMinSpeed);
+        requestParams.put("speed_thresh", String.valueOf(speed_thresh));
         requestParams.put("isdebug", Props.SessionProp.pIsDebug);
-        requestParams.put("routeid", ROUTE_NUMBER_DEFAULT);
+        //requestParams.put("routeid", ROUTE_NUMBER_DEFAULT);
         isGetFlightNumber = false;
 
         new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
@@ -100,7 +100,8 @@ public class FlightOffline {
                             {
                                 flightNumber = response.responseFlightNum;
                                 isGetFlightCallSuccess = true;
-                                replaceFlightNumber(response.responseFlightNum);
+                                //replaceFlightNumber(response.responseFlightNum);
+                                replaceFlightNumber();
                             }
                         }
                     }
@@ -129,8 +130,8 @@ public class FlightOffline {
         FontLog.appendLog(TAG + "getOfflineFlightID", 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
-        requestParams.put("speedlowflag", 0);
-        requestParams.put("isLimitReached", 0);
+        //requestParams.put("speedlowflag", isSpeedAboveMin);
+        requestParams.put("isLimitReached", isLimitReached);
         requestParams.put("flightid", flightNumber);
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", Props.SessionProp.pIsDebug);
@@ -163,13 +164,13 @@ public class FlightOffline {
         );
     }
 
-    void replaceFlightNumber(String pFlightNum) {
-        if (sqlHelper.updateTempFlightNum(tempFlightNumber, flightNumber) == 1) {
+    void replaceFlightNumber() {
+        if (sqlHelper.updateTempFlightNum(tempFlightNumber, flightNumber) > 0) {
+            FontLog.appendLog(TAG + "replaceFlightNumber: " + tempFlightNumber+":"+flightNumber, 'd');
             EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_OFFLINE_DBUPDATE_COMPLETED)
                     .setEventMessageValueString(flightNumber)
                     .setEventMessageValueObject(this));
         }
-        ;
     }
 
     int getLocationFlightCount() {

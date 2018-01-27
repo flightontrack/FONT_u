@@ -54,14 +54,14 @@ public class Flight implements GetTime,EventBus {
     //public FSTATUS fStatus = FSTATUS.PASSIVE;
     FACTION lastAction = FACTION.DEFAULT_REQUEST;
     EVENT lastEvent =EVENT.DEFAULT_EVENT;
-    boolean isSpeedAboveMin;
+    boolean isSpeedAboveMin=false;
     public String flightTimeString;
     public int lastAltitudeFt;
     public int _wayPointsCount;
     private Route route;
     private float _speedCurrent = 0;
     private float speedPrev = 0;
-    private boolean isLimitReached;
+    private boolean isLimitReached = false;
     private long _flightStartTimeGMT;
     private int _flightTimeSec;
     //private int flightRequestCounter;
@@ -162,9 +162,9 @@ public class Flight implements GetTime,EventBus {
         boolean isCurrSpeedAboveMin = (_speedCurrent >= cutoffSpeed);
         boolean isPrevSpeedAboveMin = (speedPrev >= cutoffSpeed);
         //FontLog.appendLog(TAG + "isDoubleSpeedAboveMin: cutoffSpeed: " + cutoffSpeed, 'd');
-        FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
         if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
         else if (Route.activeRoute.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
+            FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
             if (isPrevSpeedAboveMin)
                 SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             else if (isCurrSpeedAboveMin)
@@ -196,7 +196,7 @@ public class Flight implements GetTime,EventBus {
         requestParams.put("speed_thresh", String.valueOf(speed_thresh));
         //requestParams.put("isdebug", Util.getIsDebug());
         requestParams.put("isdebug", SessionProp.pIsDebug);
-        if (!(route.routeNumber == null)) requestParams.put("routeid", route.routeNumber);
+        if (route.routeNumber != ROUTE_NUMBER_DEFAULT) requestParams.put("routeid", route.routeNumber);
         isGetFlightNumber = false;
 //        requestParams.setUseJsonStreamer(true);
         new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {

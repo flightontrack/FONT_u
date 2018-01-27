@@ -2,8 +2,8 @@ package com.flightontrack.flight;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.util.ArraySet;
 import android.widget.Toast;
 
 import com.flightontrack.R;
@@ -22,7 +22,9 @@ import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
+import java.util.EnumMap;
 import java.util.ArrayList;
+//import java.util.EnumMap;
 
 
 /**
@@ -32,13 +34,19 @@ import java.util.ArrayList;
 public class Session implements EventBus{
     public enum SACTION {
         SEND_STORED_LOCATIONS,
+        SEND_OFFLINESTORED_LOCATIONS,
         START_COMMUNICATION,
-        STOP_CLOCK,
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
-        GET_OFFLINE_FLIGHTS
+        GET_OFFLINE_FLIGHTS,
+
     }
+
     private static Session sessionInstance = null;
+    static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
+    EVENT ev;
+    EventMessage eventMessage;
+
     public static Session getInstance() {
         if(sessionInstance == null) {
             sessionInstance = new Session();
@@ -47,12 +55,26 @@ public class Session implements EventBus{
     }
     static final String TAG = "Session:";
 
+
     public static void initProp(Context ctx, MainActivity maInstance) {
         ctxApp = ctx;
         sharedPreferences = ctx.getSharedPreferences(PACKAGE_NAME,Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         mainactivityInstance = maInstance;
         sqlHelper = new SQLHelper();
+//        eventReaction.put(MACT_BACKBUTTON_ONCLICK,SACTION.CHECK_CACHE_FIRST);
+//        eventReaction.put(CLOCK_ONTICK,SACTION.START_COMMUNICATION);
+//        eventReaction.put(ALERT_SENTPOINTS:
+//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.SEND_STORED_LOCATIONS);
+//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+//        eventReaction.put(ALERT_STOPAPP:
+//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+//        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
+//        eventReaction.put(FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+//
+//        flightOfflineList.add((FlightOffline) eventMessage.eventMessageValueObject);
+//        set_sAction(SACTION.SEND_OFFLINESTORED_LOCATIONS);)
+
     }
     static ArrayList<FlightOffline> flightOfflineList = new ArrayList<>();
 
@@ -92,18 +114,7 @@ public class Session implements EventBus{
         }
     }
 
-//    static Flight get_FlightInstance(String flightNumber){
-//        for (Route r : Route.routeList) {
-//            for (Flight f : r.flightList) {
-//                if (f.flightNumber.equals(flightNumber)) {
-//                    return f;
-//                }
-//            }
-//        }
-//        return Route.activeRoute.activeFlight;
-//    }
-
-    static void sendStoredLocations(){
+    void sendStoredLocations(){
         int MaxTryCount = 5;
         SvcComm.commBatchSize= dbLocationRecCountNormal;
         int counter =0;
@@ -123,8 +134,8 @@ public class Session implements EventBus{
         }
 
     }
-    static void set_sAction(SACTION request) {
-        FontLog.appendLog(TAG + "set_SessionRequest:" + request, 'd');
+    void set_sAction(SACTION request) {
+        FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
             case CHECK_CACHE_FIRST:
                 if (dbLocationRecCountNormal > 0) {
@@ -135,15 +146,13 @@ public class Session implements EventBus{
                 }
                 break;
             case CLOSEAPP_NO_CACHE_CHECK:
-                mainactivityInstance.finishActivity();
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) mainactivityInstance.finishActivity();
                 break;
-//            case BUTTON_STOP_PRESSED:
-//                if (dbLocationRecCountNormal > 0) {
-//                    set_sAction(SACTION.SEND_STORED_LOCATIONS);
-//                }
-//                // REPLACED Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
-//                break;
             case SEND_STORED_LOCATIONS:
+                //TODO
+                //sendStoredLocations();
+                break;
+            case SEND_OFFLINESTORED_LOCATIONS:
                 sendStoredLocations();
                 for(FlightOffline f: new ArrayList<>(flightOfflineList)) {
                     if (f.getLocationFlightCount() == 0){
@@ -171,10 +180,11 @@ public class Session implements EventBus{
                 }
                 break;
             case GET_OFFLINE_FLIGHTS:
-                sqlHelper.setCursorTempFlights();
-                for (int i = 0; i < sqlHelper.ctf.getCount(); i++) {
-                    new FlightOffline(sqlHelper.ctf.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.FLIGHTNUM_FlightNumber)));
+                Cursor flights = sqlHelper.getCursorTempFlights();
+                for (int i = 0; i <flights.getCount(); i++) {
+                    new FlightOffline(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
                 }
+                flights.close();
                 break;
 
         }
@@ -183,7 +193,8 @@ public class Session implements EventBus{
     @Override
     public void eventReceiver(EventMessage eventMessage){
         //Array eventReaction[EVENT];
-        EVENT ev = eventMessage.event;
+        ev = eventMessage.event;
+        this.eventMessage = eventMessage;
         FontLog.appendLog(TAG + ":eventReceiver:"+ev, 'd');
         switch (ev) {
             case MACT_BACKBUTTON_ONCLICK:
@@ -200,11 +211,12 @@ public class Session implements EventBus{
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 break;
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
+                set_sAction(SACTION.START_COMMUNICATION);
                 set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
                 break;
             case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
                 flightOfflineList.add((FlightOffline) eventMessage.eventMessageValueObject);
-                set_sAction(SACTION.SEND_STORED_LOCATIONS);
+                set_sAction(SACTION.SEND_OFFLINESTORED_LOCATIONS);
                 break;
         }
     }

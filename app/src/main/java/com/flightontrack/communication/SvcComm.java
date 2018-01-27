@@ -16,6 +16,7 @@ import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import java.util.Collections;
+//import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import cz.msebera.android.httpclient.Header;
@@ -47,7 +48,7 @@ public class SvcComm extends Service{
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        FontLog.appendLog(TAG+ "ServiceComm  - onStartCommand requestId : " + startId,'d');
+        FontLog.appendLog(TAG+ "onStartCommand requestId: " + startId,'d');
         Bundle extras = intent.getExtras();
         setRequest(extras);
         if (startIdDbItemId.containsValue(dbItemId)) return START_STICKY;

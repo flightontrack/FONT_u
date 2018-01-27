@@ -653,7 +653,10 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
                 /// swithch to red
                 break;
-        //break;
+            case ROUTE_NOACTIVEROUTE:
+                setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+
+                break;
         }
     }
 }

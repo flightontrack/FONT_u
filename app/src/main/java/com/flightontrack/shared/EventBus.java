@@ -103,7 +103,8 @@ public interface EventBus {
                 ///TODO
                 break;
             case ROUTE_NOACTIVEROUTE:
-                interfaceList.add(SvcLocationClock.getInstance());
+                if (SvcLocationClock.getInstance()!=null) interfaceList.add(SvcLocationClock.getInstance());
+                else interfaceList.add(mainactivityInstance);
                 break;
             case ROUTE_ONRESTART:
                 interfaceList.add(SvcLocationClock.getInstance());
@@ -177,6 +178,7 @@ public interface EventBus {
         }
         for( EventBus i : interfaceList) {
             if(!(null==i))i.eventReceiver(eventMessage);
+            else  FontLog.appendLog(TAG + " null interface ", 'd');
         }
     }
 

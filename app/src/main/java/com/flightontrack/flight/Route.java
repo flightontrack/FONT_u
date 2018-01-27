@@ -42,7 +42,7 @@ public class Route implements EventBus{
     }
 
     void set_rAction(RACTION request) {
-        FontLog.appendLog(TAG + "set_ROUTEREQUEST:" + request, 'd');
+        //FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
             case OPEN_NEW_FLIGHT:
                 flightList.add(new Flight(this));
@@ -103,10 +103,12 @@ public class Route implements EventBus{
                         FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
                         if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
                             //if (activeFlight == f) activeFlight = null;
+                            FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
                             flightList.remove(f);
                         }
                         if (flightList.isEmpty()) {
                             //if (activeRoute == this) activeRoute = null;
+                            FontLog.appendLog(TAG + "reaction:" + request+":r:"+routeNumber, 'd');
                             routeList.remove(this);
                         }
                     }
