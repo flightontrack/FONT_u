@@ -187,6 +187,40 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         cl.moveToFirst();
         dbw.close();
     }
+    public Cursor getCursorDataLocation() {
+
+        String[] projection = {
+                DBSchema._ID,
+                DBSchema.COLUMN_NAME_COL1,
+                DBSchema.LOC_flightid,
+                DBSchema.LOC_isTempFlight,
+                DBSchema.LOC_speedlowflag,
+                DBSchema.COLUMN_NAME_COL4,
+                DBSchema.COLUMN_NAME_COL6,
+                DBSchema.COLUMN_NAME_COL7,
+                DBSchema.COLUMN_NAME_COL8,
+                DBSchema.COLUMN_NAME_COL9,
+                DBSchema.LOC_wpntnum,
+                DBSchema.COLUMN_NAME_COL11,
+                DBSchema.LOC_date,
+                DBSchema.COLUMN_NAME_COL13
+        };
+        String sortOrder = DBSchema._ID;
+        String selection = DBSchema.LOC_isTempFlight + "= ?";
+        String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
+        dbw = getWritableDatabase();
+        Cursor c = dbw.query(
+                DBSchema.TABLE_LOCATION,  // The table to query
+                projection,                               // The columns to return
+                selection,                               // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+        dbw.close();
+        return c;
+    }
     public Cursor getCursorTempFlights() {
 
         dbw = getReadableDatabase();
@@ -195,7 +229,14 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         dbw.close();
         return c;
     }
+    public Cursor getCursorReadyToSendFlights() {
 
+        dbw = getReadableDatabase();
+        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
+        c.moveToFirst();
+        dbw.close();
+        return c;
+    }
     public static int getCursorCountLocation() {
         return cl.getCount();
     }

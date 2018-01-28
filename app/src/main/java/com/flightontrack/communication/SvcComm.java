@@ -28,6 +28,7 @@ public class SvcComm extends Service{
 
     public SvcComm() {}
     private static final String TAG = "SvcComm:";
+    public static boolean isServiceStarted;
     private RequestParams requestParams = new RequestParams();
     //private static Context ctx;
     private int dbItemId;
@@ -48,16 +49,20 @@ public class SvcComm extends Service{
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        FontLog.appendLog(TAG+ "onStartCommand requestId: " + startId,'d');
-        Bundle extras = intent.getExtras();
-        setRequest(extras);
-        if (startIdDbItemId.containsValue(dbItemId)) return START_STICKY;
-        startIdDbItemId.put(startId,dbItemId);
-        if (startIdDbItemId.size()>1){
-            for (Map.Entry<Integer, Integer> entry : startIdDbItemId.entrySet()) {
-                FontLog.appendLog("startId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
-            }
+        isServiceStarted=true;
+        //Bundle extras = intent.getExtras();
+        setRequest(intent.getExtras());
+        FontLog.appendLog(TAG+ "onStartCommand requestId: " + startId+" dbItemId :"+ dbItemId+" trackPointNumber :"+trackPointNumber,'d');
+        if (startIdDbItemId.containsValue(dbItemId)) {
+            FontLog.appendLog(TAG+ "onStartCommand startIdDbItemId contains: " + dbItemId + "return",'d');
+            return START_STICKY;
         }
+        startIdDbItemId.put(startId,dbItemId);
+//        if (startIdDbItemId.size()>1){
+//            for (Map.Entry<Integer, Integer> entry : startIdDbItemId.entrySet()) {
+//                FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
+//            }
+//        }
         //trackPointNumber
         sendData(startId);
         return START_STICKY;
@@ -65,6 +70,7 @@ public class SvcComm extends Service{
     @Override
     public void onCreate() {
         super.onCreate();
+        isServiceStarted=false;
         //ctx = getApplicationContext();
     }
     public void setRequest(Bundle extras){
@@ -170,11 +176,17 @@ public class SvcComm extends Service{
                     }
                     @Override
                     public void onFinish() {
-                        minStartId = Collections.min(startIdDbItemId.keySet());
-                        //Util.appendLog(TAG + "onFinish Remove startId= " + aSyncClient.getStartID() + " min " + minStartId, 'd');
+                        //minStartId = Collections.min(startIdDbItemId.keySet());
+                        if (startIdDbItemId.size()>1){
+                            for (Map.Entry<Integer, Integer> entry : startIdDbItemId.entrySet()) {
+                                FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
+                            }
+                        }
+                        FontLog.appendLog(TAG + "onFinish to remove ; startId= " + aSyncClient.getStartID(), 'd');
                         startIdDbItemId.remove(aSyncClient.getStartID());
-                        if (failureCounter>MAX_FAILURE_COUNT){};
-                        stopSelf(minStartId);
+                        if (failureCounter>MAX_FAILURE_COUNT){};//TODO
+                        //stopSelf(minStartId);
+                        if (startIdDbItemId.isEmpty()) stopSelf();
                     }
                 });
             }
@@ -191,11 +203,14 @@ public class SvcComm extends Service{
     public void onDestroy() {
         FontLog.appendLog(TAG + "onDestroy minStartId= "+ minStartId, 'd');
         super.onDestroy();
+        isServiceStarted=false;
+        EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONDESTROY));
     }
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         FontLog.appendLog(TAG + "onTaskRemoved",'d');
         super.onTaskRemoved(rootIntent);
+        isServiceStarted=false;
         //ReceiverRouter.alarmDisable = true;
         stopSelf();
     }

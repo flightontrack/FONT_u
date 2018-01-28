@@ -34,7 +34,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class Flight implements GetTime,EventBus {
+public class Flight extends FlightOffline implements GetTime,EventBus {
     public static enum FACTION {
         DEFAULT_REQUEST,
         REQUEST_FLIGHT,

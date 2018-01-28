@@ -1,4 +1,5 @@
 package com.flightontrack.shared;
+import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.flight.Flight;
 import com.flightontrack.flight.Route;
 import com.flightontrack.flight.Session;
@@ -42,6 +43,7 @@ public interface EventBus {
         SVCCOMM_ONSUCCESS_NOTIF,
         SVCCOMM_ONSUCCESS_ACKN,
         SVCCOMM_ONSUCCESS_COMMAND,
+        SVCCOMM_ONDESTROY,
 
         SETTINGACT_BUTTONCLEARCACHE_CLICKED,
         SETTINGACT_BUTTONSENDCACHE_CLICKED,
@@ -129,6 +131,9 @@ public interface EventBus {
                         interfaceList.add(Route.activeRoute); //initiate a new flight if multileg
                         break;
                 }
+            case SVCCOMM_ONDESTROY:
+                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
                 interfaceList.add(sqlHelper);
                 //SQLHelper.eventReceiver(eventMessage);

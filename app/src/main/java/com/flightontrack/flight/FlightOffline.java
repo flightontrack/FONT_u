@@ -52,12 +52,12 @@ public class FlightOffline {
     boolean isGetFlightCallSuccess = false;
     //boolean isTempFlightNum = true;
 
+    public FlightOffline(){}
+
     FlightOffline(String fn) {
         tempFlightNumber = fn;
-        getOfflineFlightID();
+        //getOfflineFlightID();
     }
-
-    ;
 
     void getOfflineFlightID() {
 

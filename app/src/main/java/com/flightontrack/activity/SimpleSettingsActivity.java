@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
+import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -44,10 +45,12 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     CheckBox chBoxIsDebug;
     CheckBox chBoxIsOnReboot;
     CheckBox chBoxIsRoad;
+    public static SimpleSettingsActivity simpleSettingsActivityInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        simpleSettingsActivityInstance=this;
         setContentView(R.layout.activity_simple_settings);
         txtBuild= (TextView) findViewById((R.id.txtBuild));
         txtBuild.setText((getString(R.string.app_label)+" "+ AppConfig.pAppRelease+ AppConfig.pAppReleaseSuffix));
@@ -209,11 +212,13 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        simpleSettingsActivityInstance=null;
         SessionProp.save();
     }
     @Override
     public void onStop() {
         super.onStop();
+        simpleSettingsActivityInstance=null;
         SessionProp.save();
     }
     @Override
@@ -230,11 +235,12 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     }
 @Override
     public void eventReceiver(EventMessage eventMessage){
-        EVENT ev = eventMessage.event;
-//        switch(ev){
-//            case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
-//                sqlHelper.dropCreateDb();
-//                break;
-//        }
+    EVENT ev = eventMessage.event;
+    FontLog.appendLog(TAG + " eventReceiver : "+ev, 'd');
+        switch(ev){
+            case SVCCOMM_ONDESTROY:
+                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
+                break;
+        }
     }
 }
