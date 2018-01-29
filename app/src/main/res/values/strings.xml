@@ -84,12 +84,12 @@
     <string name="instructions2">Update the fields manually or turn the switch on to scan tag</string>
 
     <!--messages-->
-    <string name="alarm_has_now_started">Connected to cloud successfully.</string>
-    <string name="tracking_has_now_stopped">Tracking has now stopped.</string>
+    <string name="alarm_has_now_started">Connected to cloud successfully</string>
+    <string name="tracking_has_now_stopped">Tracking has now stopped</string>
     <string name="user_needs_to_restart_tracking">Please restart tracking to change the time interval</string>
     <string name="user_needs_to_restart_app">Please restart the application</string>
-    <string name="reachability_error">Cannot reach the URL. Try again.</string>
-    <string name="temp_flight_alloc">Cannot reach the URL. \n Temp flight number is assigned.</string>
+    <string name="reachability_error">Cannot reach the URL\nTry again</string>
+    <string name="temp_flight_alloc">Cannot reach the URL \nTemp flight number is assigned</string>
     <string name="max_number_reached">You reached maximum allowed number of waypoints</string>
     <string name="flight_has_ended">The flight has ended</string>
     <string name="flight_uknown_req">Unknown request. The flight has ended.</string>
@@ -97,27 +97,27 @@
     <string name="toast_server_error">Server communication error</string>
     <string name="new_flight_id">You got a new flight id</string>
     <string name="start_flight">"Start Flight"</string>
-    <string name="flight_notstarted">"Flight \n Not started"</string>
-    <string name="crash_toast_text">Oops ! FlightOnTrack crashed! \n Sending report to flightontrack.com</string>
+    <string name="flight_notstarted">"Flight \nNot started"</string>
+    <string name="crash_toast_text">Oops ! FlightOnTrack crashed! \nSending report to flightontrack.com</string>
     <string name="email_commment">Please add your comments here:</string>
     <string name="email_notinstalled">There is no email client installed.</string>
     <string name="start_flight_first">Flight needs to be started first</string>
     <string name="load_logbook">Loading Pilot LogBook from Cloud ...</string>
-    <string name="driving">Looks like you are driving on road. The flight has been terminated.</string>
-    <string name="toast_permiss_declined_1">The app cannot run without this permission.</string>
-    <string name="toast_permiss_declined_2">The app cannot run in debug mode without this permission.</string>
-    <string name="toast_noconnectivity">FONT: Connectivity unavailable, cannot send location.</string>
+    <string name="driving">Looks like you are driving on road\nThe flight has been terminated</string>
+    <string name="toast_permiss_declined_1">The app cannot run without this permission</string>
+    <string name="toast_permiss_declined_2">The app cannot run in debug mode without this permission</string>
+    <string name="toast_noconnectivity">FONT: Connectivity unavailable\ncannot send location</string>
 
     <!--dialog-->
     <string name="acft_dialog">You do not have Aircraft N number populated. Is it OK?</string>
     <string name="acft_dialog_neg">No, go to Aircraft Settings</string>
     <string name="acft_dialog_pos">Yes, I will restart the flight</string>
 
-    <string name="unsentrecords_toast"> Sending location points left in cache.</string>
+    <string name="unsentrecords_toast"> Sending location points left in cache</string>
     <string name="unsentrecords_dialog"> location points left in cache. Do you want to send them to cloud now?</string>
     <string name="unsentrecords_dialog_neg">No, just cancel.</string>
     <string name="unsentrecords_dialog_pos">Yes, try it now.</string>
-    <string name="unsentrecords_failed">Failed to send location points.</string>
+    <string name="unsentrecords_failed">Failed to send location points</string>
 
     <string name="backpressed_dialog"> Do you want to stop application or keep it running in background?</string>
     <string name="backpressed_dialog_neg">Keep it running</string>

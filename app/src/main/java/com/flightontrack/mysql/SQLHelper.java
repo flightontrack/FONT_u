@@ -208,8 +208,8 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         String sortOrder = DBSchema._ID;
         String selection = DBSchema.LOC_isTempFlight + "= ?";
         String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
-        dbw = getWritableDatabase();
-        Cursor c = dbw.query(
+        dbw = getReadableDatabase();
+        Cursor cu = dbw.query(
                 DBSchema.TABLE_LOCATION,  // The table to query
                 projection,                               // The columns to return
                 selection,                               // The columns for the WHERE clause
@@ -218,23 +218,24 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
         );
-        dbw.close();
-        return c;
+        //cu.moveToFirst();
+        //dbw.close();
+        return cu;
     }
     public Cursor getCursorTempFlights() {
 
         dbw = getReadableDatabase();
         Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =1" ,new String[]{});
-        c.moveToFirst();
-        dbw.close();
+        //c.moveToFirst();
+        //dbw.close();
         return c;
     }
     public Cursor getCursorReadyToSendFlights() {
 
         dbw = getReadableDatabase();
         Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
-        c.moveToFirst();
-        dbw.close();
+        //c.moveToFirst();
+        //dbw.close();
         return c;
     }
     public static int getCursorCountLocation() {

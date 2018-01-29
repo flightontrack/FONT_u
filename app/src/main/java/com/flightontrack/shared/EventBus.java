@@ -133,6 +133,7 @@ public interface EventBus {
                 }
             case SVCCOMM_ONDESTROY:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                interfaceList.add(Session.getInstance());
                 break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
                 interfaceList.add(sqlHelper);

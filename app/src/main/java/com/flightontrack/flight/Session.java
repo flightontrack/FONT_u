@@ -39,7 +39,7 @@ public class Session implements EventBus{
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
         GET_OFFLINE_FLIGHTS,
-
+        CLOSE_FLIGHTS
     }
 
     private static Session sessionInstance = null;
@@ -79,32 +79,37 @@ public class Session implements EventBus{
 
     static void startLocationCommService() {
 
+        //sqlHelper.setCursorDataLocation();
         Cursor locations = sqlHelper.getCursorDataLocation();
-        FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + SvcComm.commBatchSize, 'd');
-             while (locations.moveToNext())   {
+        try {
+            FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + SvcComm.commBatchSize, 'd');
+            while (locations.moveToNext()) {
                 if (locations.getPosition() >= SvcComm.commBatchSize) break;
                 Intent intentComm = new Intent(ctxApp, SvcComm.class);
                 //Intent intentComm = new Intent(context, SvcIntentComm.class);
                 Bundle bundle = new Bundle();
-                bundle.putLong("itemId", sqlHelper.cl.getLong(sqlHelper.cl.getColumnIndexOrThrow(DBSchema._ID)));
-                bundle.putInt("rc", sqlHelper.cl.getInt(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1)));
-                bundle.putString("ft", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
-                bundle.putBoolean("sl", sqlHelper.cl.getInt(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag)) == 1);
-                bundle.putString("sd", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4)));
-                bundle.putString("la", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6)));
-                bundle.putString("lo", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7)));
-                bundle.putString("ac", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8)));
-                bundle.putString("al", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9)));
-                bundle.putInt("wp", sqlHelper.cl.getInt(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.LOC_wpntnum)));
-                bundle.putString("sg", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11)));
-                bundle.putString("dt", sqlHelper.cl.getString(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.LOC_date)));
-                bundle.putBoolean("irch", sqlHelper.cl.getInt(sqlHelper.cl.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL13)) == 1);
+                bundle.putLong("itemId", locations.getLong(locations.getColumnIndexOrThrow(DBSchema._ID)));
+                bundle.putInt("rc", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1)));
+                bundle.putString("ft", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
+                bundle.putBoolean("sl", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag)) == 1);
+                bundle.putString("sd", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4)));
+                bundle.putString("la", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6)));
+                bundle.putString("lo", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7)));
+                bundle.putString("ac", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8)));
+                bundle.putString("al", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9)));
+                bundle.putInt("wp", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_wpntnum)));
+                bundle.putString("sg", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11)));
+                bundle.putString("dt", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_date)));
+                bundle.putBoolean("irch", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL13)) == 1);
 
                 intentComm.putExtras(bundle);
                 ctxApp.startService(intentComm);
-
             }
+        }
+        finally {
             locations.close();
+            sqlHelper.dbw.close();
+        }
     }
     void sendStoredLocations(){
 
@@ -116,8 +121,8 @@ public class Session implements EventBus{
         while (dbLocationRecCountNormal>0){
             FontLog.appendLog(TAG + " dbLocationRecCountNormal to send: " + dbLocationRecCountNormal, 'd');
             if (counter >MaxTryCount) {
-                Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
-                sqlHelper.cl.close();
+                //Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
+                //sqlHelper.cl.close();
                 break;
             }
             try {
@@ -161,23 +166,32 @@ public class Session implements EventBus{
             case SEND_OFFLINESTORED_LOCATIONS:
                 Cursor flightsReadySend = sqlHelper.getCursorReadyToSendFlights();
                 //flightsReadySend.moveToFirst();
-                while(flightsReadySend.moveToNext()){
-                //for (int i = 0; i <flightsReadySend.getCount(); i++) {
-                    String fn = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-                    if (!Route.routeList.isEmpty()) {
-                        for (Route r : Route.routeList) {
-                            for (Flight f : r.flightList) {
-                                if (f.flightNumber.equals(fn)) {
-                                    flightToClose.add(f);
+                try {
+                    while (flightsReadySend.moveToNext()) {
+                        //for (int i = 0; i <flightsReadySend.getCount(); i++) {
+                        String fn = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                        if (!Route.routeList.isEmpty()) {
+                            for (Route r : Route.routeList) {
+                                for (Flight f : r.flightList) {
+                                    if (f.flightNumber.equals(fn)) {
+                                        flightToClose.add(f);
+                                    }
                                 }
                             }
                         }
+                        if (get_FlightInstanceByNumber(fn) == null) new FlightOffline(fn);
                     }
-                    if(get_FlightInstanceByNumber(fn)==null) new FlightOffline(fn);
                 }
-                flightsReadySend.close();
+                finally {
+                    flightsReadySend.close();
+                    sqlHelper.dbw.close();
+                }
                 sendStoredLocations();
+                break;
+            case CLOSE_FLIGHTS:
+                FontLog.appendLog(TAG + " flightToClose size: " + flightToClose.size(), 'd');
                 for(FlightOffline f: new ArrayList<>(flightToClose)) {
+                    FontLog.appendLog(TAG + " flightToClose : getLocationFlightCount:" + f.getLocationFlightCount(), 'd');
                     if (f.getLocationFlightCount() == 0){
                         FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
                         f.getCloseFlight();
@@ -197,10 +211,16 @@ public class Session implements EventBus{
                 break;
             case GET_OFFLINE_FLIGHTS:
                 Cursor flights = sqlHelper.getCursorTempFlights();
-                for (int i = 0; i <flights.getCount(); i++) {
-                    new FlightOffline(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
+                try {
+                    while (flights.moveToNext()) {
+                        new FlightOffline(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
+                    }
                 }
-                flights.close();
+                finally{
+                    flights.close();
+                    sqlHelper.dbw.close();
+                }
+
                 break;
         }
     }
@@ -232,6 +252,9 @@ public class Session implements EventBus{
             case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
                 flightToClose.add((FlightOffline) eventMessage.eventMessageValueObject);
                 set_sAction(SACTION.SEND_OFFLINESTORED_LOCATIONS);
+                break;
+            case SVCCOMM_ONDESTROY:
+                set_sAction(SACTION.CLOSE_FLIGHTS);
                 break;
         }
     }
