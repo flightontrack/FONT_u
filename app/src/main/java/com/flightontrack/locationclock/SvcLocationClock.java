@@ -239,6 +239,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 set_mode(MODE.CLOCK_ONLY);
+                stopServiceSelf();
                 break;
             case SVCCOMM_ONSUCCESS_COMMAND:
                 if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) set_mode(MODE.CLOCK_ONLY);

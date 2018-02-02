@@ -2,6 +2,8 @@ package com.flightontrack.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -20,7 +22,6 @@ import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.log.FontLog;
-import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
@@ -45,6 +46,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     CheckBox chBoxIsDebug;
     CheckBox chBoxIsOnReboot;
     CheckBox chBoxIsRoad;
+    ProgressDialog progressBar;
     public static SimpleSettingsActivity simpleSettingsActivityInstance;
 
     @Override
@@ -77,6 +79,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         sendCacheButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.show();
                 EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONSENDCACHE_CLICKED));
             }
         });
@@ -146,6 +149,22 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         txtCached= (TextView) findViewById((R.id.txtCached));
         txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
 
+        progressBar = new ProgressDialog(this);
+        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar.setMessage(getString(R.string.progressbar_cachesending));
+        progressBar.setIndeterminate(true);
+        progressBar.setCancelable(true);
+        progressBar.setMax(100);
+        progressBar.setProgress(100);
+        progressBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                if (progressBar.isShowing()) {
+                    progressBar.dismiss();
+                }
+                finish();
+            }
+        });
         updateUI();
     }
     @Override
@@ -239,6 +258,13 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     FontLog.appendLog(TAG + " eventReceiver : "+ev, 'd');
         switch(ev){
             case SVCCOMM_ONDESTROY:
+                progressBar.dismiss();
+                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
+                break;
+            case FLIGHT_ONSENDCACHECOMPLETED:
+                if (progressBar!=null)  progressBar.dismiss();
+                break;
+            case SQL_ONCLEARCACHE_COMPLETED:
                 txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
                 break;
         }

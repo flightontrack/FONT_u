@@ -100,12 +100,7 @@ android:weightSum="100"
             />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:weightSum="10"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="5dp"
-        android:layout_height="wrap_content"></LinearLayout>
+
 
     <LinearLayout
         android:orientation="horizontal"
@@ -257,15 +252,6 @@ android:weightSum="100"
             android:scaleY="2"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_weight="10"
-        android:weightSum="10"
-        >
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -286,6 +272,57 @@ android:weightSum="100"
             android:layout_weight="3"
             android:text="@string/label_btnreset"
             android:id="@+id/btnReset"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="10"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        >
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:background="@android:color/holo_blue_bright" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:weightSum="10">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="@string/label_cache"
+            android:id="@+id/txtCache"
+            style="@style/label_text"
+            />
+        <TextView
+            android:id="@+id/txtCached"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/label_text"
+            />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:text="@string/label_btnclear"
+            android:id="@+id/btnClearCache"
+            android:layout_height="wrap_content"
+            />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:text="@string/label_btnsend"
+            android:id="@+id/btnSendCache"
             android:layout_height="wrap_content"
             />
     </LinearLayout>

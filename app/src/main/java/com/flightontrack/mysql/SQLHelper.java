@@ -36,22 +36,25 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         try {
             dbw = getWritableDatabase();
             //dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
+            //dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC);
+            //dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT);
+            //dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHTNUMBER);
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
-            dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
+            dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
             dbw.close();
             dbLocationRecCountNormal = get_dbLocationRecCountNormal();
             if (dbLocationRecCountNormal == 0 && getLocationTableCountTemp() == 0) {
                 /// TODO - to come up with something... - reset ids to 1
                 dbw = getWritableDatabase();
                 dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
-                dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT_NUMBER);
+                dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC);
                 dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
-                dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
+                dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
                 dbw.close();
             }
             else {
                 dbw = getReadableDatabase();
-                dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
+                dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION);
                 dbw.close();
             }
             FontLog.appendLog(TAG + "Unsent Locations from Previous Session :  " + dbLocationRecCountNormal, 'd');
@@ -73,19 +76,27 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         db.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
         onCreate(db);
     }
-    void dropCreateDb(){
+    boolean dropCreateDb(){
+        boolean r= true;
         dbw = getWritableDatabase();
-        int lcount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
-        dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
-        dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHT_NUMBER);
-        dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
-        dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS);
-        dbLocationRecCountNormal = get_dbLocationRecCountNormal();
-        dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
-        if(dbLocationRecCountNormal ==0){
-            Toast.makeText(ctxApp,"Deleted "+lcount+" location points",Toast.LENGTH_LONG).show();
+        try {
+            int lcount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
+            dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
+            dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC);
+            dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
+            dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
+            dbLocationRecCountNormal = 0;
+            dbTempFlightRecCount = 0;
+            Toast.makeText(ctxApp, "Deleted " + lcount + " location points", Toast.LENGTH_LONG).show();
         }
-        dbw.close();
+        catch (Exception e){
+            Toast.makeText(ctxApp, "Failed to clear cache", Toast.LENGTH_LONG).show();
+            r= false;
+        }
+        finally {
+            dbw.close();
+        }
+        return r;
     }
     public void rowLocationDelete(int id, String flightId) {
         String selection = DBSchema.LOC_wpntnum + "= ? AND "+DBSchema.LOC_flightid +"= ?";
@@ -133,6 +144,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
         dbLocationRecCountNormal = 0;
+        dbTempFlightRecCount=0;
         return i;
     }
     public long  rowLocationInsert(ContentValues values) {
@@ -280,7 +292,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
     }
     int getTempFlightTableCount() {
         dbw = getWritableDatabase();
-        long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER);
+        long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION);
         dbw.close();
         return (int) numRows;
     }
@@ -306,7 +318,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 
         long r = 0;
         try {
-            r = dbw.insert(DBSchema.TABLE_FLIGHTNUMBER,
+            r = dbw.insert(DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION,
                     null,
                     values);
         } catch (Exception e) {
@@ -340,7 +352,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 //                rn=0;
 //                FontLog.appendLog(TAG + "updateTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd');
 //                rn = dbw.delete(
-//                        DBSchema.TABLE_FLIGHTNUMBER,
+//                        DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION,
 //                        DBSchema.FLIGHTNUM_FlightNumber+"="+temp_fn,
 //                        null
 //
@@ -360,7 +372,9 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         EVENT ev = eventMessage.event;
         switch(ev){
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
-                sqlHelper.dropCreateDb();
+                if(sqlHelper.dropCreateDb()){
+                    EventBus.distribute(new EventMessage(EVENT.SQL_ONCLEARCACHE_COMPLETED).setEventMessageValueBool(true));
+                }
                 break;
             case SVCCOMM_ONSUCCESS_COMMAND:
                 if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) flightLocationsDelete(eventMessage.eventMessageValueString);

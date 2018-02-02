@@ -27,6 +27,7 @@ public interface EventBus {
         FLIGHT_CLOSEFLIGHT_COMPLETED,
         FLIGHT_ONSPEEDLOW,
         FLIGHT_ONPOINTSLIMITREACHED,
+        FLIGHT_ONSENDCACHECOMPLETED,
 
         CLOCK_SERVICESTARTED_MODELOCATION,
 
@@ -52,6 +53,7 @@ public interface EventBus {
         ALERT_STOPAPP,
 
         SQL_TEMPFLIGHTNUM_ALLOCATED,
+        SQL_ONCLEARCACHE_COMPLETED,
 
         FLIGHT_OFFLINE_DBUPDATE_COMPLETED
     }
@@ -68,6 +70,7 @@ public interface EventBus {
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 interfaceList.add(Props.getInstance());
                 interfaceList.add(Route.activeRoute.activeFlight); // set the active flight to fail
+                interfaceList.add(Session.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case PROP_CHANGED_MULTILEG:
@@ -178,8 +181,14 @@ public interface EventBus {
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
                 interfaceList.add(Route.activeRoute.activeFlight);
                 break;
+            case SQL_ONCLEARCACHE_COMPLETED:
+                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                break;
             case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
                 interfaceList.add(Session.getInstance());
+                break;
+            case FLIGHT_ONSENDCACHECOMPLETED:
+                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
         }
         for( EventBus i : interfaceList) {

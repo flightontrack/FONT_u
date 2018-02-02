@@ -1,5 +1,7 @@
 package com.flightontrack.flight;
 
+import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
@@ -28,7 +30,7 @@ import static com.flightontrack.shared.Props.mainactivityInstance;
  * Created by hotvk on 1/16/2018.
  */
 
-public class FlightOffline {
+public class FlightOffline implements EventBus{
     private static final String TAG = "FlightOffline:";
     public String flightNumber;
     public String tempFlightNumber;
@@ -108,8 +110,13 @@ public class FlightOffline {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        if (mainactivityInstance != null)
+                        if (mainactivityInstance != null){
                             Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
+//                            TextView tv = (TextView) t.getView().findViewById(R.string.reachability_error);
+//                            tv.setGravity(Gravity.CENTER);
+//                            t.show();
+                        }
+                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                     }
 
                     @Override

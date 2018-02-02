@@ -9,15 +9,15 @@ public abstract class DBSchema implements BaseColumns {
  private static final String BOOLEAN_TYPE = " BOOLEAN";
  private static final String COMMA_SEP = ",";
  static final String TABLE_LOCATION = "Location";
- static final String TABLE_NAME_2 = "FLIGHT";
+ static final String TABLE_FLIGHT = "FLIGHT";
  static final String TABLE_NAME_3 = "LocationExt";
 
 
-static final String TABLE_FLIGHTNUMBER = "FlightNumber";
+static final String TABLE_FLIGHTNUMBER_ALLOCATION = "FlightNumberAllocation";
 static public final String FLIGHTNUM_FlightNumber = "FlightNumber";
 static final String FLIGHTNUM_RouteNumber = "RouteNumber";
 static final String FLIGHTNUM_FlightTimeStart = "FlightTimeStart";
-static final String SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS =    "CREATE TABLE IF NOT EXISTS " + TABLE_FLIGHTNUMBER + " (" +
+static final String SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS =    "CREATE TABLE IF NOT EXISTS " + TABLE_FLIGHTNUMBER_ALLOCATION + " (" +
          _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         FLIGHTNUM_FlightNumber + INT_TYPE +COMMA_SEP +
         FLIGHTNUM_RouteNumber + TEXT_TYPE +COMMA_SEP +
@@ -89,7 +89,7 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS =    "CREATE TABLE 
              LOC_date + TEXT_TYPE +
             " )";
 
-     static final String SQL_CREATE_TABLE_FLIGHT_IF_NOT_EXISTS =    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME_2 + " (" +
+     static final String SQL_CREATE_TABLE_FLIGHT_IF_NOT_EXISTS =    "CREATE TABLE IF NOT EXISTS " + TABLE_FLIGHT + " (" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             FLIGHT_COLUMN_NAME_COL1+ INT_TYPE + COMMA_SEP +
             FLIGHT_COLUMN_NAME_COL2+ INT_TYPE + COMMA_SEP +
@@ -109,5 +109,7 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_IF_NOT_EXISTS =    "CREATE TABLE 
 
      static final String SQL_DROP_TABLE_LOCATION =    "DROP TABLE IF EXISTS " + TABLE_LOCATION;
      static final String SQL_DROP_TABLE_LOCATIONEXT =    "DROP TABLE IF EXISTS " + TABLE_NAME_3;
-     static final String SQL_DROP_TABLE_FLIGHT_NUMBER =    "DROP TABLE IF EXISTS " + TABLE_FLIGHTNUMBER;
+     static final String SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC =    "DROP TABLE IF EXISTS " + TABLE_FLIGHTNUMBER_ALLOCATION;
+     static final String SQL_DROP_TABLE_FLIGHTNUMBER =    "DROP TABLE IF EXISTS FLIGHT_NUMBER";
+     static final String SQL_DROP_TABLE_FLIGHT =    "DROP TABLE IF EXISTS " + TABLE_FLIGHT;
 }

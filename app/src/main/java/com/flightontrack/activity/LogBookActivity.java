@@ -68,7 +68,7 @@ public class LogBookActivity extends Activity {
         }
         progressBar = new ProgressDialog(this);
         progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressBar.setMessage(getString(R.string.load_logbook));
+        progressBar.setMessage(getString(R.string.progressbar_load_logbook));
         progressBar.setIndeterminate(true);
         progressBar.setCancelable(true);
         progressBar.setMax(100);
