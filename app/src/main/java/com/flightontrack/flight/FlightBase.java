@@ -30,35 +30,21 @@ import static com.flightontrack.shared.Props.mainactivityInstance;
  * Created by hotvk on 1/16/2018.
  */
 
-public class FlightOffline implements EventBus{
-    private static final String TAG = "FlightOffline:";
+public class FlightBase implements EventBus{
+    static final String TAG = "FlightBase:";
+
     public String flightNumber;
     public String tempFlightNumber;
     public boolean isGetFlightNumber = true;
-    //public FSTATUS fStatus = FSTATUS.PASSIVE;
-//    FACTION lastAction = FACTION.DEFAULT_REQUEST;
-//    EVENT lastEvent =EVENT.DEFAULT_EVENT;
-    boolean isSpeedAboveMin=false;
-    public String flightTimeString;
-    public int lastAltitudeFt;
-    public int _wayPointsCount;
-    private Route route;
-    private float _speedCurrent = 0;
-    private float speedPrev = 0;
-    private boolean isLimitReached  = false;
-    private long _flightStartTimeGMT;
-    private int _flightTimeSec;
-    //private int flightRequestCounter;
-    private boolean isElevationCheckDone;
-    private double cutoffSpeed;
+    public boolean isThisToClose = true;
+
+    boolean isLimitReached  = false;
     boolean isGetFlightCallSuccess = false;
-    //boolean isTempFlightNum = true;
 
-    public FlightOffline(){}
+    public FlightBase(){}
 
-    FlightOffline(String fn) {
+    FlightBase(String fn) {
         tempFlightNumber = fn;
-        //getOfflineFlightID();
     }
 
     void getOfflineFlightID() {
@@ -112,9 +98,6 @@ public class FlightOffline implements EventBus{
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                         if (mainactivityInstance != null){
                             Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
-//                            TextView tv = (TextView) t.getView().findViewById(R.string.reachability_error);
-//                            tv.setGravity(Gravity.CENTER);
-//                            t.show();
                         }
                         EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                     }

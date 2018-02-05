@@ -34,7 +34,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class Flight extends FlightOffline implements GetTime,EventBus {
+public class Flight extends FlightBase implements GetTime,EventBus {
     public static enum FACTION {
         DEFAULT_REQUEST,
         REQUEST_FLIGHT,
@@ -353,7 +353,7 @@ public class Flight extends FlightOffline implements GetTime,EventBus {
             values.put(DBSchema.LOC_wpntnum, p); //wpntnum
             values.put(DBSchema.COLUMN_NAME_COL11, Integer.toString(Util.getSignalStregth())); //gsmsignal
             values.put(DBSchema.LOC_date, URLEncoder.encode(getDateTimeNow(), "UTF-8")); //date
-            values.put(DBSchema.COLUMN_NAME_COL13, iselevecheck);
+            values.put(DBSchema.LOC_is_elevetion_check, iselevecheck);
             long r = sqlHelper.rowLocationInsert(values);
             if (r > 0) {
                 lastAltitudeFt = (int) (Math.round(location.getAltitude() * 3.281));

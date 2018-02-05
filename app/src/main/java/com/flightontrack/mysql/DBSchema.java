@@ -38,7 +38,7 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS =    "CREATE 
      public static final String LOC_wpntnum = "wpntnum";
      public static final String COLUMN_NAME_COL11 = "gsmsignal";
     public static final String LOC_date = "date";
-     public static final String COLUMN_NAME_COL13 = "is_elevetion_check";
+     public static final String LOC_is_elevetion_check = "is_elevetion_check";
 
      static final String FLIGHT_COLUMN_NAME_COL1 = "state_isAlarmDisabled";
      static final String FLIGHT_COLUMN_NAME_COL2 = "request_StartFlight";
@@ -71,7 +71,7 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS =    "CREATE 
              LOC_wpntnum + INT_TYPE + COMMA_SEP +
             COLUMN_NAME_COL11 + TEXT_TYPE + COMMA_SEP +
              LOC_date + TEXT_TYPE + COMMA_SEP +
-             COLUMN_NAME_COL13 + BOOLEAN_TYPE +
+             LOC_is_elevetion_check + BOOLEAN_TYPE +
              " )";
      static final String SQL_CREATE_TABLE_LOCATIONEXT_IF_NOT_EXISTS =    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME_3 + " (" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -110,6 +110,6 @@ static final String SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS =    "CREATE 
      static final String SQL_DROP_TABLE_LOCATION =    "DROP TABLE IF EXISTS " + TABLE_LOCATION;
      static final String SQL_DROP_TABLE_LOCATIONEXT =    "DROP TABLE IF EXISTS " + TABLE_NAME_3;
      static final String SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC =    "DROP TABLE IF EXISTS " + TABLE_FLIGHTNUMBER_ALLOCATION;
-     static final String SQL_DROP_TABLE_FLIGHTNUMBER =    "DROP TABLE IF EXISTS FLIGHT_NUMBER";
+     static final String SQL_DROP_TABLE_FLIGHTNUMBER =    "DROP TABLE IF EXISTS FLIGHTNUMBER";
      static final String SQL_DROP_TABLE_FLIGHT =    "DROP TABLE IF EXISTS " + TABLE_FLIGHT;
 }

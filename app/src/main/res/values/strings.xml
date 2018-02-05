@@ -66,7 +66,6 @@
     <string name="label_chbox_boot">Start on Reboot</string>
     <string name="label_chbox_road">Is Road</string>
     <string name="label_build">Build:</string>
-    <string name="label_cachenumber">Cached locations:</string>
 
 
     <!--labels MainActivity-->

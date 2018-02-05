@@ -11,25 +11,15 @@ import com.flightontrack.shared.Props;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.flight.Flight.*;
 
-public class Route implements EventBus{
-    public enum RACTION {
-        OPEN_NEW_FLIGHT,
-        SWITCH_TO_PENDING,
-        ON_FLIGHTTIME_CHANGED,
-        CLOSE_BUTTON_STOP_PRESSED,
-        CLOSE_RECEIVEFLIGHT_FAILED,
-        RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER,
-        RESTART_NEW_FLIGHT,
-        REMOVE_FLIGHT_IF_CLOSED,
-    }
+public class Route extends RouteBase implements EventBus{
 
     private final String TAG = "Route:";
-    public static Route activeRoute;
-    public static ArrayList<Route> routeList = new ArrayList<>();
-    String routeNumber=ROUTE_NUMBER_DEFAULT;
-
-    public static Flight activeFlight;
-    public ArrayList<Flight> flightList = new ArrayList<>();
+//    public static Route activeRoute;
+//    public static ArrayList<Route> routeList = new ArrayList<>();
+//    String routeNumber=ROUTE_NUMBER_DEFAULT;
+//
+//    public static Flight activeFlight;
+//    public ArrayList<Flight> flightList = new ArrayList<>();
     int _legCount = 0;
 
     public Route() {
@@ -99,7 +89,7 @@ public class Route implements EventBus{
                 /// to avoid ConcurrentModificationException making copy of the flightList
                 //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
                 for(Route r:new ArrayList<>(routeList)) {
-                    for (Flight f : new ArrayList<>(r.flightList)) {
+                    for (FlightBase f : new ArrayList<>(r.flightList)) {
                         FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
                         if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
                             //if (activeFlight == f) activeFlight = null;

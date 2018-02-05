@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import com.flightontrack.flight.Flight;
 import com.flightontrack.R;
@@ -15,7 +14,6 @@ import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import java.util.Collections;
 //import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +27,7 @@ public class SvcComm extends Service{
     public SvcComm() {}
     private static final String TAG = "SvcComm:";
     public static boolean isServiceStarted;
-    private RequestParams requestParams = new RequestParams();
+    RequestParams requestParams;
     //private static Context ctx;
     private int dbItemId;
     private int trackPointNumber;
@@ -39,7 +37,8 @@ public class SvcComm extends Service{
     public static Integer commBatchSize = 1;
     //ArrayList<Integer> startId = new ArrayList<>();
     //ArrayList<Integer> pointNum = new ArrayList<>();
-    private static HashMap<Integer,Integer> startIdDbItemId = new HashMap<>();
+    private static HashMap<Integer,Integer> requestIdDbItemIdMap = new HashMap<>();
+    private static HashMap<Integer,RequestParams> requestIdToRequestMap = new HashMap<>();
     //private LoopjAClient aSyncClient
 
     @Override
@@ -48,23 +47,23 @@ public class SvcComm extends Service{
         throw new UnsupportedOperationException("Not yet implemented");
     }
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int requestId) {
         isServiceStarted=true;
+        dbItemId = (int) intent.getExtras().getLong("itemId");
         //Bundle extras = intent.getExtras();
-        setRequest(intent.getExtras());
-        FontLog.appendLog(TAG+ "onStartCommand requestId: " + startId+" dbItemId :"+ dbItemId+" trackPointNumber :"+trackPointNumber,'d');
-        if (startIdDbItemId.containsValue(dbItemId)) {
-            FontLog.appendLog(TAG+ "onStartCommand startIdDbItemId contains: " + dbItemId + "return",'d');
+        if (requestIdDbItemIdMap.containsValue(dbItemId)) {
+            FontLog.appendLog(TAG+ "onStartCommand requestIdDbItemIdMap contains: " + dbItemId + "return",'d');
             return START_STICKY;
         }
-        startIdDbItemId.put(startId,dbItemId);
-//        if (startIdDbItemId.size()>1){
-//            for (Map.Entry<Integer, Integer> entry : startIdDbItemId.entrySet()) {
+        setRequest(requestId,intent.getExtras());
+        //requestIdDbItemIdMap.put(requestId,dbItemId);
+//        if (requestIdDbItemIdMap.size()>1){
+//            for (Map.Entry<Integer, Integer> entry : requestIdDbItemIdMap.entrySet()) {
 //                FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
 //            }
 //        }
         //trackPointNumber
-        sendData(startId);
+        if (requestId==1) sendNext();
         return START_STICKY;
     }
     @Override
@@ -73,11 +72,13 @@ public class SvcComm extends Service{
         isServiceStarted=false;
         //ctx = getApplicationContext();
     }
-    public void setRequest(Bundle extras){
+    public void setRequest(int reqId,Bundle extras){
 
-        dbItemId = (int) extras.getLong("itemId");
+        //dbItemId = (int) extras.getLong("itemId");
         trackPointNumber = extras.getInt("wp");
         flightID = extras.getString("ft");
+        FontLog.appendLog(TAG+ "onStartCommand requestId: " + reqId +" dbItemId :"+ dbItemId+" trackPointNumber :"+trackPointNumber,'d');
+        requestParams = new RequestParams();
         requestParams.put("isdebug", SessionProp.pIsDebug);
         requestParams.put("speedlowflag",extras.getBoolean("sl"));
         requestParams.put("rcode",      extras.getInt("rc"));
@@ -94,14 +95,17 @@ public class SvcComm extends Service{
         if (extras.getBoolean("irch") ) requestParams.put("elevcheck", true);
 //        requestParams.setUseJsonStreamer(true);
         //Util.appendLog(TAG + "Request :" + "dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber,'d');
+        requestIdDbItemIdMap.put(reqId,dbItemId);
+        requestIdToRequestMap.put(reqId,requestParams);
     }
-    public void sendData(int startId){
+    public void sendNext(){
+        HashMap.Entry<Integer,RequestParams> entry=requestIdToRequestMap.entrySet().iterator().next();
         //if (!Util.isNetworkAvailable()) {
             try {
                 FontLog.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber,'d');
                 //AsyncHttpClient aSyncClient = new AsyncHttpClient();
-                final LoopjAClient aSyncClient = new LoopjAClient(startId);
-                aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+                final LoopjAClient aSyncClient = new LoopjAClient(entry.getKey());
+                aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), entry.getValue(), new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         failureCounter=0;
@@ -176,22 +180,24 @@ public class SvcComm extends Service{
                     }
                     @Override
                     public void onFinish() {
-                        //minStartId = Collections.min(startIdDbItemId.keySet());
-                        if (startIdDbItemId.size()>1){
-                            for (Map.Entry<Integer, Integer> entry : startIdDbItemId.entrySet()) {
+                        //minStartId = Collections.min(requestIdDbItemIdMap.keySet());
+                        if (requestIdDbItemIdMap.size()>1){
+                            for (Map.Entry<Integer, Integer> entry : requestIdDbItemIdMap.entrySet()) {
                                 FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
                             }
                         }
                         FontLog.appendLog(TAG + "onFinish to remove ; startId= " + aSyncClient.getStartID(), 'd');
-                        startIdDbItemId.remove(aSyncClient.getStartID());
+                        requestIdDbItemIdMap.remove(aSyncClient.getStartID());
+                        requestIdToRequestMap.remove(aSyncClient.getStartID());
                         if (failureCounter>MAX_FAILURE_COUNT){};//TODO
                         //stopSelf(minStartId);
-                        if (startIdDbItemId.isEmpty()) stopSelf();
+                        if (requestIdDbItemIdMap.isEmpty()) stopSelf();
+                        else sendNext();
                     }
                 });
             }
             catch (Exception e){
-                FontLog.appendLog(TAG+"sendData"+e.getMessage(),'d');
+                FontLog.appendLog(TAG+"sendNext"+e.getMessage(),'d');
                 return;
             }
 //        }

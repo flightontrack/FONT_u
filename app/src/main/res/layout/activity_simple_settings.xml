@@ -297,7 +297,7 @@ android:weightSum="100"
 
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="3"
+            android:layout_weight="2.2"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:text="@string/label_cache"
@@ -307,7 +307,7 @@ android:weightSum="100"
         <TextView
             android:id="@+id/txtCached"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.8"
             android:layout_height="wrap_content"
             style="@style/label_text"
             />

@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventMessage;
 
+import static com.flightontrack.mysql.DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION;
 import static com.flightontrack.shared.Const.COMMAND_TERMINATEFLIGHT;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -54,7 +55,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             }
             else {
                 dbw = getReadableDatabase();
-                dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION);
+                dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, TABLE_FLIGHTNUMBER_ALLOCATION);
                 dbw.close();
             }
             FontLog.appendLog(TAG + "Unsent Locations from Previous Session :  " + dbLocationRecCountNormal, 'd');
@@ -179,7 +180,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 DBSchema.LOC_wpntnum,
                 DBSchema.COLUMN_NAME_COL11,
                 DBSchema.LOC_date,
-                DBSchema.COLUMN_NAME_COL13
+                DBSchema.LOC_is_elevetion_check
         };
         String sortOrder = DBSchema._ID;
         //String selection = null; //DBSchema._ID + "= ?";
@@ -215,7 +216,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 DBSchema.LOC_wpntnum,
                 DBSchema.COLUMN_NAME_COL11,
                 DBSchema.LOC_date,
-                DBSchema.COLUMN_NAME_COL13
+                DBSchema.LOC_is_elevetion_check
         };
         String sortOrder = DBSchema._ID;
         String selection = DBSchema.LOC_isTempFlight + "= ?";
@@ -292,7 +293,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
     }
     int getTempFlightTableCount() {
         dbw = getWritableDatabase();
-        long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION);
+        long numRows = DatabaseUtils.queryNumEntries(dbw, TABLE_FLIGHTNUMBER_ALLOCATION);
         dbw.close();
         return (int) numRows;
     }
@@ -308,7 +309,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
     public String getNewTempFlightNum(String dateTime){
         dbw = getWritableDatabase();
 
-        Cursor c = dbw.rawQuery("select max(ifnull(flightNumber,0)) from FlightNumber" ,new String[]{});
+        Cursor c = dbw.rawQuery("select max(ifnull(flightNumber,0)) from "+TABLE_FLIGHTNUMBER_ALLOCATION ,new String[]{});
         c.moveToFirst();
         int f= c.getCount()<=0?1:c.getInt(0)+1;
         ContentValues values = new ContentValues();
@@ -318,7 +319,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 
         long r = 0;
         try {
-            r = dbw.insert(DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION,
+            r = dbw.insert(TABLE_FLIGHTNUMBER_ALLOCATION,
                     null,
                     values);
         } catch (Exception e) {

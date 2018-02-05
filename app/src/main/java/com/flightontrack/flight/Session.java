@@ -71,11 +71,11 @@ public class Session implements EventBus{
 //        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
 //        eventReaction.put(FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
 //
-//        flightToClose.add((FlightOffline) eventMessage.eventMessageValueObject);
+//        flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
 //        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
-    static ArrayList<FlightOffline> flightToClose = new ArrayList<>();
+    static ArrayList<FlightBase> flightToClose = new ArrayList<>();
 
     static void startLocationCommService() {
 
@@ -100,10 +100,11 @@ public class Session implements EventBus{
                 bundle.putInt("wp", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_wpntnum)));
                 bundle.putString("sg", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11)));
                 bundle.putString("dt", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_date)));
-                bundle.putBoolean("irch", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL13)) == 1);
+                bundle.putBoolean("irch", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1);
 
                 intentComm.putExtras(bundle);
                 ctxApp.startService(intentComm);
+                if (locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1){delay(1000);}
             }
         }
         finally {
@@ -125,20 +126,16 @@ public class Session implements EventBus{
                 //sqlHelper.cl.close();
                 break;
             }
-            try {
-                Thread.sleep(2000);
-            } catch(InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
+            delay(2000);
             counter++;
             //Toast.makeText(mainactivityInstance, R.string.toast_cachesending, Toast.LENGTH_SHORT).show();
             set_sAction(SACTION.START_COMMUNICATION);
         }
 
     }
-    public static FlightOffline get_FlightInstanceByNumber(String flightNumber){
-        FlightOffline fr=null;
-        for (FlightOffline f : flightToClose) {
+    public static FlightBase get_FlightInstanceByNumber(String flightNumber){
+        FlightBase fr=null;
+        for (FlightBase f : flightToClose) {
                 if (f.flightNumber.equals(flightNumber)) {
                     fr= f;
                 }
@@ -169,28 +166,30 @@ public class Session implements EventBus{
                 try {
                     while (flightsReadySend.moveToNext()) {
                         //for (int i = 0; i <flightsReadySend.getCount(); i++) {
-                        String fn = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                        String flNum = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
                         if (!Route.routeList.isEmpty()) {
                             for (Route r : Route.routeList) {
                                 for (Flight f : r.flightList) {
-                                    if (f.flightNumber.equals(fn)) {
+                                    if (f.flightNumber.equals(flNum)) {
                                         flightToClose.add(f);
                                     }
                                 }
                             }
                         }
-                        if (get_FlightInstanceByNumber(fn) == null) new FlightOffline(fn);
+                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);
                     }
                 }
                 finally {
                     flightsReadySend.close();
                     sqlHelper.dbw.close();
                 }
-                sendStoredLocations();
+                SvcComm.commBatchSize= dbLocationRecCountNormal;
+                set_sAction(SACTION.START_COMMUNICATION);
+                //sendStoredLocations();
                 break;
             case CLOSE_FLIGHTS:
                 FontLog.appendLog(TAG + " flightToClose size: " + flightToClose.size(), 'd');
-                for(FlightOffline f: new ArrayList<>(flightToClose)) {
+                for(FlightBase f: new ArrayList<>(flightToClose)) {
                     FontLog.appendLog(TAG + " flightToClose : getLocationFlightCount:" + f.getLocationFlightCount(), 'd');
                     if (f.getLocationFlightCount() == 0){
                         FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
@@ -215,7 +214,7 @@ public class Session implements EventBus{
                 try {
                     while (flights.moveToNext()) {
                         FontLog.appendLog(TAG+"Get flight number for "+flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid)),'d');
-                        new FlightOffline(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
+                        new FlightBase(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
                     }
                 }
                 finally{
@@ -226,7 +225,13 @@ public class Session implements EventBus{
                 break;
         }
     }
-
+    static void delay(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+    }
     @Override
     public void eventReceiver(EventMessage eventMessage){
         //Array eventReaction[EVENT];
@@ -239,6 +244,7 @@ public class Session implements EventBus{
                 break;
             case CLOCK_ONTICK:
                 set_sAction(SACTION.START_COMMUNICATION);
+                set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
                 break;
             case ALERT_SENTPOINTS:
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
@@ -252,7 +258,7 @@ public class Session implements EventBus{
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
             case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
-                flightToClose.add((FlightOffline) eventMessage.eventMessageValueObject);
+                flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
             case SVCCOMM_ONDESTROY:
