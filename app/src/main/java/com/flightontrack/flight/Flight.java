@@ -28,25 +28,26 @@ import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.flightontrack.flight.Flight.FACTION.CHANGE_IN_PENDING;
+//import static com.flightontrack.flight.Flight.FACTION.CHANGE_IN_PENDING;
 //import static com.flightontrack.flight.Flight.FACTION.RAISE_EVENT;
+//import static com.flightontrack.flight.FlightBase.FACTION.CHANGE_IN_PENDING;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class Flight extends FlightBase implements GetTime,EventBus {
-    public static enum FACTION {
-        DEFAULT_REQUEST,
-        REQUEST_FLIGHT,
-        CHANGE_IN_PENDING,
-        CHANGE_IN_FLIGHT,
-        //CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
-        TERMINATE_GETFLIGHTNUM,
-        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
-        TERMINATE_FLIGHT,
-        CLOSED,
-        REQUEST_FLIGHTNUMBER
-    }
+//    public static enum FACTION {
+//        DEFAULT_REQUEST,
+//        REQUEST_FLIGHT,
+//        CHANGE_IN_PENDING,
+//        CHANGE_IN_FLIGHT,
+//        //CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
+//        TERMINATE_GETFLIGHTNUM,
+//        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
+//        TERMINATE_FLIGHT,
+//        CLOSED,
+//        REQUEST_FLIGHTNUMBER
+//    }
     //public static final String FLIGHT_NUMBER_DEFAULT = "00";
     private static final String TAG = "Flight:";
     public String flightNumber;
@@ -244,7 +245,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                     public void onFinish() {
 
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
-                        if(lastAction!= FACTION.TERMINATE_GETFLIGHTNUM) set_fAction(CHANGE_IN_PENDING);
+                        if(lastAction!= FACTION.TERMINATE_GETFLIGHTNUM) set_fAction(FACTION.CHANGE_IN_PENDING);
 //                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
 //                            .setEventMessageValueBool(isGetFlightCallSuccess)
 //                            .setEventMessageValueString(flightNumber));
@@ -428,7 +429,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 isGetFlightCallSuccess=true;
                 isTempFlightNum =true;
                 route._legCount++;
-                set_fAction(CHANGE_IN_PENDING);
+                set_fAction(FACTION.CHANGE_IN_PENDING);
                 break;
         }
         lastEvent=ev;

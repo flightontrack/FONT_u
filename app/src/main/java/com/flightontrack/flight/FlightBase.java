@@ -32,11 +32,24 @@ import static com.flightontrack.shared.Props.mainactivityInstance;
 
 public class FlightBase implements EventBus{
     static final String TAG = "FlightBase:";
+    public static enum FACTION {
+        DEFAULT_REQUEST,
+        REQUEST_FLIGHT,
+        CHANGE_IN_PENDING,
+        CHANGE_IN_FLIGHT,
+        //CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
+        TERMINATE_GETFLIGHTNUM,
+        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
+        TERMINATE_FLIGHT,
+        CLOSED,
+        REQUEST_FLIGHTNUMBER
+    }
 
     public String flightNumber;
     public String tempFlightNumber;
     public boolean isGetFlightNumber = true;
     public boolean isThisToClose = true;
+    FACTION lastAction = FACTION.DEFAULT_REQUEST;
 
     boolean isLimitReached  = false;
     boolean isGetFlightCallSuccess = false;

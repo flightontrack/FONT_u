@@ -1,7 +1,9 @@
 package com.flightontrack.shared;
 import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.flight.Flight;
+import com.flightontrack.flight.FlightBase;
 import com.flightontrack.flight.Route;
+import com.flightontrack.flight.RouteBase;
 import com.flightontrack.flight.Session;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLog;
@@ -81,7 +83,7 @@ public interface EventBus {
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(eventMessage.eventMessageValueBool){
-                    interfaceList.add(Route.activeRoute); // set route number
+                    interfaceList.add(RouteBase.getInstance()); // set route number
                     interfaceList.add(new SvcLocationClock()); //start clock service in location mode
                     interfaceList.add(mainactivityInstance);
                 }
@@ -95,7 +97,7 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                interfaceList.add(Route.activeRoute); //remove flight
+                interfaceList.add(Route.getInstance()); //remove flight
                 break;
             case FLIGHT_ONSPEEDLOW:
                 if(!SessionProp.pIsMultileg) interfaceList.add(SvcLocationClock.getInstance());//TODO doing nothing
@@ -119,7 +121,7 @@ public interface EventBus {
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case SVCCOMM_ONSUCCESS_COMMAND:
-                interfaceList.add(Route.get_FlightInstanceByNumber(eventMessage.eventMessageValueString)); //change active flight to passive
+                interfaceList.add(Route.get_FlightInstanceByNumber(eventMessage.eventMessageValueString));
                 switch (eventMessage.eventMessageValueInt){
                     case COMMAND_TERMINATEFLIGHT:
                         interfaceList.add(Props.getInstance()); //set multileg to false
@@ -152,19 +154,17 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_SERVICESELFSTOPPED:
-                interfaceList.add(Route.activeRoute); // set to null flightlist and routelist
+                interfaceList.add(Route.getInstance()); // set to null flightlist and routelist
                 interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
 //                if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
 //                    interfaceList.add(Route.activeFlight);
 //                }
-                interfaceList.add(Route.activeRoute); /// passing acive route which calling static mrthod
-                for (Route r : Route.routeList) {
-                    for (Flight f : r.flightList) {
+                interfaceList.add(Route.getInstance()); ///
+                    for (FlightBase f : Route.flightList) {
                         interfaceList.add(f); /// check if any of them need to be closed
                     }
-                }
                 interfaceList.add(Session.getInstance()); ///start communication service
                 //FontLog.appendLog(TAG + interfaceList, 'd');
                 break;
@@ -179,7 +179,7 @@ public interface EventBus {
                 interfaceList.add(Session.getInstance());
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
-                interfaceList.add(Route.activeRoute.activeFlight);
+                interfaceList.add(Route.activeFlight);
                 break;
             case SQL_ONCLEARCACHE_COMPLETED:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);

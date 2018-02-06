@@ -23,12 +23,7 @@ public class Route extends RouteBase implements EventBus{
     int _legCount = 0;
 
     public Route() {
-        routeList.add(activeRoute = this);
-        //activeRoute = this;
-    }
-
-    public static Boolean isRouteExist() {
-        return activeRoute != null;
+        activeRoute = this;
     }
 
     void set_rAction(RACTION request) {
@@ -38,15 +33,7 @@ public class Route extends RouteBase implements EventBus{
                 flightList.add(new Flight(this));
                 break;
             case SWITCH_TO_PENDING:
-//                if (!SvcLocationClock.isInstanceCreated())
-//                    ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
-                //set_ActiveFlightID(flightList.get(flightList.size() - 1));
-                //setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-                //activeFlight.set_fAction(FACTION.CHANGE_IN_PENDING);
-                ////break;
-//            case ON_FLIGHTTIME_CHANGED:
-//                setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GREEN);
-//                break;
+                break;
             case RESTART_NEW_FLIGHT:
                 //activeFlight.set_fAction(FACTION.CHANGE_IN_WAIT_TO_CLOSEFLIGHT);
                 if (Props.SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
@@ -56,10 +43,6 @@ public class Route extends RouteBase implements EventBus{
                     ////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
                 } else {
                     EventBus.distribute(new EventMessage(EVENT.ROUTE_ONRESTART).setEventMessageValueBool(false));
-                    ////SvcLocationClock.stopLocationUpdates();
-                    /////setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
-                    //SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
-
                 }
                 break;
 //            case SET_FLIGHT_PASIVE_TIMER_CLOCKONLY:
@@ -85,27 +68,27 @@ public class Route extends RouteBase implements EventBus{
 //                    setTrackingButtonState(BUTTONREQUEST.BUTTON_STATE_RED);
 //                    //activeRoute =null;
                 break;
-            case REMOVE_FLIGHT_IF_CLOSED:
-                /// to avoid ConcurrentModificationException making copy of the flightList
-                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
-                for(Route r:new ArrayList<>(routeList)) {
-                    for (FlightBase f : new ArrayList<>(r.flightList)) {
-                        FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
-                        if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
-                            //if (activeFlight == f) activeFlight = null;
-                            FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
-                            flightList.remove(f);
-                        }
-                        if (flightList.isEmpty()) {
-                            //if (activeRoute == this) activeRoute = null;
-                            FontLog.appendLog(TAG + "reaction:" + request+":r:"+routeNumber, 'd');
-                            routeList.remove(this);
-                        }
-                    }
-                }
-                if(routeList.isEmpty()) EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
-                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size after: " + flightList.size(), 'd');
-                break;
+//            case REMOVE_FLIGHT_IF_CLOSED:
+//                /// to avoid ConcurrentModificationException making copy of the flightList
+//                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
+//                for(Route r:new ArrayList<>(routeList)) {
+//                    for (FlightBase f : new ArrayList<>(r.flightList)) {
+//                        FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
+//                        if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
+//                            //if (activeFlight == f) activeFlight = null;
+//                            FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
+//                            flightList.remove(f);
+//                        }
+//                        if (flightList.isEmpty()) {
+//                            //if (activeRoute == this) activeRoute = null;
+//                            FontLog.appendLog(TAG + "reaction:" + request+":r:"+routeNumber, 'd');
+//                            routeList.remove(this);
+//                        }
+//                    }
+//                }
+//                if(routeList.isEmpty()) EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
+//                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size after: " + flightList.size(), 'd');
+//                break;
 //            case CHECK_IFANYFLIGHT_NEED_CLOSE:
 //                //FontLog.appendLog(TAG + "ROUTE.CHECK_IFANYFLIGHT_NEED_CLOSE", 'd');
 //                if (Util.isNetworkAvailable()) {
@@ -137,56 +120,26 @@ public class Route extends RouteBase implements EventBus{
 ////        if (!(SvcLocationClock.instanceSvcLocationClock == null))
 ////            SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_ONLY);
 //    }
-    public static Flight get_FlightInstanceByNumber(String flightNumber){
-        for (Route r : Route.routeList) {
-            for (Flight f : r.flightList) {
-                if (f.flightNumber.equals(flightNumber)) {
-                    return f;
-                }
-            }
-        }
-        return Route.activeRoute.activeFlight;
-    }
-    void setToNull(){
-        for(Route r:new ArrayList<>(routeList)) {
-            for (Flight f : new ArrayList<>(r.flightList)) {
-                flightList.remove(f);
-                if (flightList.isEmpty()) routeList.remove(r);
-            }
-        }
-        activeFlight = null;
-        activeRoute = null;
-    }
 @Override
 public void eventReceiver(EventMessage eventMessage){
     EVENT ev = eventMessage.event;
     FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev, 'd');
             switch(ev){
             case MACT_BIGBUTTON_ONCLICK_START:
-                //routeList.add(new Route());
-//                routeList.add(this);
-//                activeRoute = this;
                 set_rAction(RACTION.OPEN_NEW_FLIGHT);
-                break;
-//            case MACT_BIGBUTTON_ONCLICK_STOP:
-//                activeRoute.set_rAction(RACTION.SET_FLIGHT_PASIVE);
-//                break;
-            case FLIGHT_GETNEWFLIGHT_COMPLETED:
-                if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
-                //if(eventMessage.eventMessageValueBool) set_ActiveFlightID(flightList.get(flightList.size() - 1)); //TODO flight number is passed in the message - get flight from the number
-                break;
-            case CLOCK_ONTICK:
-                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
             case FLIGHT_ONSPEEDLOW:
                 set_rAction(RACTION.RESTART_NEW_FLIGHT);
                 break;
-            case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+            case SVCCOMM_ONSUCCESS_COMMAND:
+                //TODO -  see EventBus
                 break;
-            case CLOCK_SERVICESELFSTOPPED:
-                setToNull();
-                break;
+//            case FLIGHT_CLOSEFLIGHT_COMPLETED:
+//                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+//                break;
+//            case CLOCK_SERVICESELFSTOPPED:
+//                setToNull();
+//                break;
 
         }
     }

@@ -42,7 +42,7 @@ public class Session implements EventBus{
         CLOSE_FLIGHTS
     }
 
-    private static Session sessionInstance = null;
+    static Session sessionInstance = null;
     static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
     EVENT ev;
     EventMessage eventMessage;

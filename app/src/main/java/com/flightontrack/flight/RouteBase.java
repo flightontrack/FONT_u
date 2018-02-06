@@ -23,56 +23,80 @@ public class RouteBase implements EventBus{
         REMOVE_FLIGHT_IF_CLOSED,
     }
 
-    private final String TAG = "RouteBase:";
+    final String TAG = "RouteBase:";
+    //public static ArrayList<Route> routeList = new ArrayList<>();
+    static String routeNumber=ROUTE_NUMBER_DEFAULT;
+    static RouteBase routeBaseInstance = null;
     public static Route activeRoute;
-    public static ArrayList<Route> routeList = new ArrayList<>();
-    String routeNumber=ROUTE_NUMBER_DEFAULT;
-
     public static Flight activeFlight;
     public static ArrayList<FlightBase> flightList = new ArrayList<>();
 
-    public RouteBase() {
+    public static RouteBase getInstance() {
+        if(routeBaseInstance == null) {
+            routeBaseInstance = new RouteBase();
+        }
+        return routeBaseInstance;
     }
 
      public static FlightBase get_FlightInstanceByNumber(String flightNumber){
-        for (RouteBase r : RouteBase.routeList) {
-            for (FlightBase f : r.flightList) {
+        //for (RouteBase r : RouteBase.routeList) {
+            for (FlightBase f : flightList) {
                 if (f.flightNumber.equals(flightNumber)) {
                     return f;
                 }
             }
-        }
+        //}
         return RouteBase.activeRoute.activeFlight;
     }
     void setToNull(){
-        for(RouteBase r:new ArrayList<>(routeList)) {
-            for (FlightBase f : new ArrayList<>(r.flightList)) {
+            for (FlightBase f : new ArrayList<>(flightList)) {
                 flightList.remove(f);
-                if (flightList.isEmpty()) routeList.remove(r);
             }
-        }
         activeFlight = null;
         activeRoute = null;
+    }
+    void set_rAction(RACTION request) {
+        //FontLog.appendLog(TAG + "reaction:" + request, 'd');
+        switch (request) {
+            case REMOVE_FLIGHT_IF_CLOSED:
+                /// to avoid ConcurrentModificationException making copy of the flightList
+                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
+                    for (FlightBase f : new ArrayList<>(flightList)) {
+                        FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
+                        if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
+                            //if (activeFlight == f) activeFlight = null;
+                            FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
+                            flightList.remove(f);
+                        }
+                        if (flightList.isEmpty()) {
+                            //if (activeRoute == this) activeRoute = null;
+                            FontLog.appendLog(TAG + "reaction:" + request+":r:"+routeNumber, 'd');
+                            RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
+                            RouteBase.activeFlight = null;
+                            RouteBase.activeRoute = null;
+                            EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
+                        }
+                    }
+                break;
+        }
     }
 @Override
 public void eventReceiver(EventMessage eventMessage){
     EVENT ev = eventMessage.event;
     FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev, 'd');
-            switch(ev){
-            case MACT_BIGBUTTON_ONCLICK_START:
-                break;
+    switch(ev){
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
                 break;
             case CLOCK_ONTICK:
-                break;
-            case FLIGHT_ONSPEEDLOW:
+                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
+                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
             case CLOCK_SERVICESELFSTOPPED:
+                setToNull();
                 break;
-
         }
     }
 }
