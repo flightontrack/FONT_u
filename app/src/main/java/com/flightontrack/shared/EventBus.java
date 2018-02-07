@@ -185,7 +185,8 @@ public interface EventBus {
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
             case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
-                interfaceList.add(Session.getInstance());
+                interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist or update existing flight
+                interfaceList.add(Session.getInstance());   /// start send locaions
                 break;
             case FLIGHT_ONSENDCACHECOMPLETED:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);

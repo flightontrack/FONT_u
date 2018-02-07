@@ -32,7 +32,7 @@ import static com.flightontrack.shared.Props.mainactivityInstance;
 
 public class FlightBase implements EventBus{
     static final String TAG = "FlightBase:";
-    public static enum FACTION {
+    public enum FACTION {
         DEFAULT_REQUEST,
         REQUEST_FLIGHT,
         CHANGE_IN_PENDING,
@@ -44,20 +44,28 @@ public class FlightBase implements EventBus{
         CLOSED,
         REQUEST_FLIGHTNUMBER
     }
+    public enum FSTATE {
+        DEFAULT,
+        READY_TOSENDLOCATIONS,
+        READY_TOBECLOSED,
+        CLOSED
+    }
 
     public String flightNumber;
     public String tempFlightNumber;
-    public boolean isGetFlightNumber = true;
+    public FSTATE flightState = FSTATE.DEFAULT;
+    //public boolean isGetFlightNumber = true;
     public boolean isThisToClose = true;
     FACTION lastAction = FACTION.DEFAULT_REQUEST;
 
     boolean isLimitReached  = false;
-    boolean isGetFlightCallSuccess = false;
+    //boolean isGetFlightCallSuccess = false;
 
     public FlightBase(){}
 
     FlightBase(String fn) {
         tempFlightNumber = fn;
+        flightNumber = fn; /// this need for the flights that does not need to getFlight()
     }
 
     void getOfflineFlightID() {
@@ -100,6 +108,7 @@ public class FlightBase implements EventBus{
                         if (response.responseFlightNum != null) {
                             {
                                 flightNumber = response.responseFlightNum;
+                                flightState = FSTATE.READY_TOSENDLOCATIONS;
                                 isGetFlightCallSuccess = true;
                                 //replaceFlightNumber(response.responseFlightNum);
                                 replaceFlightNumber();

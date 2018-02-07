@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
+import static com.flightontrack.flight.RouteBase.flightList;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -142,6 +143,14 @@ public class Session implements EventBus{
         }
         return fr;
     }
+
+    static void delay(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+    }
     void set_sAction(SACTION request) {
         FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
@@ -169,14 +178,14 @@ public class Session implements EventBus{
                         String flNum = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
                         if (!Route.routeList.isEmpty()) {
                             for (Route r : Route.routeList) {
-                                for (Flight f : r.flightList) {
+                                for (Flight f : flightList) {
                                     if (f.flightNumber.equals(flNum)) {
                                         flightToClose.add(f);
                                     }
                                 }
                             }
                         }
-                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);
+                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);  ///// todo sometning wrong
                     }
                 }
                 finally {
@@ -194,11 +203,31 @@ public class Session implements EventBus{
                     if (f.getLocationFlightCount() == 0){
                         FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
                         f.getCloseFlight();
-                        flightToClose.remove(f);
+                        flightToClose.remove(f); ///todo if failed
                     }
                 }
                 break;
             case START_COMMUNICATION:
+                Cursor flightsReadySend1 = sqlHelper.getCursorReadyToSendFlights();
+                ArrayList<String> storedFlights=null;
+                try {
+                    while (flightsReadySend1.moveToNext()) {
+                        //for (int i = 0; i <flightsReadySend.getCount(); i++) {
+                        String flNum = flightsReadySend1.getString(flightsReadySend1.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                        storedFlights.add(flNum);
+                                for (FlightBase f : flightList) {
+                                    if (storedFlights.contains(f.flightNumber)) continue;
+
+                                }
+                        }
+                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);  ///// todo sometning wrong
+
+                }
+                finally {
+                    flightsReadySend.close();
+                    sqlHelper.dbw.close();
+                }
+
                 if (dbLocationRecCountNormal > 0) {
                     if (Util.isNetworkAvailable()) {
                         startLocationCommService();
@@ -225,13 +254,7 @@ public class Session implements EventBus{
                 break;
         }
     }
-    static void delay(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-    }
+
     @Override
     public void eventReceiver(EventMessage eventMessage){
         //Array eventReaction[EVENT];
@@ -258,7 +281,8 @@ public class Session implements EventBus{
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
             case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
-                flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
+                //flightList.add((FlightBase) eventMessage.eventMessageValueObject);
+                //flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
             case SVCCOMM_ONDESTROY:

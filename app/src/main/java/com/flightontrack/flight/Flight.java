@@ -82,60 +82,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         set_fAction(FACTION.REQUEST_FLIGHT);
     }
 
-    void set_fAction(FACTION request) {
-        FontLog.appendLog(TAG + flightNumber+":fACTION :" + request, 'd');
-        lastAction = request;
-//        switch (fStatus) {
-//            case ACTIVE:
-                switch (request) {
-                    case CHANGE_IN_PENDING:
-                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
-                                .setEventMessageValueBool(isGetFlightCallSuccess)
-                                .setEventMessageValueString(flightNumber));
-                        break;
-                    case TERMINATE_GETFLIGHTNUM:
-                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
-                        break;
-                    case CHANGE_IN_FLIGHT:
-                        /// reset Timer 1 to slower rate
-                        _flightStartTimeGMT = getTimeGMT();
-                        SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
-                        //route.set_rAction(RACTION.ON_FLIGHTTIME_CHANGED);
-                        break;
-                    case TERMINATE_FLIGHT:
-                        //TODO
-//                        Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
-//                        //fStatus = FSTATUS.PASSIVE;
-//                        lastAction = request;
-//                        //sqlHelper.flightLocationsDelete(flightNumber);
-//                        //SessionProp.set_isMultileg(false);
-//                        //route.set_rAction(RACTION.RESTART_NEW_FLIGHT);
-                        break;
-                    case REQUEST_FLIGHTNUMBER:
-                        /// request flight number if the flight on temp number
-                        if (isGetFlightNumber) getNewFlightID();
-                        break;
-                    case REQUEST_FLIGHT:
 
-                        getNewFlightID();
-                        break;
-//                    case CHANGE_IN_PENDING:
-//                        //fStatus = FSTATUS.ACTIVE;
-//                        //lastAction = request;
-////                        if (SvcLocationClock.isInstanceCreated()) {
-////                            SvcLocationClock.instanceSvcLocationClock.set_mode(MODE.CLOCK_LOCATION);
-////                        }
-//                        break;
-                    case CLOSE_FLIGHT_IF_ZERO_LOCATIONS:
-                        if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
-                            getCloseFlight();
-                        }
-                        break;
-                    case CLOSED:
-                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
-                        break;
-                }
-    }
 
     void set_wayPointsCount(int pointsCount) {
         _wayPointsCount = pointsCount;
@@ -216,6 +163,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                         if (response.responseFlightNum != null) {
                             if (flightNumber == FLIGHT_NUMBER_DEFAULT) {
                                 flightNumber = response.responseFlightNum;
+                                flightState = FSTATE.READY_TOSENDLOCATIONS;
                                 isGetFlightCallSuccess = true;
                                 route._legCount++;
                             } else {
@@ -379,7 +327,55 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         return SessionProp.pSpinnerMinSpeed * (Route.activeRoute.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT ? 0.75 : 1.0);
     }
 
-
+    void set_fAction(FACTION request) {
+        FontLog.appendLog(TAG + flightNumber+":fACTION :" + request, 'd');
+        lastAction = request;
+//        switch (fStatus) {
+//            case ACTIVE:
+        switch (request) {
+            case CHANGE_IN_PENDING:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
+                        .setEventMessageValueBool(isGetFlightCallSuccess)
+                        .setEventMessageValueString(flightNumber));
+                break;
+            case TERMINATE_GETFLIGHTNUM:
+                flightState = FSTATE.CLOSED;
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+                break;
+            case CHANGE_IN_FLIGHT:
+                /// reset Timer 1 to slower rate
+                _flightStartTimeGMT = getTimeGMT();
+                SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
+                //route.set_rAction(RACTION.ON_FLIGHTTIME_CHANGED);
+                break;
+            case TERMINATE_FLIGHT:
+                //TODO
+//                        Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
+//                        //fStatus = FSTATUS.PASSIVE;
+//                        lastAction = request;
+//                        //sqlHelper.flightLocationsDelete(flightNumber);
+//                        //SessionProp.set_isMultileg(false);
+//                        //route.set_rAction(RACTION.RESTART_NEW_FLIGHT);
+                break;
+            case REQUEST_FLIGHTNUMBER:
+                /// request flight number if the flight on temp number
+                if (isGetFlightNumber) getNewFlightID();
+                break;
+            case REQUEST_FLIGHT:
+                getNewFlightID();
+                break;
+            case CLOSE_FLIGHT_IF_ZERO_LOCATIONS:
+                if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
+                    flightState = FSTATE.READY_TOBECLOSED;
+                    getCloseFlight();
+                }
+                break;
+            case CLOSED:
+                flightState = FSTATE.CLOSED;
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+                break;
+        }
+    }
     @Override
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
@@ -426,6 +422,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
                 flightNumber=eventMessage.eventMessageValueString;
+                tempFlightNumber=flightNumber;
                 isGetFlightCallSuccess=true;
                 isTempFlightNum =true;
                 route._legCount++;

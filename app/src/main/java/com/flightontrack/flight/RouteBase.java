@@ -21,6 +21,7 @@ public class RouteBase implements EventBus{
         RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER,
         RESTART_NEW_FLIGHT,
         REMOVE_FLIGHT_IF_CLOSED,
+        ADD_OR_UPDATE_FLIGHT
     }
 
     final String TAG = "RouteBase:";
@@ -30,6 +31,8 @@ public class RouteBase implements EventBus{
     public static Route activeRoute;
     public static Flight activeFlight;
     public static ArrayList<FlightBase> flightList = new ArrayList<>();
+    EventMessage eventMessage;
+    EVENT ev;
 
     public static RouteBase getInstance() {
         if(routeBaseInstance == null) {
@@ -63,7 +66,7 @@ public class RouteBase implements EventBus{
                 //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
                     for (FlightBase f : new ArrayList<>(flightList)) {
                         FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
-                        if (f.lastAction == FACTION.CLOSED || f.lastAction == FACTION.TERMINATE_GETFLIGHTNUM) {
+                        if (f.flightState == FlightBase.FSTATE.CLOSED) {
                             //if (activeFlight == f) activeFlight = null;
                             FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
                             flightList.remove(f);
@@ -78,11 +81,21 @@ public class RouteBase implements EventBus{
                         }
                     }
                 break;
+            case ADD_OR_UPDATE_FLIGHT:
+                for (FlightBase f: flightList){
+                    if(f.tempFlightNumber == ((FlightBase) eventMessage.eventMessageValueObject).tempFlightNumber){
+                        f.flightNumber = eventMessage.eventMessageValueString;
+                        eventMessage=null; /// kill temp flight
+                    }
+                    else flightList.add((FlightBase) eventMessage.eventMessageValueObject);
+                }
+                break;
         }
     }
 @Override
 public void eventReceiver(EventMessage eventMessage){
-    EVENT ev = eventMessage.event;
+    ev = eventMessage.event;
+    this.eventMessage = eventMessage;
     FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev, 'd');
     switch(ev){
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
@@ -91,8 +104,12 @@ public void eventReceiver(EventMessage eventMessage){
             case CLOCK_ONTICK:
                 set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
+            case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+                set_rAction(RACTION.ADD_OR_UPDATE_FLIGHT);
+                break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
                 set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+
                 break;
             case CLOCK_SERVICESELFSTOPPED:
                 setToNull();
