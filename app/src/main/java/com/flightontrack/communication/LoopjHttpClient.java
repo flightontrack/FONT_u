@@ -3,6 +3,13 @@ package com.flightontrack.communication;
 import com.loopj.android.http.*;
 
 public class LoopjHttpClient {
+
+//    LoopjAHttpClient(int maxRetries,int retriestimeOut){
+//        AsyncHttpClient client = new AsyncHttpClient();
+//        client.setMaxRetriesAndTimeout(maxRetries,retriestimeOut);
+//        return client;
+//    }
+
     private static AsyncHttpClient client = new AsyncHttpClient();
     public static int timeOut = 20000;
     public static int retriestimeOut = 3000;

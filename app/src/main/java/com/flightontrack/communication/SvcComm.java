@@ -7,7 +7,9 @@ import android.os.IBinder;
 
 import com.flightontrack.flight.Flight;
 import com.flightontrack.R;
+import com.flightontrack.flight.FlightBase;
 import com.flightontrack.flight.Route;
+import com.flightontrack.flight.RouteBase;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -122,7 +124,7 @@ public class SvcComm extends Service{
                             return;
                         }
                         try {
-                            Flight flight = Route.get_FlightInstanceByNumber(response.responseFlightNum);
+                            //FlightBase flight = RouteBase.get_FlightInstanceByNumber(response.responseFlightNum);
 
                             if (response.responseAckn != null) {
                                 FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');

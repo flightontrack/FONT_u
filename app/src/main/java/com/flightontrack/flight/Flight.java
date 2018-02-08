@@ -36,21 +36,9 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class Flight extends FlightBase implements GetTime,EventBus {
-//    public static enum FACTION {
-//        DEFAULT_REQUEST,
-//        REQUEST_FLIGHT,
-//        CHANGE_IN_PENDING,
-//        CHANGE_IN_FLIGHT,
-//        //CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
-//        TERMINATE_GETFLIGHTNUM,
-//        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
-//        TERMINATE_FLIGHT,
-//        CLOSED,
-//        REQUEST_FLIGHTNUMBER
-//    }
-    //public static final String FLIGHT_NUMBER_DEFAULT = "00";
-    private static final String TAG = "Flight:";
-    public String flightNumber;
+
+    static final String TAG = "Flight:";
+    //public String flightNumber;
     public boolean isGetFlightNumber = true;
     //public FSTATUS fStatus = FSTATUS.PASSIVE;
     FACTION lastAction = FACTION.DEFAULT_REQUEST;
@@ -105,6 +93,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         // FontLog.appendLog(TAG + "set_speedCurrent: " + _speedCurrent, 'd');
     }
 
+
     boolean isDoubleSpeedAboveMin() {
         cutoffSpeed = get_cutoffSpeed();
         boolean isCurrSpeedAboveMin = (_speedCurrent >= cutoffSpeed);
@@ -147,7 +136,9 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         if (route.routeNumber != ROUTE_NUMBER_DEFAULT) requestParams.put("routeid", route.routeNumber);
         isGetFlightNumber = false;
 //        requestParams.setUseJsonStreamer(true);
-        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.setMaxRetriesAndTimeout(2,2000);
+        client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         FontLog.appendLog(TAG + "getNewFlightID OnSuccess", 'd');
@@ -162,8 +153,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                         }
                         if (response.responseFlightNum != null) {
                             if (flightNumber == FLIGHT_NUMBER_DEFAULT) {
-                                flightNumber = response.responseFlightNum;
-                                flightState = FSTATE.READY_TOSENDLOCATIONS;
+                                set_flightNumber(response.responseFlightNum);
                                 isGetFlightCallSuccess = true;
                                 route._legCount++;
                             } else {
@@ -371,8 +361,9 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 }
                 break;
             case CLOSED:
-                flightState = FSTATE.CLOSED;
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+                set_flightState(FSTATE.CLOSED);
+                //flightState = FSTATE.CLOSED;
+                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
                 break;
         }
     }
@@ -422,7 +413,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
                 flightNumber=eventMessage.eventMessageValueString;
-                tempFlightNumber=flightNumber;
+                flightNumberTemp =flightNumber;
                 isGetFlightCallSuccess=true;
                 isTempFlightNum =true;
                 route._legCount++;

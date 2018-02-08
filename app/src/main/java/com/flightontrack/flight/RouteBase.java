@@ -1,16 +1,11 @@
 package com.flightontrack.flight;
 
-import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
-import com.flightontrack.shared.Props;
 
 import java.util.ArrayList;
 
-import static com.flightontrack.flight.Flight.FACTION;
-import static com.flightontrack.shared.Const.LEG_COUNT_HARD_LIMIT;
-import static com.flightontrack.shared.Const.MODE;
 import static com.flightontrack.shared.Const.ROUTE_NUMBER_DEFAULT;
 
 public class RouteBase implements EventBus{
@@ -62,18 +57,18 @@ public class RouteBase implements EventBus{
         //FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
             case REMOVE_FLIGHT_IF_CLOSED:
-                /// to avoid ConcurrentModificationException making copy of the flightList
                 //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
                     for (FlightBase f : new ArrayList<>(flightList)) {
                         FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
                         if (f.flightState == FlightBase.FSTATE.CLOSED) {
                             //if (activeFlight == f) activeFlight = null;
                             FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
+                            if (f==activeFlight) activeFlight =null;
                             flightList.remove(f);
                         }
                         if (flightList.isEmpty()) {
                             //if (activeRoute == this) activeRoute = null;
-                            FontLog.appendLog(TAG + "reaction:" + request+":r:"+routeNumber, 'd');
+                            FontLog.appendLog(TAG + "flightList.isEmpty()"+":r:"+routeNumber, 'd');
                             RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
                             RouteBase.activeFlight = null;
                             RouteBase.activeRoute = null;
@@ -82,14 +77,18 @@ public class RouteBase implements EventBus{
                     }
                 break;
             case ADD_OR_UPDATE_FLIGHT:
-                for (FlightBase f: flightList){
-                    if(f.tempFlightNumber == ((FlightBase) eventMessage.eventMessageValueObject).tempFlightNumber){
-                        f.flightNumber = eventMessage.eventMessageValueString;
-                        eventMessage=null; /// kill temp flight
+                FlightBase fb = (FlightBase) eventMessage.eventMessageValueObject;
+                if (flightList.contains(fb)) break;
+                else {
+                    for (FlightBase f : new ArrayList<> (flightList)) {
+                        if (f.flightNumberTemp == fb.flightNumberTemp) {
+                            f.set_flightNumber(eventMessage.eventMessageValueString);
+                            eventMessage = null; /// kill temp flight
+                        }
+                        else flightList.add((FlightBase) eventMessage.eventMessageValueObject);
                     }
-                    else flightList.add((FlightBase) eventMessage.eventMessageValueObject);
+                    break;
                 }
-                break;
         }
     }
 @Override
@@ -104,7 +103,7 @@ public void eventReceiver(EventMessage eventMessage){
             case CLOCK_ONTICK:
                 set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                 break;
-            case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+            case FLIGHT_STATECHANGEDTO_READYTOSEND:
                 set_rAction(RACTION.ADD_OR_UPDATE_FLIGHT);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:

@@ -1,7 +1,5 @@
 package com.flightontrack.flight;
 
-import android.view.Gravity;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.R;
@@ -21,7 +19,6 @@ import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
 
 import static com.flightontrack.shared.Const.REQUEST_STOP_FLIGHT;
-import static com.flightontrack.shared.Const.ROUTE_NUMBER_DEFAULT;
 import static com.flightontrack.shared.Props.SessionProp.sqlHelper;
 import static com.flightontrack.shared.Props.ctxApp;
 import static com.flightontrack.shared.Props.mainactivityInstance;
@@ -52,10 +49,10 @@ public class FlightBase implements EventBus{
     }
 
     public String flightNumber;
-    public String tempFlightNumber;
+    public String flightNumberTemp;
     public FSTATE flightState = FSTATE.DEFAULT;
     //public boolean isGetFlightNumber = true;
-    public boolean isThisToClose = true;
+    //public boolean isThisToClose = true;
     FACTION lastAction = FACTION.DEFAULT_REQUEST;
 
     boolean isLimitReached  = false;
@@ -64,13 +61,32 @@ public class FlightBase implements EventBus{
     public FlightBase(){}
 
     FlightBase(String fn) {
-        tempFlightNumber = fn;
+        flightNumberTemp = fn;
         flightNumber = fn; /// this need for the flights that does not need to getFlight()
     }
-
+    public void set_flightNumber(String fn){
+        /// this setter is for real flight number only replacement
+        flightNumber = fn;
+        replaceFlightNumber();
+        set_flightState(FSTATE.READY_TOSENDLOCATIONS);
+    }
+    public void set_flightState(FSTATE fs){
+        flightState = fs;
+        switch(fs){
+            case READY_TOSENDLOCATIONS:
+            EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
+                    .setEventMessageValueString(flightNumber)
+                    .setEventMessageValueObject(this));
+                break;
+            case READY_TOBECLOSED:
+                getCloseFlight();
+            case CLOSED:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+        }
+    }
     void getOfflineFlightID() {
 
-        FontLog.appendLog(TAG + "getNewOfflineFlightID for temp flight " +tempFlightNumber, 'd');
+        FontLog.appendLog(TAG + "getNewOfflineFlightID for temp flight " + flightNumberTemp, 'd');
         //EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
 
@@ -90,9 +106,11 @@ public class FlightBase implements EventBus{
         requestParams.put("speed_thresh", String.valueOf(speed_thresh));
         requestParams.put("isdebug", Props.SessionProp.pIsDebug);
         //requestParams.put("routeid", ROUTE_NUMBER_DEFAULT);
-        isGetFlightNumber = false;
+        //isGetFlightNumber = false;
 
-        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.setMaxRetriesAndTimeout(1,1000);
+        client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         FontLog.appendLog(TAG + "getNewFlightID OnSuccess", 'd');
@@ -107,11 +125,8 @@ public class FlightBase implements EventBus{
                         }
                         if (response.responseFlightNum != null) {
                             {
-                                flightNumber = response.responseFlightNum;
-                                flightState = FSTATE.READY_TOSENDLOCATIONS;
-                                isGetFlightCallSuccess = true;
-                                //replaceFlightNumber(response.responseFlightNum);
-                                replaceFlightNumber();
+                                //replaceFlightNumber();
+                                set_flightNumber(response.responseFlightNum);
                             }
                         }
                     }
@@ -177,11 +192,9 @@ public class FlightBase implements EventBus{
     }
 
     void replaceFlightNumber() {
-        if (sqlHelper.updateTempFlightNum(tempFlightNumber, flightNumber) > 0) {
-            FontLog.appendLog(TAG + "replaceFlightNumber: " + tempFlightNumber+":"+flightNumber, 'd');
-            EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_OFFLINE_DBUPDATE_COMPLETED)
-                    .setEventMessageValueString(flightNumber)
-                    .setEventMessageValueObject(this));
+        if (sqlHelper.updateTempFlightNum(flightNumberTemp, flightNumber) > 0) {
+            FontLog.appendLog(TAG + "replaceFlightNumber: " + flightNumberTemp +":"+flightNumber, 'd');
+
         }
     }
 

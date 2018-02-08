@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
+import static com.flightontrack.flight.RouteBase.activeFlight;
 import static com.flightontrack.flight.RouteBase.flightList;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
@@ -36,7 +37,7 @@ public class Session implements EventBus{
     public enum SACTION {
         //SEND_STORED_LOCATIONS,
         SEND_CACHED_LOCATIONS,
-        START_COMMUNICATION,
+        //START_COMMUNICATION,
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
         GET_OFFLINE_FLIGHTS,
@@ -70,7 +71,7 @@ public class Session implements EventBus{
 //        eventReaction.put(ALERT_STOPAPP:
 //        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
 //        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
-//        eventReaction.put(FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+//        eventReaction.put(FLIGHT_STATECHANGEDTO_READYTOSEND:
 //
 //        flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
 //        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
@@ -130,7 +131,7 @@ public class Session implements EventBus{
             delay(2000);
             counter++;
             //Toast.makeText(mainactivityInstance, R.string.toast_cachesending, Toast.LENGTH_SHORT).show();
-            set_sAction(SACTION.START_COMMUNICATION);
+            set_sAction(SACTION.SEND_CACHED_LOCATIONS);
         }
 
     }
@@ -169,66 +170,45 @@ public class Session implements EventBus{
 //                //TODO
 //                //sendStoredLocations();
 //                break;
-            case SEND_CACHED_LOCATIONS:
-                Cursor flightsReadySend = sqlHelper.getCursorReadyToSendFlights();
-                //flightsReadySend.moveToFirst();
-                try {
-                    while (flightsReadySend.moveToNext()) {
-                        //for (int i = 0; i <flightsReadySend.getCount(); i++) {
-                        String flNum = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-                        if (!Route.routeList.isEmpty()) {
-                            for (Route r : Route.routeList) {
-                                for (Flight f : flightList) {
-                                    if (f.flightNumber.equals(flNum)) {
-                                        flightToClose.add(f);
-                                    }
-                                }
-                            }
-                        }
-                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);  ///// todo sometning wrong
-                    }
-                }
-                finally {
-                    flightsReadySend.close();
-                    sqlHelper.dbw.close();
-                }
-                SvcComm.commBatchSize= dbLocationRecCountNormal;
-                set_sAction(SACTION.START_COMMUNICATION);
-                //sendStoredLocations();
-                break;
+//            case SEND_CACHED_LOCATIONS:
+////                Cursor flightsReadySend = sqlHelper.getCursorReadyToSendFlights();
+////                //flightsReadySend.moveToFirst();
+////                try {
+////                    while (flightsReadySend.moveToNext()) {
+////                        //for (int i = 0; i <flightsReadySend.getCount(); i++) {
+////                        String flNum = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+////                        if (!Route.routeList.isEmpty()) {
+////                            for (Route r : Route.routeList) {
+////                                for (Flight f : flightList) {
+////                                    if (f.flightNumber.equals(flNum)) {
+////                                        flightToClose.add(f);
+////                                    }
+////                                }
+////                            }
+////                        }
+////                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);  ///// todo sometning wrong
+////                    }
+////                }
+////                finally {
+////                    flightsReadySend.close();
+////                    sqlHelper.dbw.close();
+////                }
+//                SvcComm.commBatchSize= dbLocationRecCountNormal;
+//                set_sAction(SACTION.START_COMMUNICATION);
+//                //sendStoredLocations();
+//                break;
             case CLOSE_FLIGHTS:
                 FontLog.appendLog(TAG + " flightToClose size: " + flightToClose.size(), 'd');
-                for(FlightBase f: new ArrayList<>(flightToClose)) {
+                for(FlightBase f: flightList) {
+                    if (f==activeFlight) continue;
                     FontLog.appendLog(TAG + " flightToClose : getLocationFlightCount:" + f.getLocationFlightCount(), 'd');
                     if (f.getLocationFlightCount() == 0){
                         FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
-                        f.getCloseFlight();
-                        flightToClose.remove(f); ///todo if failed
+                        f.set_flightState(FlightBase.FSTATE.READY_TOBECLOSED);
                     }
                 }
                 break;
-            case START_COMMUNICATION:
-                Cursor flightsReadySend1 = sqlHelper.getCursorReadyToSendFlights();
-                ArrayList<String> storedFlights=null;
-                try {
-                    while (flightsReadySend1.moveToNext()) {
-                        //for (int i = 0; i <flightsReadySend.getCount(); i++) {
-                        String flNum = flightsReadySend1.getString(flightsReadySend1.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-                        storedFlights.add(flNum);
-                                for (FlightBase f : flightList) {
-                                    if (storedFlights.contains(f.flightNumber)) continue;
-
-                                }
-                        }
-                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);  ///// todo sometning wrong
-
-                }
-                finally {
-                    flightsReadySend.close();
-                    sqlHelper.dbw.close();
-                }
-
-                if (dbLocationRecCountNormal > 0) {
+            case SEND_CACHED_LOCATIONS:
                     if (Util.isNetworkAvailable()) {
                         startLocationCommService();
                     } else {
@@ -236,21 +216,32 @@ public class Session implements EventBus{
                         EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                         Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
                     }
-                }
                 break;
             case GET_OFFLINE_FLIGHTS:
-                Cursor flights = sqlHelper.getCursorTempFlights();
+                /// firsrt to check all temp flights in not ready to send state
+                Cursor flightsTemp = sqlHelper.getCursorTempFlights();
+                try {
+                    while (flightsTemp.moveToNext()) {
+                        FontLog.appendLog(TAG+"Get flight number for "+ flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid)),'d');
+                        new FlightBase(flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
+                    }
+                }
+                finally{
+                    flightsTemp.close();
+                    sqlHelper.dbw.close();
+                }
+                /// second to check ready to send flights which are for some reason not in flightList
+                Cursor flights = sqlHelper.getCursorReadyToSendFlights();
                 try {
                     while (flights.moveToNext()) {
                         FontLog.appendLog(TAG+"Get flight number for "+flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid)),'d');
-                        new FlightBase(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
+                        new FlightBase(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
                     }
                 }
                 finally{
                     flights.close();
                     sqlHelper.dbw.close();
                 }
-
                 break;
         }
     }
@@ -266,7 +257,7 @@ public class Session implements EventBus{
                 set_sAction(SACTION.CHECK_CACHE_FIRST);
                 break;
             case CLOCK_ONTICK:
-                set_sAction(SACTION.START_COMMUNICATION);
+                if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
                 break;
             case ALERT_SENTPOINTS:
@@ -278,9 +269,9 @@ public class Session implements EventBus{
                 break;
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
                 set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
-                set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+                if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
-            case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+            case FLIGHT_STATECHANGEDTO_READYTOSEND:
                 //flightList.add((FlightBase) eventMessage.eventMessageValueObject);
                 //flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);

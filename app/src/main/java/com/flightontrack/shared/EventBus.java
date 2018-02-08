@@ -1,6 +1,5 @@
 package com.flightontrack.shared;
 import com.flightontrack.activity.SimpleSettingsActivity;
-import com.flightontrack.flight.Flight;
 import com.flightontrack.flight.FlightBase;
 import com.flightontrack.flight.Route;
 import com.flightontrack.flight.RouteBase;
@@ -30,34 +29,33 @@ public interface EventBus {
         FLIGHT_ONSPEEDLOW,
         FLIGHT_ONPOINTSLIMITREACHED,
         FLIGHT_ONSENDCACHECOMPLETED,
+        FLIGHT_STATECHANGEDTO_READYTOSEND,
 
         CLOCK_SERVICESTARTED_MODELOCATION,
-
         CLOCK_SERVICESELFSTOPPED,
         CLOCK_ONTICK,
         CLOCK_MODECLOCK_ONLY,
-        PROP_CHANGED_MULTILEG,
 
+        PROP_CHANGED_MULTILEG,
         ROUTE_ONNEW,
         ROUTE_ONLEGLIMITREACHED,
         ROUTE_NOACTIVEROUTE,
-        ROUTE_ONRESTART,
 
+        ROUTE_ONRESTART,
         SVCCOMM_ONSUCCESS_NOTIF,
         SVCCOMM_ONSUCCESS_ACKN,
         SVCCOMM_ONSUCCESS_COMMAND,
+
         SVCCOMM_ONDESTROY,
-
         SETTINGACT_BUTTONCLEARCACHE_CLICKED,
+
         SETTINGACT_BUTTONSENDCACHE_CLICKED,
-
         ALERT_SENTPOINTS,
+
         ALERT_STOPAPP,
-
         SQL_TEMPFLIGHTNUM_ALLOCATED,
-        SQL_ONCLEARCACHE_COMPLETED,
 
-        FLIGHT_OFFLINE_DBUPDATE_COMPLETED
+        SQL_ONCLEARCACHE_COMPLETED
     }
     String TAG = "Bus:";
 
@@ -184,7 +182,7 @@ public interface EventBus {
             case SQL_ONCLEARCACHE_COMPLETED:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
-            case FLIGHT_OFFLINE_DBUPDATE_COMPLETED:
+            case FLIGHT_STATECHANGEDTO_READYTOSEND:
                 interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist or update existing flight
                 interfaceList.add(Session.getInstance());   /// start send locaions
                 break;
