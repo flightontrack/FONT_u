@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
     //public static Context ctxApp;
     static TextView txtUserName;
     public static TextView txtAcftNum ;
+    static TextView txtCached;
     public static Spinner spinnerUpdFreq;
     public static Spinner spinnerMinSpeed;
     public static CheckBox chBoxIsMultiLeg;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             spinnerUpdFreq = (Spinner) findViewById(R.id.spinnerId);
             spinnerMinSpeed = (Spinner) findViewById(R.id.spinnerMinSpeedId);
             trackingButton = (Button) findViewById(R.id.btnTracking);
+            txtCached= (TextView) findViewById((R.id.txtCached));
             //clearAll();
             AppConfig.get();
             AppConfig.pIsNFCcapable = AppConfig.pIsNFCEnabled &&isNFCcapable();
@@ -143,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             minSpeedSpinnerSetup();
             SessionProp.set_isMultileg(true);
             SessionProp.save();
+            txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         }
 //        catch (NullPointerException nullPointer){
 //            Util.appendLog(TAG + nullPointer.toString(), 'e');
@@ -621,7 +624,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
     public void eventReceiver(EventMessage eventMessage){
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + " eventReceiver : "+ev, 'd');
-
+        txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         switch(ev){
             case PROP_CHANGED_MULTILEG:
                 chBoxIsMultiLeg.setChecked(eventMessage.eventMessageValueBool);
@@ -632,13 +635,14 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             case SVCCOMM_ONSUCCESS_NOTIF:
                 Toast.makeText(mainactivityInstance,R.string.toast_server_error, Toast.LENGTH_LONG).show();
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+                break;
             case FLIGHT_FLIGHTTIME_STARTED:
             //swithch to green
-            break;
+                break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
-            if(eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-                else setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
-            break;
+                if(eventMessage.eventMessageValueBool)setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                    else setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+                break;
             case CLOCK_MODECLOCK_ONLY:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
                 break;
@@ -650,12 +654,12 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GREEN);
+                break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
                 /// swithch to red
                 break;
             case ROUTE_NOACTIVEROUTE:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
-
                 break;
         }
     }

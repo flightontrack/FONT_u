@@ -69,8 +69,8 @@ public interface EventBus {
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 interfaceList.add(Props.getInstance());
-                interfaceList.add(Route.activeRoute.activeFlight); // set the active flight to fail
-                interfaceList.add(Session.getInstance());
+                interfaceList.add(RouteBase.activeRoute.activeFlight); // close flight of set the pending flight to fail
+                //interfaceList.add(Session.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case PROP_CHANGED_MULTILEG:
@@ -95,11 +95,11 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                interfaceList.add(Route.getInstance()); //remove flight
+                interfaceList.add(RouteBase.getInstance()); //remove flight
                 break;
             case FLIGHT_ONSPEEDLOW:
                 if(!SessionProp.pIsMultileg) interfaceList.add(SvcLocationClock.getInstance());//TODO doing nothing
-                interfaceList.add(Route.activeRoute);
+                interfaceList.add(RouteBase.activeRoute);
                 break;
             case FLIGHT_ONPOINTSLIMITREACHED:
                 ///TODO
@@ -128,14 +128,14 @@ public interface EventBus {
                         interfaceList.add(SvcLocationClock.getInstance()); //swithch to clockonly
                         break;
                     case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
-                        interfaceList.add(Route.activeRoute); //initiate a new flight if multileg
+                        interfaceList.add(RouteBase.activeRoute); //initiate a new flight if multileg
                         break;
                     case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
-                        interfaceList.add(Route.activeRoute); //initiate a new flight if multileg
+                        interfaceList.add(RouteBase.activeRoute); //initiate a new flight if multileg
                         break;
                 }
             case SVCCOMM_ONDESTROY:
-                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 interfaceList.add(Session.getInstance());
                 break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
@@ -167,7 +167,7 @@ public interface EventBus {
                 //FontLog.appendLog(TAG + interfaceList, 'd');
                 break;
             case ALERT_SENTPOINTS:
-                interfaceList.add(Route.activeRoute);
+                interfaceList.add(RouteBase.activeRoute);
                 interfaceList.add(Session.getInstance());
                 break;
             case MACT_BACKBUTTON_ONCLICK:

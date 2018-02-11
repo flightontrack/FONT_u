@@ -37,14 +37,20 @@ public class RouteBase implements EventBus{
     }
 
      public static FlightBase get_FlightInstanceByNumber(String flightNumber){
-        //for (RouteBase r : RouteBase.routeList) {
-            for (FlightBase f : flightList) {
-                if (f.flightNumber.equals(flightNumber)) {
-                    return f;
-                }
+        for (FlightBase f : flightList) {
+            if (f.flightNumber.equals(flightNumber)) {
+                return f;
             }
-        //}
+        }
         return RouteBase.activeRoute.activeFlight;
+    }
+    public static boolean isFlightNumberInList(String flightNumber){
+        for (FlightBase f : flightList) {
+            if (f.flightNumber.equals(flightNumber)) {
+                return true;
+            }
+        }
+        return false;
     }
     void setToNull(){
             for (FlightBase f : new ArrayList<>(flightList)) {
@@ -57,9 +63,9 @@ public class RouteBase implements EventBus{
         //FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
             case REMOVE_FLIGHT_IF_CLOSED:
-                //FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size before: " + flightList.size(), 'd');
+                FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size : " + flightList.size(), 'd');
                     for (FlightBase f : new ArrayList<>(flightList)) {
-                        FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + f.lastAction, 'd');
+                        FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + request, 'd');
                         if (f.flightState == FlightBase.FSTATE.CLOSED) {
                             //if (activeFlight == f) activeFlight = null;
                             FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
@@ -101,14 +107,18 @@ public void eventReceiver(EventMessage eventMessage){
                 if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
                 break;
             case CLOCK_ONTICK:
-                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+                for (FlightBase f : flightList) {
+                    if (f.flightState == FlightBase.FSTATE.CLOSED) {
+                        set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+                        break;
+                    }
+                }
                 break;
             case FLIGHT_STATECHANGEDTO_READYTOSEND:
                 set_rAction(RACTION.ADD_OR_UPDATE_FLIGHT);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
                 set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
-
                 break;
             case CLOCK_SERVICESELFSTOPPED:
                 setToNull();

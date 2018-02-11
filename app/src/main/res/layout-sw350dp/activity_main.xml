@@ -137,8 +137,7 @@
                 android:text="@string/tracking_holdon"
                 />
         </LinearLayout>
-
-            <LinearLayout
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
@@ -175,7 +174,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginBottom="10dp"
                     android:orientation="horizontal"
                     >
@@ -219,6 +218,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginBottom="10dp"
                     >
 
                     <TextView
@@ -256,9 +256,33 @@
                 </LinearLayout>
                 </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:weightSum="10">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="5.43"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:text="@string/label_cachedpoints"
+                    android:id="@+id/txtCache"
+                    style="@style/label_label"
+                    />
+                <TextView
+                    android:id="@+id/txtCached"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    style="@style/label_text"
+                    />
+
 
             </LinearLayout>
-
+            </LinearLayout>
 
     </LinearLayout>
     <include layout="@layout/toolbar_bottom"/>

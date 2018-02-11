@@ -77,7 +77,7 @@ public class Session implements EventBus{
 //        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
-    static ArrayList<FlightBase> flightToClose = new ArrayList<>();
+    //static ArrayList<FlightBase> flightToClose = new ArrayList<>();
 
     static void startLocationCommService() {
 
@@ -135,15 +135,6 @@ public class Session implements EventBus{
         }
 
     }
-    public static FlightBase get_FlightInstanceByNumber(String flightNumber){
-        FlightBase fr=null;
-        for (FlightBase f : flightToClose) {
-                if (f.flightNumber.equals(flightNumber)) {
-                    fr= f;
-                }
-        }
-        return fr;
-    }
 
     static void delay(int millis) {
         try {
@@ -198,13 +189,15 @@ public class Session implements EventBus{
 //                //sendStoredLocations();
 //                break;
             case CLOSE_FLIGHTS:
-                FontLog.appendLog(TAG + " flightToClose size: " + flightToClose.size(), 'd');
                 for(FlightBase f: flightList) {
+                    FontLog.appendLog(TAG + " flightList size: " + flightList.size(), 'd');
                     if (f==activeFlight) continue;
-                    FontLog.appendLog(TAG + " flightToClose : getLocationFlightCount:" + f.getLocationFlightCount(), 'd');
+                    FontLog.appendLog(TAG + " flight "+f.flightNumber+" iflightStatet:" + f.flightState, 'd');
                     if (f.getLocationFlightCount() == 0){
-                        FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
-                        f.set_flightState(FlightBase.FSTATE.READY_TOBECLOSED);
+                        if (f.flightState == FlightBase.FSTATE.READY_TOSENDLOCATIONS) {
+                            f.set_flightState(FlightBase.FSTATE.READY_TOBECLOSED);
+                            FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
+                        }
                     }
                 }
                 break;
@@ -230,12 +223,14 @@ public class Session implements EventBus{
                     flightsTemp.close();
                     sqlHelper.dbw.close();
                 }
-                /// second to check ready to send flights which are for some reason not in flightList
+                /// second to check ready to send flights which are for some reason not in flightList (may left from previous session)
                 Cursor flights = sqlHelper.getCursorReadyToSendFlights();
                 try {
                     while (flights.moveToNext()) {
-                        FontLog.appendLog(TAG+"Get flight number for "+flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid)),'d');
-                        new FlightBase(flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid))).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
+                        String fn = flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                        if (RouteBase.isFlightNumberInList(fn)) continue;
+                        FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
+                        new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
                     }
                 }
                 finally{

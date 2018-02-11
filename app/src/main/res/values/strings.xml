@@ -54,6 +54,7 @@
     <string name="label_website_psw">User Psw:</string>
     <string name="label_reset">Reset to Defaults</string>
     <string name="label_cache">Cache</string>
+    <string name="label_cachedpoints">Cached Points</string>
     <string name="label_clear_cache">Clear Location Cache</string>
     <string name="label_send_cache">Send Location Cache</string>
     <string name="label_btnreset">Reset</string>
@@ -159,7 +160,7 @@
     <string-array name="url_array">
         <item>postnget.azurewebsites.net</item>
         <item>postnget-test.azurewebsites.net</item>
-        <item>192.168.1.6/postnget</item>
+        <item>192.168.1.4/postnget</item>
         <!--<item>http://192.168.1.3/PostngetWebApi/api/router</item>-->
         <item>96.230.122.177/postnget</item>
 

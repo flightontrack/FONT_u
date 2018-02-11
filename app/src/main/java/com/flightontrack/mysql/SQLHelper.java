@@ -44,14 +44,16 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
             dbw.close();
             dbLocationRecCountNormal = get_dbLocationRecCountNormal();
-            if (dbLocationRecCountNormal == 0 && getLocationTableCountTemp() == 0) {
+            //if (dbLocationRecCountNormal == 0 && getLocationTableCountTemp() == 0) {
+            if (getLocationTableCountTotal() == 0) {
                 /// TODO - to come up with something... - reset ids to 1
-                dbw = getWritableDatabase();
-                dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
-                dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC);
-                dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
-                dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
-                dbw.close();
+                dropCreateDb();
+//                dbw = getWritableDatabase();
+//                dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
+//                dbw.execSQL(DBSchema.SQL_DROP_TABLE_FLIGHTNUMBER_ALLOC);
+//                dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
+//                dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
+//                dbw.close();
             }
             else {
                 dbw = getReadableDatabase();
@@ -373,7 +375,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         EVENT ev = eventMessage.event;
         switch(ev){
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
-                if(sqlHelper.dropCreateDb()){
+                if(dropCreateDb()){
                     EventBus.distribute(new EventMessage(EVENT.SQL_ONCLEARCACHE_COMPLETED).setEventMessageValueBool(true));
                 }
                 break;

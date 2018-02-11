@@ -37,6 +37,7 @@ public class FlightBase implements EventBus{
         //CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
         TERMINATE_GETFLIGHTNUM,
         CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
+        CLOSE_FLIGHT,
         TERMINATE_FLIGHT,
         CLOSED,
         REQUEST_FLIGHTNUMBER
@@ -45,6 +46,7 @@ public class FlightBase implements EventBus{
         DEFAULT,
         READY_TOSENDLOCATIONS,
         READY_TOBECLOSED,
+        CLOSING,
         CLOSED
     }
 
@@ -80,8 +82,10 @@ public class FlightBase implements EventBus{
                 break;
             case READY_TOBECLOSED:
                 getCloseFlight();
+                break;
             case CLOSED:
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+                break;
         }
     }
     void getOfflineFlightID() {
@@ -109,7 +113,7 @@ public class FlightBase implements EventBus{
         //isGetFlightNumber = false;
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.setMaxRetriesAndTimeout(1,1000);
+        client.setMaxRetriesAndTimeout(2,1000);
         client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -142,6 +146,7 @@ public class FlightBase implements EventBus{
                     @Override
                     public void onFinish() {
                         //FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
+
                     }
 
                     @Override
@@ -150,11 +155,13 @@ public class FlightBase implements EventBus{
                     }
                 }
         );
+        client=null;
         requestParams = null;
     }
 
     void getCloseFlight() {
         FontLog.appendLog(TAG + "getOfflineFlightID", 'd');
+        set_flightState(FSTATE.CLOSING);
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
         //requestParams.put("speedlowflag", isSpeedAboveMin);

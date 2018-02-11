@@ -69,7 +69,22 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         r.activeFlight=this;
         set_fAction(FACTION.REQUEST_FLIGHT);
     }
-
+    public void set_flightState(FSTATE fs){
+        flightState = fs;
+        switch(fs){
+            case READY_TOSENDLOCATIONS:
+                EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
+                        .setEventMessageValueString(flightNumber)
+                        .setEventMessageValueObject(this));
+                break;
+            case READY_TOBECLOSED:
+                getCloseFlight();
+                break;
+            case CLOSED:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+                break;
+        }
+    }
 
 
     void set_wayPointsCount(int pointsCount) {
@@ -237,7 +252,8 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                     }
 
                     public void onFinish() {
-                        set_fAction(FACTION.CLOSED);
+                        //set_fAction(FACTION.CLOSED);
+                        set_flightState(FSTATE.CLOSED);
                     }
                 }
         );
@@ -329,8 +345,8 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                         .setEventMessageValueString(flightNumber));
                 break;
             case TERMINATE_GETFLIGHTNUM:
-                flightState = FSTATE.CLOSED;
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+                set_flightState(FSTATE.CLOSED);
+                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
                 break;
             case CHANGE_IN_FLIGHT:
                 /// reset Timer 1 to slower rate
@@ -356,15 +372,18 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 break;
             case CLOSE_FLIGHT_IF_ZERO_LOCATIONS:
                 if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
-                    flightState = FSTATE.READY_TOBECLOSED;
-                    getCloseFlight();
+                    set_flightState(FSTATE.READY_TOBECLOSED);
+                    //getCloseFlight();
                 }
                 break;
-            case CLOSED:
-                set_flightState(FSTATE.CLOSED);
-                //flightState = FSTATE.CLOSED;
-                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+            case CLOSE_FLIGHT:
+                set_flightState(FSTATE.READY_TOBECLOSED);
                 break;
+//            case CLOSED:
+//                set_flightState(FSTATE.CLOSED);
+//                //flightState = FSTATE.CLOSED;
+//                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+//                break;
         }
     }
     @Override
@@ -395,11 +414,11 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                         set_fAction(FACTION.TERMINATE_FLIGHT);
                         break;
                     case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
-                        /// the request from server normally coming when the flight in CLOSE_FLIGHT_IF_ZERO_LOCATIONS already
-                        if(lastAction!= FACTION.CLOSED) {
-                            isSpeedAboveMin = false;
-                            set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
-                        }
+                        /// this request is disable
+//                        if(flightState==FSTATE.READY_TOSENDLOCATIONS) {
+//                            isSpeedAboveMin = false;
+//                            set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
+//                        }
                         break;
                     case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
                         isLimitReached = true;
@@ -409,7 +428,8 @@ public class Flight extends FlightBase implements GetTime,EventBus {
             break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 if(lastAction == FACTION.REQUEST_FLIGHT) set_fAction(FACTION.TERMINATE_GETFLIGHTNUM);
-                else set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
+                else set_fAction(FACTION.CLOSE_FLIGHT);
+                //TODO remove flight points
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
                 flightNumber=eventMessage.eventMessageValueString;
