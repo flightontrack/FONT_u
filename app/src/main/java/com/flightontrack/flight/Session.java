@@ -41,7 +41,8 @@ public class Session implements EventBus{
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
         GET_OFFLINE_FLIGHTS,
-        CLOSE_FLIGHTS
+        CLOSE_FLIGHTS,
+        LAST_CHANCE
     }
 
     static Session sessionInstance = null;
@@ -191,7 +192,7 @@ public class Session implements EventBus{
             case CLOSE_FLIGHTS:
                 for(FlightBase f: flightList) {
                     FontLog.appendLog(TAG + " flightList size: " + flightList.size(), 'd');
-                    if (f==activeFlight) continue;
+                    if (activeFlight!=null && f==activeFlight) continue;
                     FontLog.appendLog(TAG + " flight "+f.flightNumber+" iflightStatet:" + f.flightState, 'd');
                     if (f.getLocationFlightCount() == 0){
                         if (f.flightState == FlightBase.FSTATE.READY_TOSENDLOCATIONS) {
@@ -272,6 +273,10 @@ public class Session implements EventBus{
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
             case SVCCOMM_ONDESTROY:
+                set_sAction(SACTION.CLOSE_FLIGHTS);
+                break;
+            case CLOCK_SERVICESELFSTOPPED:
+                set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 set_sAction(SACTION.CLOSE_FLIGHTS);
                 break;
         }

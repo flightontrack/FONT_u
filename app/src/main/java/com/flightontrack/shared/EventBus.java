@@ -152,7 +152,8 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_SERVICESELFSTOPPED:
-                interfaceList.add(Route.getInstance()); // set to null flightlist and routelist
+                interfaceList.add(RouteBase.getInstance()); // set to null flightlist and routelist
+                interfaceList.add(Session.getInstance()); // set to null flightlist and routelist
                 interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:

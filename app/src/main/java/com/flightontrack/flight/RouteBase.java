@@ -53,11 +53,13 @@ public class RouteBase implements EventBus{
         return false;
     }
     void setToNull(){
-            for (FlightBase f : new ArrayList<>(flightList)) {
-                flightList.remove(f);
-            }
-        activeFlight = null;
-        activeRoute = null;
+//            for (FlightBase f : new ArrayList<>(flightList)) {
+//                flightList.remove(f);
+//            }
+        RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
+        RouteBase.activeFlight = null;
+        RouteBase.activeRoute = null;
+        EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
     }
     void set_rAction(RACTION request) {
         //FontLog.appendLog(TAG + "reaction:" + request, 'd');
@@ -75,10 +77,7 @@ public class RouteBase implements EventBus{
                         if (flightList.isEmpty()) {
                             //if (activeRoute == this) activeRoute = null;
                             FontLog.appendLog(TAG + "flightList.isEmpty()"+":r:"+routeNumber, 'd');
-                            RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
-                            RouteBase.activeFlight = null;
-                            RouteBase.activeRoute = null;
-                            EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
+                            setToNull();
                         }
                     }
                 break;
