@@ -122,6 +122,9 @@ public void eventReceiver(EventMessage eventMessage){
             case CLOCK_SERVICESELFSTOPPED:
                 setToNull();
                 break;
+            case CLOCK_MODECLOCK_ONLY:
+                activeFlight = null;
+                break;
         }
     }
 }

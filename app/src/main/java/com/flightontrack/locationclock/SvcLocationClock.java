@@ -13,6 +13,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+import com.flightontrack.flight.RouteBase;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.other.PhoneListener;
 import com.flightontrack.shared.EventBus;
@@ -25,13 +26,14 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.shared.Props.ctxApp;
 
 public class SvcLocationClock extends Service implements EventBus, LocationListener,GetTime {
-    private static final String TAG = "SvcLocationClock:";
+    static final String TAG = "SvcLocationClock:";
     //private static Context ctx;
     static LocationManager locationManager;
     public static PhoneListener phStateListener;
     public static SvcLocationClock instanceSvcLocationClock = null;
-    private static boolean isBound = false;
-    private static int counter = 0;
+    static boolean isBound = false;
+    static int tryCounter = 0;
+    final int TRY_NUMBER = 3;
     static MODE _mode;
     static int _intervalClockSecCurrent = MIN_TIME_BW_GPS_UPDATES_SEC;
     public static int intervalClockSecPrev = _intervalClockSecCurrent;
@@ -93,25 +95,23 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     }
     @Override
     public void onLocationChanged(final Location location) {
-        counter++;
-        if(_mode==MODE.CLOCK_ONLY&& dbLocationRecCountNormal <1){
-            stopServiceSelf();
-            return;
+        if(_mode==MODE.CLOCK_ONLY && RouteBase.activeFlight==null){
+            tryCounter++;
+            FontLog.appendLog(TAG + "_TIMER :  tryCounter:" + tryCounter, 'd');
+            if(tryCounter >TRY_NUMBER || dbLocationRecCountNormal <1) {
+                tryCounter = 0;
+                stopServiceSelf();
+                return;
+            }
         }
         else {
+            tryCounter =0;
             long currTime = getTimeGMT();
-            FontLog.appendLog(TAG + "_TIMER :  Count:" + counter, 'd');
-
             if (currTime + TIME_RESERVE >= alarmNextTimeUTCmsec) {
                 //Util.appendLog(TAG + "isClockTimeReached: ", 'd');
                 /// it is a protection
                 setClockNextTimeLocalMsec(_intervalClockSecCurrent);
                 EventBus.distribute(new EventMessage(EVENT.CLOCK_ONTICK).setEventMessageValueClockMode(_mode).setEventMessageValueLocation(location));
-//                if (_mode == MODE.CLOCK_LOCATION) {
-//                    //EventBus.distribute(new EventMessage(EVENT.CLOCK_ONTICK).setEventMessageValueClockMode(_mode).setEventMessageValueLocation(location));
-//                }
-//
-//                set_SessionRequest(SACTION.START_COMMUNICATION);
             }
         }
     }

@@ -150,11 +150,12 @@ public interface EventBus {
                 break;
             case CLOCK_MODECLOCK_ONLY:
                 interfaceList.add(mainactivityInstance);
+                interfaceList.add(RouteBase.getInstance());
                 break;
             case CLOCK_SERVICESELFSTOPPED:
-                interfaceList.add(RouteBase.getInstance()); // set to null flightlist and routelist
-                interfaceList.add(Session.getInstance()); // set to null flightlist and routelist
-                interfaceList.add(mainactivityInstance);
+                interfaceList.add(RouteBase.getInstance());
+                interfaceList.add(Session.getInstance());
+                //interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
 //                if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
