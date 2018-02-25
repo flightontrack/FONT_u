@@ -185,7 +185,7 @@ public interface EventBus {
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
             case FLIGHT_STATECHANGEDTO_READYTOSEND:
-                interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist or update existing flight
+                interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist 
                 interfaceList.add(Session.getInstance());   /// start send locaions
                 break;
             case FLIGHT_ONSENDCACHECOMPLETED:

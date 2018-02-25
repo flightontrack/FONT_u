@@ -32,7 +32,7 @@ import com.flightontrack.shared.EventMessage;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.shared.Util;
-import com.flightontrack.flight.Route;
+import com.flightontrack.flight.RouteBase;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.receiver.ReceiverHealthCheckAlarm;
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
 //            if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
 //                FontLog.appendLog(TAG + "New App Context", 'd');
 //                Util.setCurrAppContext(ctxApp.toString());
-//                Route.activeRoute = null;
+//                RouteBase.activeRoute = null;
 //            }
 
             if (!AppConfig.pIsAppTypePublic) {
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                 acftActivity();
                 return true;
             case R.id.action_facebook:
-                if (!(Route.activeRoute.activeFlight == null)) facebActivity();
+                if (!(RouteBase.activeFlight == null)) facebActivity();
                 else
                     Toast.makeText(MainActivity.this, getString(R.string.start_flight_first), Toast.LENGTH_LONG).show();
                 return true;
@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
             @Override
             public void onClick(View view) {
                 //Util.appendLog(TAG + "trackingButton: onClick",'d');
-                //if (Route._routeStatus == RSTATUS.PASSIVE) {
+                //if (RouteBase._routeStatus == RSTATUS.PASSIVE) {
                 switch (trackingButtonState) {
                     case BUTTON_STATE_RED:
                         Util.setAcftNum(txtAcftNum.getText().toString());
@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
 //
 //                } else {
 //                    set_isMultileg(false);
-//                    activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
+//                    activeRouteBase.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
 //                }
 
             }
@@ -573,7 +573,7 @@ public class MainActivity extends AppCompatActivity implements EventBus{
                 break;
             case BUTTON_STATE_YELLOW:
                 MainActivity.trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                MainActivity.trackingButton.setText("Flight " + (Route.activeRoute.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
+                MainActivity.trackingButton.setText("Flight " + (RouteBase.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
                 //editor.putInt("trackingButtonState", BUTTON_STATE_YELLOW);
                 break;
             case BUTTON_STATE_GREEN:
@@ -597,10 +597,10 @@ public class MainActivity extends AppCompatActivity implements EventBus{
         trackingButtonState = request;
     }
     static String setTextGreen() {
-        SessionProp.pTextGreen = "Flight: " + (Route.activeFlight.flightNumber) + '\n' +
-                "Point: " + Route.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeFlight.flightTimeString + '\n'
-                + "Alt: " + Route.activeFlight.lastAltitudeFt + " ft";
+        SessionProp.pTextGreen = "Flight: " + (RouteBase.activeFlight.flightNumber) + '\n' +
+                "Point: " + RouteBase.activeFlight._wayPointsCount +
+                ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString + '\n'
+                + "Alt: " + RouteBase.activeFlight.lastAltitudeFt + " ft";
         return SessionProp.pTextGreen;
     }
     static String setTextRed() {
@@ -608,12 +608,12 @@ public class MainActivity extends AppCompatActivity implements EventBus{
         String fTime = "";
         String flightN = FLIGHT_NUMBER_DEFAULT;
 
-        if (Route.activeRoute == null) {
+        if (RouteBase.activeRoute == null) {
             FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
         } else {
-            if (Route.activeFlight!=null) {
-                flightN = Route.activeFlight.flightNumber;
-                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + Route.activeFlight.flightTimeString;
+            if (RouteBase.activeFlight!=null) {
+                flightN = RouteBase.activeFlight.flightNumber;
+                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString;
             }
             fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
         }

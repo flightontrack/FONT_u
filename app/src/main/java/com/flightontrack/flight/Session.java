@@ -11,6 +11,7 @@ import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.flight.RouteBase.activeFlight;
 import static com.flightontrack.flight.RouteBase.flightList;
+import static com.flightontrack.flight.RouteBase.isFlightNumberInList;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -25,7 +26,6 @@ import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
 import java.util.EnumMap;
-import java.util.ArrayList;
 //import java.util.EnumMap;
 
 
@@ -212,12 +212,20 @@ public class Session implements EventBus{
                     }
                 break;
             case GET_OFFLINE_FLIGHTS:
+
+                /// get flights from flightlist
+                for (FlightBase f : flightList){
+                    if(f.isTempFlightNum) f.set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
+                }
                 /// firsrt to check all temp flights in not ready to send state
+
                 Cursor flightsTemp = sqlHelper.getCursorTempFlights();
                 try {
                     while (flightsTemp.moveToNext()) {
-                        FontLog.appendLog(TAG+"Get flight number for "+ flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid)),'d');
-                        new FlightBase(flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid))).getOfflineFlightID();
+                        String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                        if (isFlightNumberInList(fn)) continue;
+                        FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
+                        new FlightBase(fn).set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
                     }
                 }
                 finally{

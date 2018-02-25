@@ -20,29 +20,28 @@ import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import cz.msebera.android.httpclient.Header;
 
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-
-import cz.msebera.android.httpclient.Header;
-
-//import static com.flightontrack.flight.Flight.FACTION.CHANGE_IN_PENDING;
-//import static com.flightontrack.flight.Flight.FACTION.RAISE_EVENT;
-//import static com.flightontrack.flight.FlightBase.FACTION.CHANGE_IN_PENDING;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class Flight extends FlightBase implements GetTime,EventBus {
+    public enum FACTION {
+        DEFAULT_REQUEST,
+        CHANGE_IN_PENDING,
+        CHANGE_IN_FLIGHT,
+        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
+        TERMINATE_FLIGHT,
+    }
 
     static final String TAG = "Flight:";
-    //public String flightNumber;
     public boolean isGetFlightNumber = true;
-    //public FSTATUS fStatus = FSTATUS.PASSIVE;
     FACTION lastAction = FACTION.DEFAULT_REQUEST;
-    EVENT lastEvent =EVENT.DEFAULT_EVENT;
     boolean isSpeedAboveMin=false;
     public String flightTimeString;
     public int lastAltitudeFt;
@@ -50,42 +49,46 @@ public class Flight extends FlightBase implements GetTime,EventBus {
     private Route route;
     private float _speedCurrent = 0;
     private float speedPrev = 0;
-    private boolean isLimitReached = false;
     private long _flightStartTimeGMT;
     private int _flightTimeSec;
     //private int flightRequestCounter;
     private boolean isElevationCheckDone;
     private double cutoffSpeed;
     boolean isGetFlightCallSuccess = false;
-    boolean isTempFlightNum = false;
+
 
     public Flight(){}
 
     public Flight(Route r) {
         route = r;
         flightTimeString = FLIGHT_TIME_ZERO;
-        flightNumber = FLIGHT_NUMBER_DEFAULT;
+        //flightNumber = FLIGHT_NUMBER_DEFAULT;
         isElevationCheckDone = false;
         r.activeFlight=this;
-        set_fAction(FACTION.REQUEST_FLIGHT);
+        set_flightState(FSTATE.GETTINGFLIGHT);
+        //set_fAction(FACTION.REQUEST_FLIGHT);
     }
-    public void set_flightState(FSTATE fs){
-        flightState = fs;
-        switch(fs){
-            case READY_TOSENDLOCATIONS:
-                EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
-                        .setEventMessageValueString(flightNumber)
-                        .setEventMessageValueObject(this));
-                break;
-            case READY_TOBECLOSED:
-                getCloseFlight();
-                break;
-            case CLOSED:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
-                break;
-        }
+//    public void set_flightState(FSTATE fs){
+//        flightState = fs;
+//        switch(fs){
+//            case READY_TOSENDLOCATIONS:
+//                EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
+//                        .setEventMessageValueString(flightNumber)
+//                        .setEventMessageValueObject(this));
+//                break;
+//            case READY_TOBECLOSED:
+//                getCloseFlight();
+//                break;
+//            case CLOSED:
+//                EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+//                break;
+//        }
+//    }
+    public void set_flightNumber(String fn){
+        FontLog.appendLog(TAG + "set_flightNumber fn " + fn, 'd');
+        flightNumber = fn;
+        set_flightState(FSTATE.READY_TOSENDLOCATIONS);
     }
-
 
     void set_wayPointsCount(int pointsCount) {
         _wayPointsCount = pointsCount;
@@ -115,7 +118,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         boolean isPrevSpeedAboveMin = (speedPrev >= cutoffSpeed);
         //FontLog.appendLog(TAG + "isDoubleSpeedAboveMin: cutoffSpeed: " + cutoffSpeed, 'd');
         if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
-        else if (Route.activeRoute.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
+        else if (RouteBase.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
             FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
             if (isPrevSpeedAboveMin)
                 SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
@@ -126,10 +129,11 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         return false;
     }
 
-    public void getNewFlightID() {
+    void getNewFlightID() {
 
-        FontLog.appendLog(TAG + "getNewFlightID", 'd');
-        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
+        FontLog.appendLog(TAG + "FlightBase-getNewFlightID: temp: " + flightNumberTemp, 'd');
+        //set_flightState(FSTATE.GETTINGFLIGHT);
+        //if(!isTempFlightNum) EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
@@ -156,7 +160,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        FontLog.appendLog(TAG + "getNewFlightID OnSuccess", 'd');
+                        FontLog.appendLog(TAG + "Flight - getNewFlightID OnSuccess", 'd');
                         //String responseText = new String(responseBody);
                         Response response = new Response(new String(responseBody));
                         //char responseType = response.responseType;
@@ -167,56 +171,46 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                             return;
                         }
                         if (response.responseFlightNum != null) {
-                            if (flightNumber == FLIGHT_NUMBER_DEFAULT) {
+
+                            isGetFlightCallSuccess = true;
+                            route._legCount++;
+                            //if (flightNumber == FLIGHT_NUMBER_DEFAULT) {
+                            if (!isTempFlightNum) {
                                 set_flightNumber(response.responseFlightNum);
-                                isGetFlightCallSuccess = true;
-                                route._legCount++;
                             } else {
-                                //replaceFlightNumber(response.responseFlightNum);
+                                Flight.super.set_flightNumber(response.responseFlightNum);
                             }
                         }
                     }
-
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                         //flightRequestCounter++;
                         //FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
                         //if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                         if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
-                        if (flightNumber == null) {
-//                            try {
-//                                String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
-//                                //flightNumber = sqlHelper.getNewTempFlightNum(flightNumber, route.routeNumber, dt);
-//                            } catch (UnsupportedEncodingException e1) {
-//                                e1.printStackTrace();
-//                            }
-                        }
+                        set_flightState(FSTATE.DEFAULT);
+//                        if (flightNumber == null) {
+////                            try {
+////                                String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
+////                                //flightNumber = sqlHelper.getNewTempFlightNum(flightNumber, route.routeNumber, dt);
+////                            } catch (UnsupportedEncodingException e1) {
+////                                e1.printStackTrace();
+////                            }
+//                        }
                         //if(SvcLocationClock.isInstanceCreated()) ctxApp.stopService(new Intent(ctxApp, SvcLocationClock.class));
                     }
-
                     @Override
                     public void onFinish() {
-
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
-                        if(lastAction!= FACTION.TERMINATE_GETFLIGHTNUM) set_fAction(FACTION.CHANGE_IN_PENDING);
-//                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
-//                            .setEventMessageValueBool(isGetFlightCallSuccess)
-//                            .setEventMessageValueString(flightNumber));
-//                        route._legCount++;
-                        //set_FlightNumber(flightNumber);
-//                        if (flightNumber == null)
-//                            //it is never null now;
-//                            route.set_rAction(RACTION.RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER);
-//                        else
-//                            route.set_rAction(RACTION.SWITCH_TO_PENDING);
+                        if(flightState!= FSTATE.CLOSED) set_fAction(FACTION.CHANGE_IN_PENDING);
                     }
-
                     @Override
                     public void onRetry(int retryNo) {
                         FontLog.appendLog(TAG + "getNewFlightID onRetry:" + retryNo, 'd');
                     }
                 }
         );
+        client=null;
         requestParams = null;
     }
 
@@ -330,7 +324,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
     }
 
     private double get_cutoffSpeed() {
-        return SessionProp.pSpinnerMinSpeed * (Route.activeRoute.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT ? 0.75 : 1.0);
+        return SessionProp.pSpinnerMinSpeed * (RouteBase.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT ? 0.75 : 1.0);
     }
 
     void set_fAction(FACTION request) {
@@ -344,10 +338,10 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                         .setEventMessageValueBool(isGetFlightCallSuccess)
                         .setEventMessageValueString(flightNumber));
                 break;
-            case TERMINATE_GETFLIGHTNUM:
-                set_flightState(FSTATE.CLOSED);
-                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
-                break;
+//            case TERMINATE_GETFLIGHTNUM:
+//                set_flightState(FSTATE.CLOSED);
+//                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
+//                break;
             case CHANGE_IN_FLIGHT:
                 /// reset Timer 1 to slower rate
                 _flightStartTimeGMT = getTimeGMT();
@@ -356,29 +350,23 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 break;
             case TERMINATE_FLIGHT:
                 //TODO
-//                        Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
-//                        //fStatus = FSTATUS.PASSIVE;
-//                        lastAction = request;
-//                        //sqlHelper.flightLocationsDelete(flightNumber);
-//                        //SessionProp.set_isMultileg(false);
-//                        //route.set_rAction(RACTION.RESTART_NEW_FLIGHT);
                 break;
-            case REQUEST_FLIGHTNUMBER:
-                /// request flight number if the flight on temp number
-                if (isGetFlightNumber) getNewFlightID();
-                break;
-            case REQUEST_FLIGHT:
-                getNewFlightID();
-                break;
+//            case REQUEST_FLIGHTNUMBER:
+//                /// request flight number if the flight on temp number
+//                if (isGetFlightNumber) getNewFlightID();
+//                break;
+//            case REQUEST_FLIGHT:
+//                getNewFlightID();
+//                break;
             case CLOSE_FLIGHT_IF_ZERO_LOCATIONS:
                 if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
                     set_flightState(FSTATE.READY_TOBECLOSED);
                     //getCloseFlight();
                 }
                 break;
-            case CLOSE_FLIGHT:
-                set_flightState(FSTATE.READY_TOBECLOSED);
-                break;
+//            case CLOSE_FLIGHT:
+//                set_flightState(FSTATE.READY_TOBECLOSED);
+//                break;
 //            case CLOSED:
 //                set_flightState(FSTATE.CLOSED);
 //                //flightState = FSTATE.CLOSED;
@@ -427,19 +415,19 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                 }
             break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
-                if(lastAction == FACTION.REQUEST_FLIGHT) set_fAction(FACTION.TERMINATE_GETFLIGHTNUM);
-                else set_fAction(FACTION.CLOSE_FLIGHT);
+                if(flightState == FSTATE.GETTINGFLIGHT) set_flightState(FSTATE.CLOSED);
+                else  set_flightState(FSTATE.READY_TOBECLOSED);
                 //TODO remove flight points
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
-                flightNumber=eventMessage.eventMessageValueString;
-                flightNumberTemp =flightNumber;
+                set_flightNumberTemp(eventMessage.eventMessageValueString);
+//                flightNumber=eventMessage.eventMessageValueString;
+//                flightNumberTemp =flightNumber;
                 isGetFlightCallSuccess=true;
-                isTempFlightNum =true;
+                //isTempFlightNum =true;
                 route._legCount++;
                 set_fAction(FACTION.CHANGE_IN_PENDING);
                 break;
         }
-        lastEvent=ev;
     }
 }

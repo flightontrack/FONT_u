@@ -62,13 +62,13 @@ public class RouteBase implements EventBus{
         EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
     }
     void set_rAction(RACTION request) {
-        //FontLog.appendLog(TAG + "reaction:" + request, 'd');
+        FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
             case REMOVE_FLIGHT_IF_CLOSED:
                 FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size : " + flightList.size(), 'd');
                     for (FlightBase f : new ArrayList<>(flightList)) {
                         FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + request, 'd');
-                        if (f.flightState == FlightBase.FSTATE.CLOSED) {
+                        if (f.flightState.equals(FlightBase.FSTATE.CLOSED)) {
                             //if (activeFlight == f) activeFlight = null;
                             FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
                             if (f==activeFlight) activeFlight =null;
@@ -83,15 +83,20 @@ public class RouteBase implements EventBus{
                 break;
             case ADD_OR_UPDATE_FLIGHT:
                 FlightBase fb = (FlightBase) eventMessage.eventMessageValueObject;
+                FontLog.appendLog(TAG + "fb.fn"+fb.flightNumber, 'd');
+                FontLog.appendLog(TAG + "fb.fnt"+fb.flightNumberTemp, 'd');
                 if (flightList.contains(fb)) break;
                 else {
-                    for (FlightBase f : new ArrayList<> (flightList)) {
-                        if (f.flightNumberTemp == fb.flightNumberTemp) {
-                            f.set_flightNumber(eventMessage.eventMessageValueString);
-                            eventMessage = null; /// kill temp flight
-                        }
-                        else flightList.add((FlightBase) eventMessage.eventMessageValueObject);
-                    }
+//                    for (FlightBase f : new ArrayList<> (flightList)) {
+//                        FontLog.appendLog(TAG + "f.fn"+fb.flightNumber, 'd');
+//                        FontLog.appendLog(TAG + "f.fnt"+fb.flightNumberTemp, 'd');
+//                        if (f.flightNumberTemp.equals(fb.flightNumberTemp)) {
+//                            f.set_flightNumber(eventMessage.eventMessageValueString);
+//                            eventMessage = null; /// kill temp flight
+//                        }
+//                        else flightList.add((FlightBase) eventMessage.eventMessageValueObject);
+//                    }
+                    flightList.add((FlightBase) eventMessage.eventMessageValueObject);
                     break;
                 }
         }
