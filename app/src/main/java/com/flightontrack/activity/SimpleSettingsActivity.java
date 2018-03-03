@@ -258,7 +258,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     FontLog.appendLog(TAG + " eventReceiver : "+ev, 'd');
         switch(ev){
             case SVCCOMM_ONDESTROY:
-                progressBar.dismiss();
+                if (progressBar!=null) progressBar.dismiss();
                 txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
                 break;
             case FLIGHT_ONSENDCACHECOMPLETED:
@@ -266,6 +266,9 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
                 break;
             case SQL_ONCLEARCACHE_COMPLETED:
                 txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
+                break;
+            case FLIGHTBASE_GETFLIGHTNUM:
+                if (progressBar!=null)  progressBar.dismiss();
                 break;
         }
     }

@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
@@ -229,7 +230,9 @@ public class Util {
     public static boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ctxApp.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null&&activeNetworkInfo.isConnected() ;
+        Boolean isNetworkAvailable = activeNetworkInfo != null&&activeNetworkInfo.isConnected();
+        if (!isNetworkAvailable) Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+        return isNetworkAvailable ;
     }
 
     public static void setCloudPsw(View view){

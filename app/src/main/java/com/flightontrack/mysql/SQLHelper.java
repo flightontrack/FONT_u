@@ -20,6 +20,7 @@ import com.flightontrack.shared.GetTime;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 
 public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
@@ -237,6 +238,64 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         //dbw.close();
         return cu;
     }
+    public ArrayList<Location> getDataLocationList() {
+
+        String[] projection = {
+                DBSchema._ID,
+                DBSchema.COLUMN_NAME_COL1,
+                DBSchema.LOC_flightid,
+                DBSchema.LOC_isTempFlight,
+                DBSchema.LOC_speedlowflag,
+                DBSchema.COLUMN_NAME_COL4,
+                DBSchema.COLUMN_NAME_COL6,
+                DBSchema.COLUMN_NAME_COL7,
+                DBSchema.COLUMN_NAME_COL8,
+                DBSchema.COLUMN_NAME_COL9,
+                DBSchema.LOC_wpntnum,
+                DBSchema.COLUMN_NAME_COL11,
+                DBSchema.LOC_date,
+                DBSchema.LOC_is_elevetion_check
+        };
+        String sortOrder = DBSchema._ID;
+        String selection = DBSchema.LOC_isTempFlight + "= ?";
+        String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
+        dbw = getReadableDatabase();
+        Cursor cu = dbw.query(
+                DBSchema.TABLE_LOCATION,  // The table to query
+                projection,                               // The columns to return
+                selection,                               // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+        ArrayList<Location> locations = new ArrayList();
+        try {
+            while (cu.moveToNext()) {
+                Location l = new Location();
+                l.i = cu.getPosition();
+                l.itemId = cu.getLong(cu.getColumnIndexOrThrow(DBSchema._ID));
+                l.rc = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1));
+                l.ft = cu.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                l.sl = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag));
+                l.sd = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4));
+                l.la = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6));
+                l.lo = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7));
+                l.ac = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8));
+                l.al = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9));
+                l.wp = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_wpntnum));
+                l.sg = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11));
+                l.dt = cu.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_date));
+                l.irch = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check));
+                locations.add(l);
+            }
+        }
+        finally {
+            cu.moveToFirst();
+            dbw.close();
+        }
+        return locations;
+    }
     public Cursor getCursorTempFlights() {
 
         dbw = getReadableDatabase();
@@ -246,13 +305,34 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         return c;
     }
     public Cursor getCursorReadyToSendFlights() {
-
         dbw = getReadableDatabase();
         Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
-        //c.moveToFirst();
-        //dbw.close();
         return c;
+
     }
+//    public Cursor getListReadyToSendFlights() {
+//
+//
+//
+//        dbw = getReadableDatabase();
+//        Cursor cu = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
+//        ArrayList<String> flightList = new ArrayList<>();
+//        try {
+//            while (cu.moveToNext()) {
+//                flightList.add(.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+//                if (RouteBase.isFlightNumberInList(fn)) continue;
+//                FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
+//                new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
+//            }
+//        }
+//        finally{
+//            flights.close();
+//            sqlHelper.dbw.close();
+//        }
+//        //c.moveToFirst();
+//        //dbw.close();
+//        return c;
+//    }
     public static int getCursorCountLocation() {
         return cl.getCount();
     }

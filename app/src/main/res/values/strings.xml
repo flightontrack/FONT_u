@@ -105,7 +105,7 @@
     <string name="driving">Looks like you are driving on road\nThe flight has been terminated</string>
     <string name="toast_permiss_declined_1">The app cannot run without this permission</string>
     <string name="toast_permiss_declined_2">The app cannot run in debug mode without this permission</string>
-    <string name="toast_noconnectivity">FONT: Connectivity unavailable\nFailed to send location cache</string>
+    <string name="toast_noconnectivity">Network connectivity unavailable</string>
     <string name="toast_cachesending"> Sending location points left in cache</string>
     <string name="progressbar_load_logbook">Loading Pilot LogBook from Cloud ...</string>
     <string name="progressbar_cachesending"> Sending cache to Cloud ...</string>
@@ -160,7 +160,7 @@
     <string-array name="url_array">
         <item>postnget.azurewebsites.net</item>
         <item>postnget-test.azurewebsites.net</item>
-        <item>192.168.1.4/postnget</item>
+        <item>192.168.1.5/postnget</item>
         <!--<item>http://192.168.1.3/PostngetWebApi/api/router</item>-->
         <item>96.230.122.177/postnget</item>
 

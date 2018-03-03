@@ -30,6 +30,7 @@ public interface EventBus {
         FLIGHT_ONPOINTSLIMITREACHED,
         FLIGHT_ONSENDCACHECOMPLETED,
         FLIGHT_STATECHANGEDTO_READYTOSEND,
+        FLIGHTBASE_GETFLIGHTNUM,
 
         CLOCK_SERVICESTARTED_MODELOCATION,
         CLOCK_SERVICESELFSTOPPED,
@@ -91,6 +92,16 @@ public interface EventBus {
                 }
                     //interfaceList.add(mainactivityInstance);
                 break;
+                case FLIGHTBASE_GETFLIGHTNUM:
+                if(!eventMessage.eventMessageValueBool){
+                    interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                }
+                else
+                {
+                }
+                    //interfaceList.add(mainactivityInstance);
+                break;
+
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 interfaceList.add(mainactivityInstance);
                 break;
@@ -158,14 +169,13 @@ public interface EventBus {
                 //interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
-//                if(eventMessage.eventMessageValueClockMode==MODE.CLOCK_LOCATION) {
-//                    interfaceList.add(Route.activeFlight);
-//                }
-                interfaceList.add(Route.getInstance()); ///
-                    for (FlightBase f : Route.flightList) {
-                        interfaceList.add(f); /// check if any of them need to be closed
-                    }
-                interfaceList.add(Session.getInstance()); ///start communication service
+                interfaceList.add(RouteBase.getInstance()); /// delete closed flights from flightlist
+                for (FlightBase f : Route.flightList) {
+                    interfaceList.add(f);                   /// check if any of them need to be replace temp flight num
+                                                            /// check if any of them need to be closed
+                }
+                interfaceList.add(Session.getInstance());   /// start communication service
+                                                            /// get online flight number for temp flights not in list
                 //FontLog.appendLog(TAG + interfaceList, 'd');
                 break;
             case ALERT_SENTPOINTS:

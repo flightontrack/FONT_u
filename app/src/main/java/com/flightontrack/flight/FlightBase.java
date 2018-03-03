@@ -41,7 +41,7 @@ public class FlightBase implements EventBus{
     }
 
     public String flightNumber = FLIGHT_NUMBER_DEFAULT;
-    public String flightNumberTemp = FLIGHT_NUMBER_DEFAULT;
+    //public String flightNumberTemp = FLIGHT_NUMBER_DEFAULT;
     boolean isTempFlightNum = false;
     public FSTATE flightState = FSTATE.DEFAULT;
     boolean isLimitReached  = false;
@@ -49,19 +49,19 @@ public class FlightBase implements EventBus{
     public FlightBase(){}
 
     FlightBase(String fn) {
-        set_flightNumberTemp(fn);
+        flightNumber = fn;;
     }
     public void set_flightNumber(String fn){
         FontLog.appendLog(TAG + "set_flightNumber super fn " + fn, 'd');
-        flightNumber = fn;
-        replaceFlightNumber();
+        replaceFlightNumber(fn);
+        //flightNumber = fn;
         set_flightState(FSTATE.READY_TOSENDLOCATIONS);
     }
-    public void set_flightNumberTemp(String fnt){
-        flightNumberTemp = fnt;
-        flightNumber = fnt;
-        if (!fnt.equals(FLIGHT_NUMBER_DEFAULT)) isTempFlightNum =true;
-    }
+//    public void set_flightNumberTemp(String fnt){
+//        flightNumberTemp = fnt;
+//        flightNumber = fnt;
+//        if (!fnt.equals(FLIGHT_NUMBER_DEFAULT)) isTempFlightNum =true;
+//    }
     public void set_flightState(FSTATE fs){
         if (flightState == fs) return;
         flightState = fs;
@@ -78,14 +78,15 @@ public class FlightBase implements EventBus{
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
                 break;
             case GETTINGFLIGHT:
-                if(!isTempFlightNum) EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
+                //if(!isTempFlightNum) EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
                 getNewFlightID();
                 break;
         }
     }
     void getNewFlightID() {
 
-        FontLog.appendLog(TAG + "FlightBase-getNewFlightID: temp : " + flightNumberTemp, 'd');
+        FontLog.appendLog(TAG + "FlightBase-getNewFlightID: " +flightNumber, 'd');
         //EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
 
@@ -134,8 +135,8 @@ public class FlightBase implements EventBus{
                     if (mainactivityInstance != null){
                         Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                     }
-                    set_flightState(FSTATE.DEFAULT);
-                    EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED).setEventMessageValueBool(false));
+                    //set_flightState(FSTATE.CLOSED);
+                    EventBus.distribute(new EventMessage(EVENT.FLIGHTBASE_GETFLIGHTNUM).setEventMessageValueBool(false));
                 }
 
                 @Override
@@ -154,7 +155,7 @@ public class FlightBase implements EventBus{
     }
 
     void getCloseFlight() {
-        FontLog.appendLog(TAG + "getNewFlightID", 'd');
+        FontLog.appendLog(TAG + "getCloseFlight: " + flightNumber, 'd');
         set_flightState(FSTATE.CLOSING);
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
@@ -185,15 +186,17 @@ public class FlightBase implements EventBus{
                     }
                     @Override
                     public void onFinish() {
+                        set_flightState(FSTATE.CLOSED);
                     }
                 }
         );
     }
 
-    void replaceFlightNumber() {
-        if (sqlHelper.updateTempFlightNum(flightNumberTemp, flightNumber) > 0) {
-            FontLog.appendLog(TAG + "replaceFlightNumber: " + flightNumberTemp +":"+flightNumber, 'd');
+    void replaceFlightNumber(String fnew) {
+        if (sqlHelper.updateTempFlightNum(flightNumber, fnew) > 0) {
+            FontLog.appendLog(TAG + "replaceFlightNumber: " + flightNumber+"->" +fnew, 'd');
         }
+        flightNumber = fnew;
     }
 
     int getLocationFlightCount() {

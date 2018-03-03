@@ -37,9 +37,11 @@ public class Flight extends FlightBase implements GetTime,EventBus {
         CHANGE_IN_FLIGHT,
         CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
         TERMINATE_FLIGHT,
+        GET_ONLINE_FLIGHT_NUM
     }
 
     static final String TAG = "Flight:";
+    //public String flightNumberTemp = FLIGHT_NUMBER_DEFAULT;
     public boolean isGetFlightNumber = true;
     FACTION lastAction = FACTION.DEFAULT_REQUEST;
     boolean isSpeedAboveMin=false;
@@ -131,7 +133,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
 
     void getNewFlightID() {
 
-        FontLog.appendLog(TAG + "FlightBase-getNewFlightID: temp: " + flightNumberTemp, 'd');
+        FontLog.appendLog(TAG + "Flight - getNewFlightID:  " + flightNumber, 'd');
         //set_flightState(FSTATE.GETTINGFLIGHT);
         //if(!isTempFlightNum) EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
@@ -178,6 +180,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                             if (!isTempFlightNum) {
                                 set_flightNumber(response.responseFlightNum);
                             } else {
+                                isTempFlightNum = false;
                                 Flight.super.set_flightNumber(response.responseFlightNum);
                             }
                         }
@@ -187,8 +190,8 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                         //flightRequestCounter++;
                         //FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
                         //if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
-                        if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
-                        set_flightState(FSTATE.DEFAULT);
+                        if(!isTempFlightNum) if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
+                        //set_flightState(FSTATE.DEFAULT);
 //                        if (flightNumber == null) {
 ////                            try {
 ////                                String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
@@ -202,7 +205,7 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                     @Override
                     public void onFinish() {
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
-                        if(flightState!= FSTATE.CLOSED) set_fAction(FACTION.CHANGE_IN_PENDING);
+                        if(flightState!= FSTATE.CLOSED) if(!isTempFlightNum) set_fAction(FACTION.CHANGE_IN_PENDING);
                     }
                     @Override
                     public void onRetry(int retryNo) {
@@ -246,14 +249,17 @@ public class Flight extends FlightBase implements GetTime,EventBus {
                     }
 
                     public void onFinish() {
-                        //set_fAction(FACTION.CLOSED);
                         set_flightState(FSTATE.CLOSED);
                     }
                 }
         );
         requestParams = null;
     }
-
+    public void set_flightNumberTemp(String fnt){
+        //flightNumberTemp = fnt;
+        flightNumber = fnt;
+        if (!fnt.equals(FLIGHT_NUMBER_DEFAULT)) isTempFlightNum =true;
+    }
     public void saveLocCheckSpeed(final Location location) {
 
         float speedCurrent = location.getSpeed();
@@ -385,7 +391,9 @@ public class Flight extends FlightBase implements GetTime,EventBus {
 //                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
                     saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
                 }
-                if (Util.isNetworkAvailable()) {
+                //if (Util.isNetworkAvailable()) {
+                if (true) {
+                    if(isTempFlightNum) getNewFlightID();
                     if (lastAction == FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS) {
                         /// try close again, previouse attempt did not work
                         set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);

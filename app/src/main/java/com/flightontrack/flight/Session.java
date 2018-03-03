@@ -19,12 +19,14 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.DBSchema;
+import com.flightontrack.mysql.Location;
 import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 //import java.util.EnumMap;
 
@@ -114,6 +116,30 @@ public class Session implements EventBus{
             locations.close();
             sqlHelper.dbw.close();
         }
+
+//        ArrayList<Location> locList = sqlHelper.getDataLocationList();
+//        for (Location l:locList) {
+//            if (l.i >= SvcComm.commBatchSize) break;
+//            Intent intentComm = new Intent(ctxApp, SvcComm.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putLong("itemId", l.itemId);
+//            bundle.putInt("rc", l.rc);
+//            bundle.putString("ft", l.ft);
+//            bundle.putBoolean("sl", l.sl==1);
+//            bundle.putString("sd", l.sd);
+//            bundle.putString("la", l.la);
+//            bundle.putString("lo", l.lo);
+//            bundle.putString("ac", l.ac);
+//            bundle.putString("al", l.al);
+//            bundle.putInt("wp", l.wp);
+//            bundle.putString("sg", l.sg);
+//            bundle.putString("dt", l.dt);
+//            bundle.putBoolean("irch", l.irch == 1);
+//
+//            intentComm.putExtras(bundle);
+//            ctxApp.startService(intentComm);
+//            if (l.irch == 1){delay(1000);}
+//        }
     }
     void sendStoredLocations(){
 
@@ -208,15 +234,14 @@ public class Session implements EventBus{
                     } else {
                         FontLog.appendLog(TAG + "Connectivity unavailable Can't send location", 'd');
                         EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
-                        Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
                     }
                 break;
             case GET_OFFLINE_FLIGHTS:
-
-                /// get flights from flightlist
-                for (FlightBase f : flightList){
-                    if(f.isTempFlightNum) f.set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
-                }
+//                /// get flights from flightlist
+//                for (FlightBase f : flightList){
+//                    if(f.isTempFlightNum) f..set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
+//                }
                 /// firsrt to check all temp flights in not ready to send state
 
                 Cursor flightsTemp = sqlHelper.getCursorTempFlights();
@@ -225,7 +250,11 @@ public class Session implements EventBus{
                         String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
                         if (isFlightNumberInList(fn)) continue;
                         FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
-                        new FlightBase(fn).set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
+                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
+                        else {
+                            FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
+                            EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
+                        }
                     }
                 }
                 finally{

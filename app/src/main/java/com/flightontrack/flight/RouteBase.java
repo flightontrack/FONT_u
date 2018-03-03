@@ -84,7 +84,7 @@ public class RouteBase implements EventBus{
             case ADD_OR_UPDATE_FLIGHT:
                 FlightBase fb = (FlightBase) eventMessage.eventMessageValueObject;
                 FontLog.appendLog(TAG + "fb.fn"+fb.flightNumber, 'd');
-                FontLog.appendLog(TAG + "fb.fnt"+fb.flightNumberTemp, 'd');
+                //FontLog.appendLog(TAG + "fb.fnt"+fb.flightNumberTemp, 'd');
                 if (flightList.contains(fb)) break;
                 else {
 //                    for (FlightBase f : new ArrayList<> (flightList)) {
