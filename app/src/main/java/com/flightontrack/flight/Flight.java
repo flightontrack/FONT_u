@@ -391,8 +391,8 @@ public class Flight extends FlightBase implements GetTime,EventBus {
 //                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
                     saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
                 }
-                //if (Util.isNetworkAvailable()) {
-                if (true) {
+                if (Util.isNetworkAvailable()) {
+                //if (true) {
                     if(isTempFlightNum) getNewFlightID();
                     if (lastAction == FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS) {
                         /// try close again, previouse attempt did not work

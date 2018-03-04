@@ -54,14 +54,14 @@
     <string name="label_website_psw">User Psw:</string>
     <string name="label_reset">Reset to Defaults</string>
     <string name="label_cache">Cache</string>
-    <string name="label_cachedpoints">Cached Points</string>
+    <string name="label_cachedpoints">Points Cached</string>
     <string name="label_clear_cache">Clear Location Cache</string>
     <string name="label_send_cache">Send Location Cache</string>
     <string name="label_btnreset">Reset</string>
     <string name="label_btnclear">Clear</string>
     <string name="label_btnsend">Send</string>
     <string name="label_btnpsw_show">Show Psw</string>
-    <string name="label_btnpsw_get">Get Passw</string>
+    <string name="label_btnpsw_get">Get Psw</string>
     <string name="label_btnpsw_hide">Hide Psw</string>
     <string name="label_chbox_logfile">Debug Log File</string>
     <string name="label_chbox_boot">Start on Reboot</string>

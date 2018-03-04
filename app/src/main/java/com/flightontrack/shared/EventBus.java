@@ -46,6 +46,7 @@ public interface EventBus {
         SVCCOMM_ONSUCCESS_NOTIF,
         SVCCOMM_ONSUCCESS_ACKN,
         SVCCOMM_ONSUCCESS_COMMAND,
+        SVCCOMM_BATCHSIZE_CHANGED,
 
         SVCCOMM_ONDESTROY,
         SETTINGACT_BUTTONCLEARCACHE_CLICKED,
@@ -147,6 +148,9 @@ public interface EventBus {
                 }
             case SVCCOMM_ONDESTROY:
                 if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                interfaceList.add(Session.getInstance());
+                break;
+            case SVCCOMM_BATCHSIZE_CHANGED:
                 interfaceList.add(Session.getInstance());
                 break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:

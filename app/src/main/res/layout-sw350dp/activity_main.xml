@@ -264,14 +264,13 @@
                 android:weightSum="10">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="5.4"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:text="@string/label_cachedpoints"
                     android:id="@+id/txtCache"
                     style="@style/label_label"
-                    />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5.35"
+                    android:inputType="text"
+                    android:text="@string/label_cachedpoints" />
                 <TextView
                     android:id="@+id/txtCached"
                     android:layout_width="0dp"

@@ -91,7 +91,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
             dbLocationRecCountNormal = 0;
             dbTempFlightRecCount = 0;
-            Toast.makeText(ctxApp, "Deleted " + lcount + " location points", Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctxApp, "Deleted " + lcount + " location points", Toast.LENGTH_LONG).show();
         }
         catch (Exception e){
             Toast.makeText(ctxApp, "Failed to clear cache", Toast.LENGTH_LONG).show();

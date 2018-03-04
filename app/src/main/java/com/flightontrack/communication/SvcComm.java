@@ -36,7 +36,8 @@ public class SvcComm extends Service{
     private String flightID;
     private Integer minStartId;
     private static Integer failureCounter=0;
-    public static Integer commBatchSize = 1;
+    public static Integer commBatchSize = COMM_BATCH_SIZE_MAX;
+    boolean sendNextStarted;
     //ArrayList<Integer> startId = new ArrayList<>();
     //ArrayList<Integer> pointNum = new ArrayList<>();
     private static HashMap<Integer,Integer> requestIdDbItemIdMap = new HashMap<>();
@@ -65,13 +66,14 @@ public class SvcComm extends Service{
 //            }
 //        }
         //trackPointNumber
-        if (requestId==1) sendNext();
+        if (!sendNextStarted) sendNext();
         return START_STICKY;
     }
     @Override
     public void onCreate() {
         super.onCreate();
         isServiceStarted=false;
+        sendNextStarted = false;
         //ctx = getApplicationContext();
     }
     public void setRequest(int reqId,Bundle extras){
@@ -100,48 +102,53 @@ public class SvcComm extends Service{
         requestIdDbItemIdMap.put(reqId,dbItemId);
         requestIdToRequestMap.put(reqId,requestParams);
     }
-    public void sendNext(){
-        HashMap.Entry<Integer,RequestParams> entry=requestIdToRequestMap.entrySet().iterator().next();
-        //if (!Util.isNetworkAvailable()) {
-            try {
-                FontLog.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber,'d');
-                //AsyncHttpClient aSyncClient = new AsyncHttpClient();
-                final LoopjAClient aSyncClient = new LoopjAClient(entry.getKey());
-                aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), entry.getValue(), new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        failureCounter=0;
+    public void sendNext() {
+        sendNextStarted = true;
+        HashMap.Entry<Integer, RequestParams> entry = requestIdToRequestMap.entrySet().iterator().next();
+        if (!Util.isNetworkAvailable()) {
+        try {
+            FontLog.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber, 'd');
+            //AsyncHttpClient aSyncClient = new AsyncHttpClient();
+            final LoopjAClient aSyncClient = new LoopjAClient(entry.getKey());
+            aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), entry.getValue(), new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    failureCounter = 0;
+                    if (commBatchSize == COMM_BATCH_SIZE_MIN) {
+                        /// need to call service again because the batch is smal to send all  location
                         commBatchSize = COMM_BATCH_SIZE_MAX;
-                        Response response = new Response(new String(responseBody));
-                        //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
-                        if (response.jsonErrorCount>0) {
-                            FontLog.appendLog(TAG + "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount,'d');
-                            if (response.jsonErrorCount>MAX_JSON_ERROR) {
-                                /// raise this event as NOTIF
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
-                                //Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
-                            }
-                            return;
+                        EventBus.distribute(new EventMessage(EVENT.SVCCOMM_BATCHSIZE_CHANGED)
+                                .setEventMessageValueInt(COMM_BATCH_SIZE_MAX));
+                    }
+                    Response response = new Response(new String(responseBody));
+                    //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
+                    if (response.jsonErrorCount > 0) {
+                        FontLog.appendLog(TAG + "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd');
+                        if (response.jsonErrorCount > MAX_JSON_ERROR) {
+                            /// raise this event as NOTIF
+                            EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                            //Route.activeRoute.set_rAction(RACTION.CLOSE_BUTTON_STOP_PRESSED);
                         }
-                        try {
-                            //FlightBase flight = RouteBase.get_FlightInstanceByNumber(response.responseFlightNum);
-
-                            if (response.responseAckn != null) {
-                                FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum+":"+response.responseAckn, 'd');
-                                sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
-                                ///set_SessionRequest(SACTION.ON_COMMUNICATION_SUCCESS);
-                            }
-                            if (response.responseNotif != null) {
-                                FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif,'d');
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
-                                // flight.set_fAction(FACTION.ON_SERVER_N0TIF);
-                            }
-                            if (response.responseCommand != null) {
-                                FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " +response.responseCommand,'d');
-                                if (response.iresponseCommand==COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad) return;
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_COMMAND)
-                                        .setEventMessageValueInt(response.iresponseCommand)
-                                        .setEventMessageValueString(response.responseFlightNum));
+                        return;
+                    }
+                    try {
+                        if (response.responseAckn != null) {
+                            FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn, 'd');
+                            sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
+                            ///set_SessionRequest(SACTION.ON_COMMUNICATION_SUCCESS);
+                        }
+                        if (response.responseNotif != null) {
+                            FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd');
+                            EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                            // flight.set_fAction(FACTION.ON_SERVER_N0TIF);
+                        }
+                        if (response.responseCommand != null) {
+                            FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd');
+                            if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
+                                return;
+                            EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_COMMAND)
+                                    .setEventMessageValueInt(response.iresponseCommand)
+                                    .setEventMessageValueString(response.responseFlightNum));
 //                                switch (response.iresponseCommand) {
 //                                    case COMMAND_TERMINATEFLIGHT:
 //                                        if (SessionProp.pIsRoad) break; /// just ignore the request
@@ -164,49 +171,49 @@ public class SvcComm extends Service{
 //                                    case -1:
 //                                        break;
 //                                }
-                            }
-                            if (response.responseDataLoad!=null){
-                                FontLog.appendLog(TAG + "Data response : "+response.responseDataLoad,'d');
-                            }
-                        } catch (Exception e) {
-                            FontLog.appendLog(TAG + "onSuccess : EXCEPTION :" + e.getMessage(),'e');
-                        } finally {
                         }
+                        if (response.responseDataLoad != null) {
+                            FontLog.appendLog(TAG + "Data response : " + response.responseDataLoad, 'd');
+                        }
+                    } catch (Exception e) {
+                        FontLog.appendLog(TAG + "onSuccess : EXCEPTION :" + e.getMessage(), 'e');
+                    } finally {
                     }
+                }
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        FontLog.appendLog(TAG + "onFailure; startId= " + aSyncClient.getStartID(), 'd');
-                        commBatchSize = COMM_BATCH_SIZE_MIN;
-                        failureCounter++;
-                    }
-                    @Override
-                    public void onFinish() {
-                        //minStartId = Collections.min(requestIdDbItemIdMap.keySet());
-                        if (requestIdDbItemIdMap.size()>1){
-                            for (Map.Entry<Integer, Integer> entry : requestIdDbItemIdMap.entrySet()) {
-                                FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(),'d');
-                            }
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                    FontLog.appendLog(TAG + "onFailure; startId= " + aSyncClient.getStartID(), 'd');
+                    commBatchSize = COMM_BATCH_SIZE_MIN;
+                    failureCounter++;
+                }
+
+                @Override
+                public void onFinish() {
+                    //minStartId = Collections.min(requestIdDbItemIdMap.keySet());
+                    if (requestIdDbItemIdMap.size() > 1) {
+                        for (Map.Entry<Integer, Integer> entry : requestIdDbItemIdMap.entrySet()) {
+                            FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(), 'd');
                         }
-                        FontLog.appendLog(TAG + "onFinish to remove ; startId= " + aSyncClient.getStartID(), 'd');
-                        requestIdDbItemIdMap.remove(aSyncClient.getStartID());
-                        requestIdToRequestMap.remove(aSyncClient.getStartID());
-                        if (failureCounter>MAX_FAILURE_COUNT){};//TODO
-                        //stopSelf(minStartId);
-                        if (requestIdDbItemIdMap.isEmpty()) stopSelf();
-                        else sendNext();
                     }
-                });
-            }
-            catch (Exception e){
-                FontLog.appendLog(TAG+"sendNext"+e.getMessage(),'d');
-                return;
-            }
-//        }
-//        else {
-//            Util.appendLog(TAG + "Connectivity unavailable, cant send location", 'd');
-//            Toast.makeText(ctx, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
-//        }
+                    FontLog.appendLog(TAG + "onFinish to remove ; startId= " + aSyncClient.getStartID(), 'd');
+                    requestIdDbItemIdMap.remove(aSyncClient.getStartID());
+                    requestIdToRequestMap.remove(aSyncClient.getStartID());
+                    if (failureCounter > MAX_FAILURE_COUNT) {
+                    }
+                    ;//TODO
+                    //stopSelf(minStartId);
+                    if (requestIdDbItemIdMap.isEmpty()) {
+
+                        stopSelf();
+                    } else sendNext();
+                }
+            });
+        } catch (Exception e) {
+            FontLog.appendLog(TAG + "sendNext" + e.getMessage(), 'd');
+            return;
+        }
+    }
     }
     public void onDestroy() {
         FontLog.appendLog(TAG + "onDestroy minStartId= "+ minStartId, 'd');

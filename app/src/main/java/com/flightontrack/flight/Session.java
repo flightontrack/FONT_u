@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
+import static com.flightontrack.communication.SvcComm.commBatchSize;
 import static com.flightontrack.flight.RouteBase.activeFlight;
 import static com.flightontrack.flight.RouteBase.flightList;
 import static com.flightontrack.flight.RouteBase.isFlightNumberInList;
@@ -87,9 +88,9 @@ public class Session implements EventBus{
         //sqlHelper.setCursorDataLocation();
         Cursor locations = sqlHelper.getCursorDataLocation();
         try {
-            FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + SvcComm.commBatchSize, 'd');
+            FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + commBatchSize, 'd');
             while (locations.moveToNext()) {
-                if (locations.getPosition() >= SvcComm.commBatchSize) break;
+                if (locations.getPosition() >= commBatchSize) break;
                 Intent intentComm = new Intent(ctxApp, SvcComm.class);
                 //Intent intentComm = new Intent(context, SvcIntentComm.class);
                 Bundle bundle = new Bundle();
@@ -143,7 +144,7 @@ public class Session implements EventBus{
     }
     void sendStoredLocations(){
 
-        SvcComm.commBatchSize= dbLocationRecCountNormal;
+        commBatchSize= dbLocationRecCountNormal;
         //SvcComm.commBatchSize= 50;
         int counter =0;
         //dbLocationRecCountNormal=sqlHelper.getCursorDataLocation().getCount();
@@ -303,6 +304,12 @@ public class Session implements EventBus{
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
                 set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
                 if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+                break;
+            case SVCCOMM_BATCHSIZE_CHANGED:
+                if (dbLocationRecCountNormal > 0) {
+                    commBatchSize=(dbLocationRecCountNormal>COMM_BATCH_SIZE_MAX?dbLocationRecCountNormal:COMM_BATCH_SIZE_MAX);
+                    set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+                }
                 break;
             case FLIGHT_STATECHANGEDTO_READYTOSEND:
                 //flightList.add((FlightBase) eventMessage.eventMessageValueObject);
