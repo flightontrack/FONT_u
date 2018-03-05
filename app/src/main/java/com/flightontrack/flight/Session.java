@@ -81,7 +81,6 @@ public class Session implements EventBus{
 //        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
-    //static ArrayList<FlightBase> flightToClose = new ArrayList<>();
 
     static void startLocationCommService() {
 
@@ -142,27 +141,27 @@ public class Session implements EventBus{
 //            if (l.irch == 1){delay(1000);}
 //        }
     }
-    void sendStoredLocations(){
-
-        commBatchSize= dbLocationRecCountNormal;
-        //SvcComm.commBatchSize= 50;
-        int counter =0;
-        //dbLocationRecCountNormal=sqlHelper.getCursorDataLocation().getCount();
-        int MaxTryCount = 0; //dbLocationRecCountNormal/SvcComm.commBatchSize*2;
-        while (dbLocationRecCountNormal>0){
-            FontLog.appendLog(TAG + " dbLocationRecCountNormal to send: " + dbLocationRecCountNormal, 'd');
-            if (counter >MaxTryCount) {
-                //Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
-                //sqlHelper.cl.close();
-                break;
-            }
-            delay(2000);
-            counter++;
-            //Toast.makeText(mainactivityInstance, R.string.toast_cachesending, Toast.LENGTH_SHORT).show();
-            set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-        }
-
-    }
+//    void sendStoredLocations(){
+//
+//        commBatchSize= dbLocationRecCountNormal;
+//        //SvcComm.commBatchSize= 50;
+//        int counter =0;
+//        //dbLocationRecCountNormal=sqlHelper.getCursorDataLocation().getCount();
+//        int MaxTryCount = 0; //dbLocationRecCountNormal/SvcComm.commBatchSize*2;
+//        while (dbLocationRecCountNormal>0){
+//            FontLog.appendLog(TAG + " dbLocationRecCountNormal to send: " + dbLocationRecCountNormal, 'd');
+//            if (counter >MaxTryCount) {
+//                //Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
+//                //sqlHelper.cl.close();
+//                break;
+//            }
+//            delay(2000);
+//            counter++;
+//            //Toast.makeText(mainactivityInstance, R.string.toast_cachesending, Toast.LENGTH_SHORT).show();
+//            set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+//        }
+//
+//    }
 
     static void delay(int millis) {
         try {

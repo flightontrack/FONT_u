@@ -82,9 +82,9 @@ public class Util {
         editor.putInt("wayPointLimit", WAY_POINT_HARD_LIMIT > wp_limit ? WAY_POINT_HARD_LIMIT : wp_limit).commit();
     }
 
-    public static void setAcftNum(String an) {
-        MainActivity.txtAcftNum.setText(an);
-    }
+//    public static void setAcftNum(String an) {
+//        MainActivity.txtAcftNum.setText(an);
+//    }
 
     public static String getAcftNum(int a) {
         String acft;

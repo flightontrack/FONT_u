@@ -113,14 +113,14 @@ public final class Props implements EventBus{
             pSpinnerMinSpeedPos = pos;
             String[] minSpeedArray=ctxApp.getResources().getStringArray(R.array.speed_array);
             pSpinnerMinSpeed = Double.parseDouble(minSpeedArray[pos]) * 0.44704;
-            MainActivity.spinnerMinSpeed.setSelection(pos);
+            mainactivityInstance.spinnerMinSpeed.setSelection(pos);
 
         }
         public static void set_pIntervalLocationUpdateSecPos(int pos) {
             //FontLog.appendLog(TAG + "set_pIntervalLocationUpdateSecPos:"+pos,'d');
             pIntervalSelectedItem =pos;
             pIntervalLocationUpdateSec =pUpdateIntervalSec[pos];
-            MainActivity.spinnerUpdFreq.setSelection(pos);
+            mainactivityInstance.spinnerUpdFreq.setSelection(pos);
         }
 
         public static void clearOnDestroy() {
@@ -145,7 +145,6 @@ public final class Props implements EventBus{
         public static void resetSessionProp() {
             clearToDefault();
             get();
-            //save();
         }
     }
     public static String getCurrAppContext() {

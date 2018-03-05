@@ -49,7 +49,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
             if (!SvcLocationClock.isInstanceCreated()) {
                 FontLog.appendLog(TAG+ "Restarting : performClick()",'d');
                 SessionProp.set_isMultileg(true);
-                MainActivity.trackingButton.performClick();
+                mainactivityInstance.trackingButton.performClick();
                 isRestart = true;
                 healthCheckComm(context);
             }

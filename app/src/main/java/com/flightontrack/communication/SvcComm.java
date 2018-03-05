@@ -105,7 +105,7 @@ public class SvcComm extends Service{
     public void sendNext() {
         sendNextStarted = true;
         HashMap.Entry<Integer, RequestParams> entry = requestIdToRequestMap.entrySet().iterator().next();
-        if (!Util.isNetworkAvailable()) {
+        if (Util.isNetworkAvailable()) {
         try {
             FontLog.appendLog(TAG + "Send: flight: " + flightID + " dbItemId :" + String.valueOf(dbItemId) + " point: " + trackPointNumber, 'd');
             //AsyncHttpClient aSyncClient = new AsyncHttpClient();
@@ -204,8 +204,10 @@ public class SvcComm extends Service{
                     ;//TODO
                     //stopSelf(minStartId);
                     if (requestIdDbItemIdMap.isEmpty()) {
-
                         stopSelf();
+                        // if still location to send left  - rethrow the call
+                        EventBus.distribute(new EventMessage(EVENT.SVCCOMM_BATCHSIZE_CHANGED)
+                                .setEventMessageValueInt(COMM_BATCH_SIZE_MAX));
                     } else sendNext();
                 }
             });
