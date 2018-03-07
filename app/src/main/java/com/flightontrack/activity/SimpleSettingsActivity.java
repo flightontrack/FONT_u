@@ -57,53 +57,34 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         txtBuild= (TextView) findViewById((R.id.txtBuild));
         txtBuild.setText((getString(R.string.app_label)+" "+ AppConfig.pAppRelease+ AppConfig.pAppReleaseSuffix));
         resetButton = (Button) findViewById(R.id.btnReset);
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SessionProp.resetSessionProp();
-                updateUI();
-                //spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
-                Util.setPsw(null);
-                getPswButton.setText(R.string.label_btnpsw_get);
-                //MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
-            }
+        resetButton.setOnClickListener(view -> {
+            SessionProp.resetSessionProp();
+            updateUI();
+            //spinnerUrls.setSelection(SessionProp.pSpinnerUrlsPos);
+            Util.setPsw(null);
+            getPswButton.setText(R.string.label_btnpsw_get);
+            //MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
         });
         clearCacheButton = (Button) findViewById(R.id.btnClearCache);
-        clearCacheButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONCLEARCACHE_CLICKED));
-            }
-        });
+        clearCacheButton.setOnClickListener(view -> EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONCLEARCACHE_CLICKED)));
         sendCacheButton = (Button) findViewById(R.id.btnSendCache);
-        sendCacheButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                progressBar.show();
-                EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONSENDCACHE_CLICKED));
-            }
+        sendCacheButton.setOnClickListener(view -> {
+            progressBar.show();
+            EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONSENDCACHE_CLICKED));
         });
         getPswButton = (Button) findViewById(R.id.btnGetPsw);
-        getPswButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (Util.getPsw()==null) {
-                    Util.setCloudPsw(view);
-                }
-                txtPsw.setVisibility(View.VISIBLE);
+        getPswButton.setOnClickListener(view -> {
+            if (Util.getPsw()==null) {
+                Util.setCloudPsw(view);
             }
+            txtPsw.setVisibility(View.VISIBLE);
         });
         if(!AppConfig.pIsAppTypePublic) {
             chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
             if (null!=chBoxIsOnReboot) {
                 chBoxIsOnReboot.setChecked(SessionProp.pIsOnReboot);
-                chBoxIsOnReboot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        SessionProp.pIsOnReboot = b;
-                        //Util.setIsOnBoot(b);
-                    }
+                chBoxIsOnReboot.setOnCheckedChangeListener((compoundButton, b) -> {
+                    SessionProp.pIsOnReboot = b;
                 });
             }
             spinnerTextTo = (Spinner) findViewById(R.id.spinnerTextTo);
@@ -111,7 +92,6 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             adapterTextTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerTextTo.setAdapter(adapterTextTo);
             spinnerTextTo.setOnItemSelectedListener(this);
-
         }
         else{
             findViewById(R.id.layoutTextTo).setVisibility(View.INVISIBLE);
@@ -119,22 +99,15 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         }
         chBoxIsDebug = (CheckBox) findViewById(R.id.isDebugCheckBoxCheckBox);
         //chBoxIsDebug.setChecked(SessionProp.pIsDebug);
-        chBoxIsDebug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                    @Override
-                                                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                                                        if(b) set_writePermissions();
-                                                        //Util.setIsDebug(b);
-                                                        SessionProp.pIsDebug=b;
-                                                    }
-                                                });
+        chBoxIsDebug.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(b) set_writePermissions();
+            SessionProp.pIsDebug=b;
+        });
         chBoxIsRoad = (CheckBox) findViewById(R.id.isRoadCheckBox);
         //chBoxIsRoad.setChecked(SessionProp.pIsRoad);
-        chBoxIsRoad.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SessionProp.pIsRoad=b;
-                //Route.set_isRoad(b);
-            }
+        chBoxIsRoad.setOnCheckedChangeListener((compoundButton, b) -> {
+            SessionProp.pIsRoad=b;
+            //Route.set_isRoad(b);
         });
         txtUser= (TextView) findViewById((R.id.txtWebsiteUser));
         txtUser.setText(Pilot.getUserID());
@@ -156,14 +129,11 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         progressBar.setCancelable(true);
         progressBar.setMax(100);
         progressBar.setProgress(100);
-        progressBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                if (progressBar.isShowing()) {
-                    progressBar.dismiss();
-                }
-                finish();
+        progressBar.setOnCancelListener(dialog -> {
+            if (progressBar.isShowing()) {
+                progressBar.dismiss();
             }
+            finish();
         });
         updateUI();
     }

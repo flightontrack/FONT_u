@@ -48,19 +48,19 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.flight.Session.*;
 
 public class MainActivity extends AppCompatActivity implements EventBus {
-    private static final String TAG = "MainActivity:";
-    TextView txtUserName;
+    static final String TAG = "MainActivity:";
+    public static boolean isToDestroy = true;
     public TextView txtAcftNum;
-    TextView txtCached;
     public Spinner spinnerUpdFreq;
     public Spinner spinnerMinSpeed;
-    CheckBox chBoxIsMultiLeg;
     public Button trackingButton;
+    TextView txtUserName;
+    TextView txtCached;
+    CheckBox chBoxIsMultiLeg;
     Toolbar toolbarTop;
     Toolbar toolbarBottom;
     ActionMenuView amvMenu;
     View cardLayout1;
-    public static boolean isToDestroy = true;
     ReceiverHealthCheckAlarm alarmReceiver;
 
     /**
@@ -70,6 +70,36 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     private GoogleApiClient client;
 
     public MainActivity() {
+    }
+
+    public static Boolean isMainActivityExist() {
+        return mainactivityInstance != null;
+    }
+
+    static String setTextGreen() {
+        SessionProp.pTextGreen = "Flight: " + (RouteBase.activeFlight.flightNumber) + '\n' +
+                "Point: " + RouteBase.activeFlight._wayPointsCount +
+                ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString + '\n'
+                + "Alt: " + RouteBase.activeFlight.lastAltitudeFt + " ft";
+        return SessionProp.pTextGreen;
+    }
+
+    static String setTextRed() {
+        String fText = SessionProp.pTextRed;
+        String fTime = "";
+        String flightN = FLIGHT_NUMBER_DEFAULT;
+
+        if (RouteBase.activeRoute == null) {
+            FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
+        } else {
+            if (RouteBase.activeFlight != null) {
+                flightN = RouteBase.activeFlight.flightNumber;
+                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString;
+            }
+            fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
+        }
+        SessionProp.pTextRed = fText + fTime;
+        return SessionProp.pTextRed;
     }
 
     @Override
@@ -94,13 +124,14 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 setSupportActionBar(toolbarBottom);
             }
             cardLayout1 = findViewById(R.id.cardLayoutId1);
-            cardLayout1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            //cardLayout1.setOnClickListener(new View.OnClickListener() {
+            cardLayout1.setOnClickListener(v-> {
+                //@Override
+                //public void onClick(View view) {
                     //FontLog.appendLog(TAG + "Method1", 'd');
                     Intent intent = new Intent(ctxApp, AircraftActivity.class);
                     startActivity(intent);
-                }
+                //}
 
             });
             toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
@@ -291,32 +322,25 @@ public class MainActivity extends AppCompatActivity implements EventBus {
 
     }
 
-    public MainActivity getInstance(){
-        return this;
-    }
-
     void init_listeners() {
 
-        trackingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Util.appendLog(TAG + "trackingButton: onClick",'d');
-                //if (RouteBase._routeStatus == RSTATUS.PASSIVE) {
-                switch (trackingButtonState) {
-                    case BUTTON_STATE_RED:
-                        //Util.setAcftNum(txtAcftNum.getText().toString());
-                        /// /// if (!AppConfig.pAutostart && !is_services_available()) return;
-                        if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
+        trackingButton.setOnClickListener(view -> {
+            //Util.appendLog(TAG + "trackingButton: onClick",'d');
+            //if (RouteBase._routeStatus == RSTATUS.PASSIVE) {
+            switch (trackingButtonState) {
+                case BUTTON_STATE_RED:
+                    //Util.setAcftNum(txtAcftNum.getText().toString());
+                    /// /// if (!AppConfig.pAutostart && !is_services_available()) return;
+                    if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
 
-                            new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
-                            if (!SessionProp.pIsEmptyAcftOk) return;
-                        }
-                        EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_START));
-                        break;
-                    default:
-                        EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
-                        break;
-                }
+                        new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();
+                        if (!SessionProp.pIsEmptyAcftOk) return;
+                    }
+                    EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_START));
+                    break;
+                default:
+                    EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
+                    break;
             }
         });
     }
@@ -425,23 +449,15 @@ public class MainActivity extends AppCompatActivity implements EventBus {
         adapterSpeed.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         spinnerMinSpeed.setAdapter(adapterSpeed);
         spinnerMinSpeed.setSelection(SessionProp.pSpinnerMinSpeedPos);
-        //Util.setSpinnerSpeedPos(SessionProp.pSpinnerMinSpeedPos);
         spinnerMinSpeed.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Util.setSpinnerSpeedPos(position);
                 SessionProp.set_pSpinnerMinSpeedPos(position);
-                //Util.setTrackingSpeed(spinnerMinSpeed.getSelectedItem().toString());
-
             }
 
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
         //pMinSpeedArray= getResources().getStringArray(R.array.speed_array);
-    }
-
-    public static Boolean isMainActivityExist() {
-        return mainactivityInstance != null;
     }
 
     public void finishActivity() {
@@ -475,7 +491,6 @@ public class MainActivity extends AppCompatActivity implements EventBus {
         return true;
     }
 
-
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -492,15 +507,6 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 .build();
     }
 
-    //    static void Method1(View v){
-//        Util.appendLog(TAG + "Method1", 'd');
-//        Intent intent = new Intent(this, AircraftActivity.class);
-//        //startActivity(intent);
-//        //acftActivity();
-//    }
-//    public void trackingButtonPerformClick(){
-//        trackingButton.performClick();
-//    }
     void setTrackingButton(BUTTONREQUEST request) {
         //Util.appendLog(TAG+"trackingButtonState request:" +request,'d');
         switch (request) {
@@ -532,32 +538,6 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 // MainActivity.trackingButton.setText("Flight " + (Flight.get_ActiveFlightID()) + ctx.getString(R.string.tracking_is_off));
         }
         trackingButtonState = request;
-    }
-
-    static String setTextGreen() {
-        SessionProp.pTextGreen = "Flight: " + (RouteBase.activeFlight.flightNumber) + '\n' +
-                "Point: " + RouteBase.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString + '\n'
-                + "Alt: " + RouteBase.activeFlight.lastAltitudeFt + " ft";
-        return SessionProp.pTextGreen;
-    }
-
-    static String setTextRed() {
-        String fText = SessionProp.pTextRed;
-        String fTime = "";
-        String flightN = FLIGHT_NUMBER_DEFAULT;
-
-        if (RouteBase.activeRoute == null) {
-            FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
-        } else {
-            if (RouteBase.activeFlight != null) {
-                flightN = RouteBase.activeFlight.flightNumber;
-                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString;
-            }
-            fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
-        }
-        SessionProp.pTextRed = fText + fTime;
-        return SessionProp.pTextRed;
     }
 
     @Override

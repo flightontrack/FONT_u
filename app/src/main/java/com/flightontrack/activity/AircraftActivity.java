@@ -12,9 +12,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,21 +30,19 @@ import org.json.JSONObject;
 
 public class AircraftActivity extends Activity {
     private static final String TAG = "AircraftActivity:";
-    //public static SharedPreferences sharedPreferences;
-    //public static SharedPreferences.Editor editor;
 
-    static TextView txtBlueText;
-    static TextView txtAcftMake;
-    static TextView txtAcftModel;
-    static TextView txtAcftSeries;
-    static EditText txtAcftRegNum;
-    static EditText txtAcftName;
-    static TextView txtAcftTagId;
-    static TextView txtUserName;
-    static Button doneButton;
-    static Button cancelButton;
-    static Button clearButton;
-    static Switch nfcSwitch;
+    TextView txtBlueText;
+    TextView txtAcftMake;
+    TextView txtAcftModel;
+    TextView txtAcftSeries;
+    EditText txtAcftRegNum;
+    EditText txtAcftName;
+    TextView txtAcftTagId;
+    TextView txtUserName;
+    Button doneButton;
+    Button cancelButton;
+    Button clearButton;
+    Switch nfcSwitch;
     //ShowAlertClass showAlertClass;
     protected static NfcAdapter nfcAdapter;
     IntentFilter tagDetected;
@@ -68,7 +64,7 @@ public class AircraftActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FontLog.appendLog(TAG + "AircraftActivity onCreate", 'd');
-        setContentView(Props.AppConfig.pIsNFCcapable ? R.layout.activity_acraft: R.layout.activity_acraft_no_nfc);
+        setContentView(Props.AppConfig.pIsNFCcapable ? R.layout.activity_acraft : R.layout.activity_acraft_no_nfc);
     }
 
     @Override
@@ -77,33 +73,35 @@ public class AircraftActivity extends Activity {
         //getMenuInflater().inflate(R.menu.acraft, menu);
         return true;
     }
-   @Override
+
+    @Override
     public void onResume() {
-       FontLog.appendLog(TAG + "AircraftActivity onResume", 'd');
-       txtUserName = (TextView) findViewById(R.id.txtUserName);
-       txtUserName.setText(Pilot.getPilotUserName());
-       txtAcftName = (EditText) findViewById(R.id.txtAcftName);
-       txtAcftRegNum = (EditText) findViewById(R.id.txtAcftRegNum);
+        FontLog.appendLog(TAG + "AircraftActivity onResume", 'd');
+        txtUserName = (TextView) findViewById(R.id.txtUserName);
+        txtUserName.setText(Pilot.getPilotUserName());
+        txtAcftName = (EditText) findViewById(R.id.txtAcftName);
+        txtAcftRegNum = (EditText) findViewById(R.id.txtAcftRegNum);
 
-       doneButton = (Button) findViewById(R.id.btn_acft_done);
-       cancelButton = (Button) findViewById(R.id.btn_acft_cancel);
-       clearButton = (Button) findViewById(R.id.btn_acft_clear);
+        doneButton = (Button) findViewById(R.id.btn_acft_done);
+        cancelButton = (Button) findViewById(R.id.btn_acft_cancel);
+        clearButton = (Button) findViewById(R.id.btn_acft_clear);
 
-       if (Props.AppConfig.pIsNFCcapable) {
-           nfcSwitch = (Switch) findViewById(R.id.switch_nfc);
-           txtBlueText = (TextView) findViewById(R.id.txtBlueText);
-           nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-           txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
-           txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
-           txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
-           txtAcftTagId = (TextView) findViewById(R.id.txtAcftTagId);
-           setAcft(getAcft());
-       }
-       setAcft_nonfc(getAcft());
-       init_listeners();
+        if (Props.AppConfig.pIsNFCcapable) {
+            nfcSwitch = (Switch) findViewById(R.id.switch_nfc);
+            txtBlueText = (TextView) findViewById(R.id.txtBlueText);
+            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+            txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
+            txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
+            txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
+            txtAcftTagId = (TextView) findViewById(R.id.txtAcftTagId);
+            setAcft(getAcft());
+        }
+        setAcft_nonfc(getAcft());
+        init_listeners();
 
-       super.onResume();
+        super.onResume();
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -115,55 +113,40 @@ public class AircraftActivity extends Activity {
 //        return super.onOptionsItemSelected(item);
     }
 
-    void init_listeners(){
-        doneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject json  = new JSONObject();
-                try
-                {
-                    json.put("AcftRegNum",txtAcftRegNum.getText().toString());
-                    json.put("AcftName",txtAcftName.getText().toString());
-                    setAcft_nonfc(json);
-                    if (Props.AppConfig.pIsNFCcapable) {
-                        json.put("AcftMake", txtAcftMake.getText().toString());
-                        json.put("AcftModel", txtAcftModel.getText().toString());
-                        json.put("AcftSeries", txtAcftSeries.getText().toString());
-                        json.put("AcftTagId", txtAcftTagId.getText().toString());
-                        setAcft(json);
-                    }
-                } catch (JSONException e)
-                {
-                    //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
-                }
-                Pilot.setPilotUserName(txtUserName.getText().toString());
-                finish();
-            }
-        });
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clearAcftPreferences();
-                setAcft_nonfc(getAcft());
+    void init_listeners() {
+
+        doneButton.setOnClickListener(view -> {
+            JSONObject json = new JSONObject();
+            try {
+                json.put("AcftRegNum", txtAcftRegNum.getText().toString());
+                json.put("AcftName", txtAcftName.getText().toString());
+                setAcft_nonfc(json);
                 if (Props.AppConfig.pIsNFCcapable) {
-                    setAcft(getAcft());
+                    json.put("AcftMake", txtAcftMake.getText().toString());
+                    json.put("AcftModel", txtAcftModel.getText().toString());
+                    json.put("AcftSeries", txtAcftSeries.getText().toString());
+                    json.put("AcftTagId", txtAcftTagId.getText().toString());
+                    setAcft(json);
                 }
+            } catch (JSONException e) {
+                //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
+            }
+            Pilot.setPilotUserName(txtUserName.getText().toString());
+            finish();
+        });
+        cancelButton.setOnClickListener(view -> finish());
+        clearButton.setOnClickListener(view -> {
+            clearAcftPreferences();
+            setAcft_nonfc(getAcft());
+            if (Props.AppConfig.pIsNFCcapable) {
+                setAcft(getAcft());
             }
         });
         if (Props.AppConfig.pIsNFCcapable) {
             enableNfcForegroundMode();
-            nfcSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    FontLog.appendLog(TAG + "AircraftActivity onCheckedChanged", 'd');
-                    setTagNFCState(buttonView.isChecked());
-                }
+            nfcSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                FontLog.appendLog(TAG + "AircraftActivity onCheckedChanged", 'd');
+                setTagNFCState(buttonView.isChecked());
             });
         }
 //                txtUserName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -183,28 +166,25 @@ public class AircraftActivity extends Activity {
 //                return false; // pass on to other listeners.
 //            }
 //        });
-        txtUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                String input;
-                EditText editText;
-                if (!hasFocus) {
-                    editText = (EditText) v;
-                    input = editText.getText().toString();
-                    Pilot.setPilotUserName(input);
-                }
+        txtUserName.setOnFocusChangeListener((v, hasFocus) -> {
+            String input;
+            EditText editText;
+            if (!hasFocus) {
+                editText = (EditText) v;
+                input = editText.getText().toString();
+                Pilot.setPilotUserName(input);
             }
         });
     }
+
     //void setAcft(String AcftMake,String AcftModel,String AcftSeries,String AcftRegNum,String AcftTagId){
-    void setAcft(JSONObject json){
-        try
-        {
-            FontLog.appendLog(TAG+ json.toString(),'d');
+    void setAcft(JSONObject json) {
+        try {
+            FontLog.appendLog(TAG + json.toString(), 'd');
             String AcftMake = json.getString("AcftMake");
-            String AcftModel = json.getString("AcftModel").replace(" ","");
-            String AcftSeries = json.getString("AcftSeries").replace(" ","");
-            String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
+            String AcftModel = json.getString("AcftModel").replace(" ", "");
+            String AcftSeries = json.getString("AcftSeries").replace(" ", "");
+            String AcftRegNum = json.getString("AcftRegNum").replace(" ", "");
             String AcftTagId = json.getString("AcftTagId");
             String AcftName = json.getString("AcftName");
             Props.editor.putString("AcftMake", AcftMake.trim());
@@ -222,16 +202,15 @@ public class AircraftActivity extends Activity {
             txtAcftTagId.setText(AcftTagId);
             txtAcftName.setText(AcftName);
 
-        } catch (JSONException e)
-        {
-            Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ");
+        } catch (JSONException e) {
+            Log.e(GLOBALTAG, TAG + "Couldn't parse JSON: ");
         }
     }
-    void setAcft_nonfc(JSONObject json){
-        try
-        {
-            FontLog.appendLog(TAG+ json.toString(),'d');
-            String AcftRegNum = json.getString("AcftRegNum").replace(" ","");
+
+    void setAcft_nonfc(JSONObject json) {
+        try {
+            FontLog.appendLog(TAG + json.toString(), 'd');
+            String AcftRegNum = json.getString("AcftRegNum").replace(" ", "");
             String AcftName = json.getString("AcftName");
             Props.editor.putString("AcftRegNum", AcftRegNum.trim());
             Props.editor.putString("AcftName", AcftName.trim());
@@ -240,110 +219,105 @@ public class AircraftActivity extends Activity {
             txtAcftRegNum.setText(AcftRegNum);
             txtAcftName.setText(AcftName);
 
-        } catch (JSONException e)
-        {
-            Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ");
+        } catch (JSONException e) {
+            Log.e(GLOBALTAG, TAG + "Couldn't parse JSON: ");
         }
     }
-    JSONObject getAcft(){
+
+    JSONObject getAcft() {
 //        txtAcftMake.setText(sharedPreferences.getString("AcftMake",""));
 //        txtAcftModel.setText(sharedPreferences.getString("AcftModel",""));
 //        txtAcftSeries.setText(sharedPreferences.getString("AcftSeries",""));
 //        txtAcftRegNum.setText(sharedPreferences.getString("AcftRegNum",getString(R.string.default_acft_N)));
 //        txtAcftRegNum.setText(sharedPreferences.getString("AcftTagId",""));
-        JSONObject json  = new JSONObject();
-        try
-        {
-            json.put("AcftMake", Props.sharedPreferences.getString("AcftMake",""));
-            json.put("AcftModel", Props.sharedPreferences.getString("AcftModel",""));
-            json.put("AcftSeries", Props.sharedPreferences.getString("AcftSeries",""));
-            json.put("AcftRegNum", Props.sharedPreferences.getString("AcftRegNum",getString(R.string.default_acft_N)));
-            json.put("AcftTagId", Props.sharedPreferences.getString("AcftTagId",""));
-            json.put("AcftName", Props.sharedPreferences.getString("AcftName",""));
-        } catch (JSONException e)
-        {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("AcftMake", Props.sharedPreferences.getString("AcftMake", ""));
+            json.put("AcftModel", Props.sharedPreferences.getString("AcftModel", ""));
+            json.put("AcftSeries", Props.sharedPreferences.getString("AcftSeries", ""));
+            json.put("AcftRegNum", Props.sharedPreferences.getString("AcftRegNum", getString(R.string.default_acft_N)));
+            json.put("AcftTagId", Props.sharedPreferences.getString("AcftTagId", ""));
+            json.put("AcftName", Props.sharedPreferences.getString("AcftName", ""));
+        } catch (JSONException e) {
             //Log.e(GLOBALTAG,TAG+ "Couldn't parse JSON: ", e);
         }
         return json;
     }
-    public void setTagNFCState(Boolean tagstate){
-    if(tagstate&&!nfcAdapter.isEnabled()) {
-        new ShowAlertClass(this).showNFCDisabledAlertToUser();
-        tagstate = false;
-        nfcSwitch.setChecked(tagstate);
-    }
+
+    public void setTagNFCState(Boolean tagstate) {
+        if (tagstate && !nfcAdapter.isEnabled()) {
+            new ShowAlertClass(this).showNFCDisabledAlertToUser();
+            tagstate = false;
+            nfcSwitch.setChecked(tagstate);
+        }
         Props.editor.putBoolean("nfctagstate", tagstate).commit();
-        txtBlueText.setText(getTagNFCState()?R.string.instructions1:R.string.instructions2);
+        txtBlueText.setText(getTagNFCState() ? R.string.instructions1 : R.string.instructions2);
     }
-    public static Boolean getTagNFCState(){
+
+    public static Boolean getTagNFCState() {
         return Props.sharedPreferences.getBoolean("nfctagstate", false);
     }
+
     public void enableNfcForegroundMode() {
         //Util.appendLog(TAG+ "AircraftActivity enableForegroundMode");
         // foreground mode gives the current active application priority for reading scanned tags
         tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED); // filter for tags
         ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        try
-        {
+        try {
             ndefDetected.addDataType("application/com.flightontrack");
-        } catch (IntentFilter.MalformedMimeTypeException e)
-        {
+        } catch (IntentFilter.MalformedMimeTypeException e) {
             throw new RuntimeException("Could not add MIME type.", e);
         }
-        nfcFilters = new IntentFilter[]{tagDetected,ndefDetected};
+        nfcFilters = new IntentFilter[]{tagDetected, ndefDetected};
         pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, this.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcFilters, null);
     }
-    NdefMessage[] getNdefMessagesFromIntent(Intent intent)
-    {
+
+    NdefMessage[] getNdefMessagesFromIntent(Intent intent) {
         // Parse the intent
         NdefMessage[] msgs = null;
         String action = intent.getAction();
         if (action.equals(NfcAdapter.ACTION_TAG_DISCOVERED)
-                || action.equals(NfcAdapter.ACTION_NDEF_DISCOVERED))
-        {
+                || action.equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
             Parcelable[] rawMsgs = intent
                     .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMsgs != null)
-            {
+            if (rawMsgs != null) {
                 msgs = new NdefMessage[rawMsgs.length];
-                for (int i = 0; i < rawMsgs.length; i++)
-                {
+                for (int i = 0; i < rawMsgs.length; i++) {
                     msgs[i] = (NdefMessage) rawMsgs[i];
                 }
-            } else
-            {
+            } else {
                 // Unknown tag type
-                byte[] empty = new byte[] {};
+                byte[] empty = new byte[]{};
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN,
                         empty, empty, empty);
-    NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
-    msgs = new NdefMessage[] { msg };
-}
-} else
-        {
-        //Log.e(GLOBALTAG,TAG+ "Unknown intent.");
-        finish();
+                NdefMessage msg = new NdefMessage(new NdefRecord[]{record});
+                msgs = new NdefMessage[]{msg};
+            }
+        } else {
+            //Log.e(GLOBALTAG,TAG+ "Unknown intent.");
+            finish();
         }
         return msgs;
-        }
-@Override
-public void onNewIntent(Intent intent) {
-    FontLog.appendLog(TAG+ "AircraftActivity onNewIntent",'d');
-    //Util.appendLog(TAG+ intent.getAction());
-    if ((intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
-            || intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) && getTagNFCState()) {
-        NdefMessage[] msgs = getNdefMessagesFromIntent(intent);
-        NdefRecord record = msgs[0].getRecords()[0];
-        byte[] payload = record.getPayload();
-        //String jsonString = new String(payload);
-        try {
-            JSONObject j = new JSONObject(new String(payload));
-            j.put("AcftName",txtAcftName.getText().toString());
-            setAcft(j);
-        } catch (JSONException e) {
-            FontLog.appendLog(TAG+ "Couldn't create json from NFC: "+e.getMessage(),'e');
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        FontLog.appendLog(TAG + "AircraftActivity onNewIntent", 'd');
+        //Util.appendLog(TAG+ intent.getAction());
+        if ((intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
+                || intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) && getTagNFCState()) {
+            NdefMessage[] msgs = getNdefMessagesFromIntent(intent);
+            NdefRecord record = msgs[0].getRecords()[0];
+            byte[] payload = record.getPayload();
+            //String jsonString = new String(payload);
+            try {
+                JSONObject j = new JSONObject(new String(payload));
+                j.put("AcftName", txtAcftName.getText().toString());
+                setAcft(j);
+            } catch (JSONException e) {
+                FontLog.appendLog(TAG + "Couldn't create json from NFC: " + e.getMessage(), 'e');
+            }
         }
     }
-}
 }
