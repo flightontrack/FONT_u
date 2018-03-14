@@ -12,8 +12,8 @@ public class RouteBase implements EventBus{
     public enum RACTION {
         OPEN_NEW_FLIGHT,
         SWITCH_TO_PENDING,
-        CLOSE_RECEIVEFLIGHT_FAILED,
-        RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER,
+        //CLOSE_RECEIVEFLIGHT_FAILED,
+        //RECEIVEFLIGHT_FAILED_GET_TEMPFLIGHTNUMBER,
         RESTART_NEW_FLIGHT,
         REMOVE_FLIGHT_IF_CLOSED,
         ADD_OR_UPDATE_FLIGHT
@@ -53,9 +53,6 @@ public class RouteBase implements EventBus{
         return false;
     }
     void setToNull(){
-//            for (FlightBase f : new ArrayList<>(flightList)) {
-//                flightList.remove(f);
-//            }
         RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
         RouteBase.activeFlight = null;
         RouteBase.activeRoute = null;
@@ -87,15 +84,6 @@ public class RouteBase implements EventBus{
                 //FontLog.appendLog(TAG + "fb.fnt"+fb.flightNumberTemp, 'd');
                 if (flightList.contains(fb)) break;
                 else {
-//                    for (FlightBase f : new ArrayList<> (flightList)) {
-//                        FontLog.appendLog(TAG + "f.fn"+fb.flightNumber, 'd');
-//                        FontLog.appendLog(TAG + "f.fnt"+fb.flightNumberTemp, 'd');
-//                        if (f.flightNumberTemp.equals(fb.flightNumberTemp)) {
-//                            f.set_flightNumber(eventMessage.eventMessageValueString);
-//                            eventMessage = null; /// kill temp flight
-//                        }
-//                        else flightList.add((FlightBase) eventMessage.eventMessageValueObject);
-//                    }
                     flightList.add((FlightBase) eventMessage.eventMessageValueObject);
                     break;
                 }

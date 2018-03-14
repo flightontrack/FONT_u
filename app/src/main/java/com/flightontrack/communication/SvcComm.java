@@ -55,7 +55,7 @@ public class SvcComm extends Service{
         dbItemId = (int) intent.getExtras().getLong("itemId");
         //Bundle extras = intent.getExtras();
         if (requestIdDbItemIdMap.containsValue(dbItemId)) {
-            FontLog.appendLog(TAG+ "onStartCommand requestIdDbItemIdMap contains: " + dbItemId + "return",'d');
+            FontLog.appendLog(TAG+ "onStartCommand requestIdDbItemIdMap contains: " + dbItemId + " return",'d');
             return START_STICKY;
         }
         setRequest(requestId,intent.getExtras());
@@ -81,7 +81,7 @@ public class SvcComm extends Service{
         //dbItemId = (int) extras.getLong("itemId");
         trackPointNumber = extras.getInt("wp");
         flightID = extras.getString("ft");
-        FontLog.appendLog(TAG+ "onStartCommand requestId: " + reqId +" dbItemId :"+ dbItemId+" trackPointNumber :"+trackPointNumber,'d');
+        FontLog.appendLog(TAG+ "setRequest  requestId: " + reqId +" dbItemId :"+ dbItemId+" trackPointNumber :"+trackPointNumber,'d');
         requestParams = new RequestParams();
         requestParams.put("isdebug", SessionProp.pIsDebug);
         requestParams.put("speedlowflag",extras.getBoolean("sl"));

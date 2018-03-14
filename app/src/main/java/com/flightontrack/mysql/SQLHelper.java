@@ -291,7 +291,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             }
         }
         finally {
-            cu.moveToFirst();
+            cu.close();
             dbw.close();
         }
         return locations;
@@ -304,35 +304,27 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         //dbw.close();
         return c;
     }
-    public Cursor getCursorReadyToSendFlights() {
-        dbw = getReadableDatabase();
-        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
-        return c;
-
-    }
-//    public Cursor getListReadyToSendFlights() {
-//
-//
-//
+//    public Cursor getCursorReadyToSendFlights() {
 //        dbw = getReadableDatabase();
-//        Cursor cu = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
-//        ArrayList<String> flightList = new ArrayList<>();
-//        try {
-//            while (cu.moveToNext()) {
-//                flightList.add(.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-//                if (RouteBase.isFlightNumberInList(fn)) continue;
-//                FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
-//                new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
-//            }
-//        }
-//        finally{
-//            flights.close();
-//            sqlHelper.dbw.close();
-//        }
-//        //c.moveToFirst();
-//        //dbw.close();
+//        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
 //        return c;
+//
 //    }
+    public ArrayList<String> getListReadyToSendFlights() {
+        dbw = getReadableDatabase();
+        Cursor cu = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
+        ArrayList<String> flightList = new ArrayList<>();
+        try {
+            while (cu.moveToNext()) {
+                flightList.add(cu.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
+            }
+        }
+        finally{
+            cu.close();
+            sqlHelper.dbw.close();
+        }
+        return flightList;
+    }
     public static int getCursorCountLocation() {
         return cl.getCount();
     }

@@ -317,9 +317,8 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     }
 
     public void onCheckboxClicked(View view) {
-        FontLog.appendLog(TAG + "!!!!! CheckBox clicked !!!!!", 'd');
+       //FontLog.appendLog(TAG + "!!!!! CheckBox clicked !!!!!", 'd');
         EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_ONCLICK).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
-
     }
 
     void init_listeners() {
@@ -330,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             switch (trackingButtonState) {
                 case BUTTON_STATE_RED:
                     //Util.setAcftNum(txtAcftNum.getText().toString());
-                    /// /// if (!AppConfig.pAutostart && !is_services_available()) return;
+                    if (!AppConfig.pAutostart && !is_services_available()) return;
                     if (!isAircraftPopulated() && !SessionProp.pIsEmptyAcftOk) {
 
                         new ShowAlertClass(mainactivityInstance).showAircraftIsEmptyAlert();

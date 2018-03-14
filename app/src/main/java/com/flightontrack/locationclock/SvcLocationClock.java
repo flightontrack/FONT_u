@@ -181,7 +181,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(ctxApp, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctxApp, provider +" Disabled ", Toast.LENGTH_LONG).show();
     }
 
     @Override

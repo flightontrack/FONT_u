@@ -38,7 +38,6 @@ import java.util.EnumMap;
 
 public class Session implements EventBus{
     public enum SACTION {
-        //SEND_STORED_LOCATIONS,
         SEND_CACHED_LOCATIONS,
         //START_COMMUNICATION,
         CLOSEAPP_NO_CACHE_CHECK,
@@ -84,62 +83,61 @@ public class Session implements EventBus{
 
     static void startLocationCommService() {
 
-        //sqlHelper.setCursorDataLocation();
-        Cursor locations = sqlHelper.getCursorDataLocation();
-        try {
-            FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + commBatchSize, 'd');
-            while (locations.moveToNext()) {
-                if (locations.getPosition() >= commBatchSize) break;
-                Intent intentComm = new Intent(ctxApp, SvcComm.class);
-                //Intent intentComm = new Intent(context, SvcIntentComm.class);
-                Bundle bundle = new Bundle();
-                bundle.putLong("itemId", locations.getLong(locations.getColumnIndexOrThrow(DBSchema._ID)));
-                bundle.putInt("rc", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1)));
-                bundle.putString("ft", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
-                bundle.putBoolean("sl", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag)) == 1);
-                bundle.putString("sd", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4)));
-                bundle.putString("la", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6)));
-                bundle.putString("lo", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7)));
-                bundle.putString("ac", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8)));
-                bundle.putString("al", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9)));
-                bundle.putInt("wp", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_wpntnum)));
-                bundle.putString("sg", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11)));
-                bundle.putString("dt", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_date)));
-                bundle.putBoolean("irch", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1);
-
-                intentComm.putExtras(bundle);
-                ctxApp.startService(intentComm);
-                if (locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1){delay(1000);}
-            }
-        }
-        finally {
-            locations.close();
-            sqlHelper.dbw.close();
-        }
-
-//        ArrayList<Location> locList = sqlHelper.getDataLocationList();
-//        for (Location l:locList) {
-//            if (l.i >= SvcComm.commBatchSize) break;
-//            Intent intentComm = new Intent(ctxApp, SvcComm.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putLong("itemId", l.itemId);
-//            bundle.putInt("rc", l.rc);
-//            bundle.putString("ft", l.ft);
-//            bundle.putBoolean("sl", l.sl==1);
-//            bundle.putString("sd", l.sd);
-//            bundle.putString("la", l.la);
-//            bundle.putString("lo", l.lo);
-//            bundle.putString("ac", l.ac);
-//            bundle.putString("al", l.al);
-//            bundle.putInt("wp", l.wp);
-//            bundle.putString("sg", l.sg);
-//            bundle.putString("dt", l.dt);
-//            bundle.putBoolean("irch", l.irch == 1);
+//        Cursor locations = sqlHelper.getCursorDataLocation();
+//        try {
+//            FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + commBatchSize, 'd');
+//            while (locations.moveToNext()) {
+//                if (locations.getPosition() >= commBatchSize) break;
+//                Intent intentComm = new Intent(ctxApp, SvcComm.class);
+//                //Intent intentComm = new Intent(context, SvcIntentComm.class);
+//                Bundle bundle = new Bundle();
+//                bundle.putLong("itemId", locations.getLong(locations.getColumnIndexOrThrow(DBSchema._ID)));
+//                bundle.putInt("rc", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1)));
+//                bundle.putString("ft", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
+//                bundle.putBoolean("sl", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag)) == 1);
+//                bundle.putString("sd", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4)));
+//                bundle.putString("la", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6)));
+//                bundle.putString("lo", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7)));
+//                bundle.putString("ac", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8)));
+//                bundle.putString("al", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9)));
+//                bundle.putInt("wp", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_wpntnum)));
+//                bundle.putString("sg", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11)));
+//                bundle.putString("dt", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_date)));
+//                bundle.putBoolean("irch", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1);
 //
-//            intentComm.putExtras(bundle);
-//            ctxApp.startService(intentComm);
-//            if (l.irch == 1){delay(1000);}
+//                intentComm.putExtras(bundle);
+//                ctxApp.startService(intentComm);
+//                if (locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1){delay(1000);}
+//            }
 //        }
+//        finally {
+//            locations.close();
+//            sqlHelper.dbw.close();
+//        }
+
+        ArrayList<Location> locList = sqlHelper.getDataLocationList();
+        for (Location l:locList) {
+            if (l.i >= commBatchSize) break;
+            Intent intentComm = new Intent(ctxApp, SvcComm.class);
+            Bundle bundle = new Bundle();
+            bundle.putLong("itemId", l.itemId);
+            bundle.putInt("rc", l.rc);
+            bundle.putString("ft", l.ft);
+            bundle.putBoolean("sl", l.sl==1);
+            bundle.putString("sd", l.sd);
+            bundle.putString("la", l.la);
+            bundle.putString("lo", l.lo);
+            bundle.putString("ac", l.ac);
+            bundle.putString("al", l.al);
+            bundle.putInt("wp", l.wp);
+            bundle.putString("sg", l.sg);
+            bundle.putString("dt", l.dt);
+            bundle.putBoolean("irch", l.irch == 1);
+
+            intentComm.putExtras(bundle);
+            ctxApp.startService(intentComm);
+            if (l.irch == 1){delay(1000);}
+        }
     }
 //    void sendStoredLocations(){
 //
@@ -184,37 +182,7 @@ public class Session implements EventBus{
             case CLOSEAPP_NO_CACHE_CHECK:
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) mainactivityInstance.finishActivity();
                 break;
-//            case SEND_STORED_LOCATIONS:
-//                //TODO
-//                //sendStoredLocations();
-//                break;
-//            case SEND_CACHED_LOCATIONS:
-////                Cursor flightsReadySend = sqlHelper.getCursorReadyToSendFlights();
-////                //flightsReadySend.moveToFirst();
-////                try {
-////                    while (flightsReadySend.moveToNext()) {
-////                        //for (int i = 0; i <flightsReadySend.getCount(); i++) {
-////                        String flNum = flightsReadySend.getString(flightsReadySend.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-////                        if (!Route.routeList.isEmpty()) {
-////                            for (Route r : Route.routeList) {
-////                                for (Flight f : flightList) {
-////                                    if (f.flightNumber.equals(flNum)) {
-////                                        flightToClose.add(f);
-////                                    }
-////                                }
-////                            }
-////                        }
-////                        if (get_FlightInstanceByNumber(flNum) == null) new FlightBase(flNum);  ///// todo sometning wrong
-////                    }
-////                }
-////                finally {
-////                    flightsReadySend.close();
-////                    sqlHelper.dbw.close();
-////                }
-//                SvcComm.commBatchSize= dbLocationRecCountNormal;
-//                set_sAction(SACTION.START_COMMUNICATION);
-//                //sendStoredLocations();
-//                break;
+
             case CLOSE_FLIGHTS:
                 for(FlightBase f: flightList) {
                     FontLog.appendLog(TAG + " flightList size: " + flightList.size(), 'd');
@@ -242,8 +210,9 @@ public class Session implements EventBus{
 //                for (FlightBase f : flightList){
 //                    if(f.isTempFlightNum) f..set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
 //                }
-                /// firsrt to check all temp flights in not ready to send state
 
+                /// firsrt to check all temp flights in not ready to send state.
+                /// Get new flight and request flight number.
                 Cursor flightsTemp = sqlHelper.getCursorTempFlights();
                 try {
                     while (flightsTemp.moveToNext()) {
@@ -261,20 +230,29 @@ public class Session implements EventBus{
                     flightsTemp.close();
                     sqlHelper.dbw.close();
                 }
-                /// second to check ready to send flights which are for some reason not in flightList (may left from previous session)
-                Cursor flights = sqlHelper.getCursorReadyToSendFlights();
-                try {
-                    while (flights.moveToNext()) {
-                        String fn = flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-                        if (RouteBase.isFlightNumberInList(fn)) continue;
-                        FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
-                        new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
-                    }
+
+                /// second to check flights is ready to send which are for some reason not in flightList (may left from previous session).
+                /// Get new flight on existing flight number
+                //Cursor flights = sqlHelper.getCursorReadyToSendFlights();
+                ArrayList<String> flightNumberList = sqlHelper.getListReadyToSendFlights();
+                for (String fn : flightNumberList){
+                    if (RouteBase.isFlightNumberInList(fn)) continue;
+                    FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
+                    new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
                 }
-                finally{
-                    flights.close();
-                    sqlHelper.dbw.close();
-                }
+
+//                try {
+//                    while (flights.moveToNext()) {
+//                        String fn = flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+//                        if (RouteBase.isFlightNumberInList(fn)) continue;
+//                        FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
+//                        new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
+//                    }
+//                }
+//                finally{
+//                    flights.close();
+//                    sqlHelper.dbw.close();
+//                }
                 break;
         }
     }
@@ -284,7 +262,7 @@ public class Session implements EventBus{
         //Array eventReaction[EVENT];
         ev = eventMessage.event;
         this.eventMessage = eventMessage;
-        FontLog.appendLog(TAG + ":eventReceiver:"+ev, 'd');
+        FontLog.appendLog(TAG + "eventReceiver: "+ev, 'd');
         switch (ev) {
             case MACT_BACKBUTTON_ONCLICK:
                 set_sAction(SACTION.CHECK_CACHE_FIRST);

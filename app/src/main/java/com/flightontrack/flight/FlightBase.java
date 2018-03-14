@@ -18,15 +18,9 @@ import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.flightontrack.shared.Const.FLIGHT_NUMBER_DEFAULT;
-import static com.flightontrack.shared.Const.REQUEST_STOP_FLIGHT;
-import static com.flightontrack.shared.Props.SessionProp.sqlHelper;
-import static com.flightontrack.shared.Props.ctxApp;
-import static com.flightontrack.shared.Props.mainactivityInstance;
-
-/**
- * Created by hotvk on 1/16/2018.
- */
+import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.SessionProp.*;
+import static com.flightontrack.shared.Props.*;
 
 public class FlightBase implements EventBus{
     static final String TAG = "FlightBase:";
@@ -34,6 +28,8 @@ public class FlightBase implements EventBus{
     public enum FSTATE {
         DEFAULT,
         GETTINGFLIGHT,
+        PENDING,
+        INFLIGHT,
         READY_TOSENDLOCATIONS,
         READY_TOBECLOSED,
         CLOSING,
@@ -41,7 +37,6 @@ public class FlightBase implements EventBus{
     }
 
     public String flightNumber = FLIGHT_NUMBER_DEFAULT;
-    //public String flightNumberTemp = FLIGHT_NUMBER_DEFAULT;
     boolean isTempFlightNum = false;
     public FSTATE flightState = FSTATE.DEFAULT;
     boolean isLimitReached  = false;
@@ -49,27 +44,17 @@ public class FlightBase implements EventBus{
     public FlightBase(){}
 
     FlightBase(String fn) {
-        flightNumber = fn;;
+        flightNumber = fn;
     }
-    public void set_flightNumber(String fn){
-        FontLog.appendLog(TAG + "set_flightNumber super fn " + fn, 'd');
-        replaceFlightNumber(fn);
-        //flightNumber = fn;
-        set_flightState(FSTATE.READY_TOSENDLOCATIONS);
-    }
-//    public void set_flightNumberTemp(String fnt){
-//        flightNumberTemp = fnt;
-//        flightNumber = fnt;
-//        if (!fnt.equals(FLIGHT_NUMBER_DEFAULT)) isTempFlightNum =true;
-//    }
+
     public void set_flightState(FSTATE fs){
         if (flightState == fs) return;
         flightState = fs;
         switch(fs){
             case READY_TOSENDLOCATIONS:
-            EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
-                    .setEventMessageValueString(flightNumber)
-                    .setEventMessageValueObject(this));
+                EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
+                        .setEventMessageValueString(flightNumber)
+                        .setEventMessageValueObject(this));
                 break;
             case READY_TOBECLOSED:
                 getCloseFlight();
@@ -78,16 +63,20 @@ public class FlightBase implements EventBus{
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
                 break;
             case GETTINGFLIGHT:
-                //if(!isTempFlightNum) EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
                 getNewFlightID();
                 break;
         }
     }
+    public void set_flightNumber(String fn){
+        FontLog.appendLog(TAG + "set_flightNumber super fn " + fn, 'd');
+        replaceFlightNumber(fn);
+        set_flightState(FSTATE.READY_TOSENDLOCATIONS);
+    }
+
     void getNewFlightID() {
 
         FontLog.appendLog(TAG + "FlightBase-getNewFlightID: " +flightNumber, 'd');
-        //EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
@@ -105,8 +94,6 @@ public class FlightBase implements EventBus{
         long speed_thresh = Math.round(Props.SessionProp.pSpinnerMinSpeed);
         requestParams.put("speed_thresh", String.valueOf(speed_thresh));
         requestParams.put("isdebug", Props.SessionProp.pIsDebug);
-        //requestParams.put("routeid", ROUTE_NUMBER_DEFAULT);
-        //isGetFlightNumber = false;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.setMaxRetriesAndTimeout(2,1000);
@@ -135,7 +122,6 @@ public class FlightBase implements EventBus{
                     if (mainactivityInstance != null){
                         Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                     }
-                    //set_flightState(FSTATE.CLOSED);
                     EventBus.distribute(new EventMessage(EVENT.FLIGHTBASE_GETFLIGHTNUM).setEventMessageValueBool(false));
                 }
 
