@@ -95,7 +95,8 @@ public void eventReceiver(EventMessage eventMessage){
     this.eventMessage = eventMessage;
     FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev, 'd');
     switch(ev){
-            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+            //case FLIGHT_GETNEWFLIGHT_COMPLETED:
+            case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                 if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
                 break;
             case CLOCK_ONTICK:

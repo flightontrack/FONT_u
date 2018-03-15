@@ -35,7 +35,7 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 public class Flight extends FlightBase implements GetTime, EventBus {
     public enum FACTION {
         DEFAULT_REQUEST,
-        CHANGE_IN_PENDING,
+        //CHANGE_IN_PENDING,
         CHANGE_IN_FLIGHT,
         CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
         TERMINATE_FLIGHT,
@@ -69,6 +69,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     public void set_flightNumber(String fn) {
         FontLog.appendLog(TAG + "set_flightNumber fn " + fn, 'd');
         flightNumber = fn;
+        set_flightState(FSTATE.READY_TOSAVELOCATIONS);
         set_flightState(FSTATE.READY_TOSENDLOCATIONS);
     }
 
@@ -169,8 +170,11 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                         //FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
                         //if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
-                        if (!isTempFlightNum) if (mainactivityInstance != null)
+                        if (!isTempFlightNum) if (mainactivityInstance != null) {
                             Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
+                            raiseEventGetFlightComleted();
+                        }
+
                         //set_flightState(FSTATE.DEFAULT);
 //                        if (flightNumber == null) {
 ////                            try {
@@ -187,7 +191,8 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                     public void onFinish() {
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
                         if (flightState != FSTATE.CLOSED)
-                            if (!isTempFlightNum) set_fAction(FACTION.CHANGE_IN_PENDING);
+                            //if (!isTempFlightNum) set_fAction(FACTION.CHANGE_IN_PENDING);
+                            //if (!isTempFlightNum) raiseEventGetFlightComleted();
                     }
 
                     @Override
@@ -314,17 +319,21 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         EventBus.distribute(new EventMessage(EVENT.FLIGHT_FLIGHTTIME_UPDATE_COMPLETED));
     }
 
-    private double get_cutoffSpeed() {
+    double get_cutoffSpeed() {
         return SessionProp.pSpinnerMinSpeed * (RouteBase.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT ? 0.75 : 1.0);
     }
+    void raiseEventGetFlightComleted(){
+        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
+                .setEventMessageValueBool(isGetFlightCallSuccess)
+                .setEventMessageValueString(flightNumber));
+    }
+
     public void set_flightState(FSTATE fs) {
         Flight.super.set_flightState(fs);
         switch (fs) {
-            case PENDING:
-                ///TODO
-//                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
-//                        .setEventMessageValueBool(isGetFlightCallSuccess)
-//                        .setEventMessageValueString(flightNumber));
+            case READY_TOSAVELOCATIONS:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_STATECHANGEDTO_READYTOSAVE));
+                //raiseEventGetFlightComleted();
                 break;
             case INFLIGHT:
 
@@ -337,11 +346,11 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 //        switch (fStatus) {
 //            case ACTIVE:
         switch (request) {
-            case CHANGE_IN_PENDING:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
-                        .setEventMessageValueBool(isGetFlightCallSuccess)
-                        .setEventMessageValueString(flightNumber));
-                break;
+//            case CHANGE_IN_PENDING:
+//                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
+//                        .setEventMessageValueBool(isGetFlightCallSuccess)
+//                        .setEventMessageValueString(flightNumber));
+//                break;
 //            case TERMINATE_GETFLIGHTNUM:
 //                set_flightState(FSTATE.CLOSED);
 //                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
@@ -412,10 +421,14 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 //TODO remove flight points
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:
-                set_flightNumberTemp(eventMessage.eventMessageValueString);
+                //set_flightNumberTemp(eventMessage.eventMessageValueString);
+                flightNumber = eventMessage.eventMessageValueString;
+                //if (!fnt.equals(FLIGHT_NUMBER_DEFAULT))
+                isTempFlightNum = true;
                 isGetFlightCallSuccess = true;
                 route._legCount++;
-                set_fAction(FACTION.CHANGE_IN_PENDING);
+                //set_fAction(FACTION.CHANGE_IN_PENDING);
+                set_flightState(FSTATE.READY_TOSAVELOCATIONS);
                 break;
         }
     }

@@ -30,6 +30,7 @@ public class FlightBase implements EventBus{
         GETTINGFLIGHT,
         PENDING,
         INFLIGHT,
+        READY_TOSAVELOCATIONS,
         READY_TOSENDLOCATIONS,
         READY_TOBECLOSED,
         CLOSING,

@@ -230,7 +230,8 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + " eventReceiver:"+ev, 'd');
         switch(ev){
-            case FLIGHT_GETNEWFLIGHT_COMPLETED:
+            //case FLIGHT_GETNEWFLIGHT_COMPLETED:
+            case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                 //if (!SvcLocationClock.isInstanceCreated()) ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 break;

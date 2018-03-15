@@ -26,9 +26,11 @@ public interface EventBus {
         FLIGHT_FLIGHTTIME_STARTED,
         FLIGHT_FLIGHTTIME_UPDATE_COMPLETED,
         FLIGHT_CLOSEFLIGHT_COMPLETED,
+        FLIGHT_ONSPEEDABOVEMIN,
         FLIGHT_ONSPEEDLOW,
         FLIGHT_ONPOINTSLIMITREACHED,
         FLIGHT_ONSENDCACHECOMPLETED,
+        FLIGHT_STATECHANGEDTO_READYTOSAVE,
         FLIGHT_STATECHANGEDTO_READYTOSEND,
         FLIGHTBASE_GETFLIGHTNUM,
 
@@ -83,17 +85,16 @@ public interface EventBus {
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(eventMessage.eventMessageValueBool){
-                    interfaceList.add(RouteBase.getInstance()); // set route number
-                    interfaceList.add(new SvcLocationClock()); //start clock service in location mode
-                    interfaceList.add(mainactivityInstance);
+//                    interfaceList.add(RouteBase.getInstance()); // set route number
+//                    interfaceList.add(new SvcLocationClock()); //start clock service in location mode
+//                    interfaceList.add(mainactivityInstance);
                 }
                 else
                 {
                     interfaceList.add(sqlHelper);
                 }
-                    //interfaceList.add(mainactivityInstance);
                 break;
-                case FLIGHTBASE_GETFLIGHTNUM:
+            case FLIGHTBASE_GETFLIGHTNUM:
                 if(!eventMessage.eventMessageValueBool){
                     interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 }
@@ -198,9 +199,14 @@ public interface EventBus {
             case SQL_ONCLEARCACHE_COMPLETED:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
+            case FLIGHT_STATECHANGEDTO_READYTOSAVE:
+                interfaceList.add(RouteBase.getInstance()); // set route number
+                interfaceList.add(new SvcLocationClock()); //start clock service in location mode
+                interfaceList.add(mainactivityInstance);
+                break;
             case FLIGHT_STATECHANGEDTO_READYTOSEND:
-                interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist 
-                interfaceList.add(Session.getInstance());   /// start send locaions
+                interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist if it is not in
+                interfaceList.add(Session.getInstance());   /// start send locations for the flights with replaced flight number
                 break;
             case FLIGHT_ONSENDCACHECOMPLETED:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
