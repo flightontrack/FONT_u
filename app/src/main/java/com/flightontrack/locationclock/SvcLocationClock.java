@@ -20,6 +20,7 @@ import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.GetTime;
 import com.flightontrack.activity.MainActivity;
+import com.flightontrack.shared.Props;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -250,6 +251,9 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
                 break;
             case ROUTE_ONRESTART:
                 if (!eventMessage.eventMessageValueBool) set_mode(MODE.CLOCK_ONLY);
+                break;
+            case FLIGHT_ONSPEEDABOVEMIN:
+                requestLocationUpdate(Props.SessionProp.pIntervalLocationUpdateSec, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
                 break;
         }
     }

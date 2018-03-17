@@ -65,7 +65,7 @@ public class RouteBase implements EventBus{
                 FontLog.appendLog(TAG + "REMOVE_FLIGHT_IF_CLOSED: flightList: size : " + flightList.size(), 'd');
                     for (FlightBase f : new ArrayList<>(flightList)) {
                         FontLog.appendLog(TAG + "f:" + f.flightNumber + ":" + request, 'd');
-                        if (f.flightState.equals(FlightBase.FSTATE.CLOSED)) {
+                        if (f.flightState.equals(FlightBase.FLIGHT_STATE.CLOSED)) {
                             //if (activeFlight == f) activeFlight = null;
                             FontLog.appendLog(TAG + "reaction:" + request+":f:"+f, 'd');
                             if (f==activeFlight) activeFlight =null;
@@ -101,13 +101,13 @@ public void eventReceiver(EventMessage eventMessage){
                 break;
             case CLOCK_ONTICK:
                 for (FlightBase f : flightList) {
-                    if (f.flightState == FlightBase.FSTATE.CLOSED) {
+                    if (f.flightState == FlightBase.FLIGHT_STATE.CLOSED) {
                         set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
                         break;
                     }
                 }
                 break;
-            case FLIGHT_STATECHANGEDTO_READYTOSEND:
+            case FLIGHT_REMOTENUMBER_RECEIVED:
                 set_rAction(RACTION.ADD_OR_UPDATE_FLIGHT);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:

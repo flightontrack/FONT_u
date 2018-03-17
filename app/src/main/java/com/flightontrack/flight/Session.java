@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
 import static com.flightontrack.communication.SvcComm.commBatchSize;
@@ -74,7 +72,7 @@ public class Session implements EventBus{
 //        eventReaction.put(ALERT_STOPAPP:
 //        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
 //        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
-//        eventReaction.put(FLIGHT_STATECHANGEDTO_READYTOSEND:
+//        eventReaction.put(FLIGHT_REMOTENUMBER_RECEIVED:
 //
 //        flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
 //        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
@@ -189,8 +187,8 @@ public class Session implements EventBus{
                     if (activeFlight!=null && f==activeFlight) continue;
                     FontLog.appendLog(TAG + " flight "+f.flightNumber+" iflightStatet:" + f.flightState, 'd');
                     if (f.getLocationFlightCount() == 0){
-                        if (f.flightState == FlightBase.FSTATE.READY_TOSENDLOCATIONS) {
-                            f.set_flightState(FlightBase.FSTATE.READY_TOBECLOSED);
+                        if (f.flightNumStatus == FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT) {
+                            f.set_flightState(FlightBase.FLIGHT_STATE.READY_TOBECLOSED);
                             FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
                         }
                     }
@@ -219,7 +217,7 @@ public class Session implements EventBus{
                         String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
                         if (isFlightNumberInList(fn)) continue;
                         FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
-                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
+                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.GETTINGFLIGHT);
                         else {
                             FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
                             EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
@@ -238,7 +236,8 @@ public class Session implements EventBus{
                 for (String fn : flightNumberList){
                     if (RouteBase.isFlightNumberInList(fn)) continue;
                     FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
-                    new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
+                    //new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.READY_TOSENDLOCATIONS);
+                    new FlightBase(fn).set_flightNumStatus(FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
                 }
 
 //                try {
@@ -282,13 +281,13 @@ public class Session implements EventBus{
                 set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
                 if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 break;
-            case SVCCOMM_BATCHSIZE_CHANGED:
+            case SVCCOMM_LOCRECCOUNT_NOTZERO:
+                //commBatchSize=(dbLocationRecCountNormal>COMM_BATCH_SIZE_MAX?dbLocationRecCountNormal:COMM_BATCH_SIZE_MAX);
                 if (dbLocationRecCountNormal > 0) {
-                    commBatchSize=(dbLocationRecCountNormal>COMM_BATCH_SIZE_MAX?dbLocationRecCountNormal:COMM_BATCH_SIZE_MAX);
                     set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 }
                 break;
-            case FLIGHT_STATECHANGEDTO_READYTOSEND:
+            case FLIGHT_REMOTENUMBER_RECEIVED:
                 //flightList.add((FlightBase) eventMessage.eventMessageValueObject);
                 //flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);

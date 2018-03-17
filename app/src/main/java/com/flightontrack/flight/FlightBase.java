@@ -25,21 +25,24 @@ import static com.flightontrack.shared.Props.*;
 public class FlightBase implements EventBus{
     static final String TAG = "FlightBase:";
 
-    public enum FSTATE {
+    public enum FLIGHT_STATE {
         DEFAULT,
         GETTINGFLIGHT,
-        PENDING,
-        INFLIGHT,
         READY_TOSAVELOCATIONS,
-        READY_TOSENDLOCATIONS,
+        INFLIGHT_SPEEDABOVEMIN,
+        STOPPED,
         READY_TOBECLOSED,
         CLOSING,
         CLOSED
     }
-
+    public enum FLIGHTNUMBER_SRC {
+        REMOTE_DEFAULT,
+        LOCAL
+    }
     public String flightNumber = FLIGHT_NUMBER_DEFAULT;
-    boolean isTempFlightNum = false;
-    public FSTATE flightState = FSTATE.DEFAULT;
+    //boolean isTempFlightNum = false;
+    public FLIGHT_STATE flightState = FLIGHT_STATE.DEFAULT;
+    public FLIGHTNUMBER_SRC flightNumStatus = FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
     boolean isLimitReached  = false;
 
     public FlightBase(){}
@@ -48,33 +51,46 @@ public class FlightBase implements EventBus{
         flightNumber = fn;
     }
 
-    public void set_flightState(FSTATE fs){
+    public void set_flightState(FLIGHT_STATE fs){
+        FontLog.appendLog(TAG + "flightState : " + fs, 'd');
         if (flightState == fs) return;
         flightState = fs;
         switch(fs){
-            case READY_TOSENDLOCATIONS:
-                EventBus.distribute(new EventMessage(EventBus.EVENT.FLIGHT_STATECHANGEDTO_READYTOSEND)
-                        .setEventMessageValueString(flightNumber)
-                        .setEventMessageValueObject(this));
+            case GETTINGFLIGHT:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
+                getNewFlightID();
+                break;
+            case READY_TOSAVELOCATIONS:
                 break;
             case READY_TOBECLOSED:
                 getCloseFlight();
                 break;
+            case CLOSING:
+                break;
             case CLOSED:
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_CLOSEFLIGHT_COMPLETED).setEventMessageValueString(flightNumber));
-                break;
-            case GETTINGFLIGHT:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
-                getNewFlightID();
                 break;
         }
     }
     public void set_flightNumber(String fn){
         FontLog.appendLog(TAG + "set_flightNumber super fn " + fn, 'd');
         replaceFlightNumber(fn);
-        set_flightState(FSTATE.READY_TOSENDLOCATIONS);
+        //set_flightState(FLIGHT_STATE.READY_TOSENDLOCATIONS);
+        set_flightNumStatus(FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
     }
-
+    public void set_flightNumStatus(FLIGHTNUMBER_SRC fns) {
+        flightNumStatus=fns;
+        switch (fns) {
+            case REMOTE_DEFAULT:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_REMOTENUMBER_RECEIVED)
+                        .setEventMessageValueObject(this)
+                        .setEventMessageValueString(flightNumber)
+                );
+                break;
+            case LOCAL:
+                break;
+        }
+    }
     void getNewFlightID() {
 
         FontLog.appendLog(TAG + "FlightBase-getNewFlightID: " +flightNumber, 'd');
@@ -143,7 +159,7 @@ public class FlightBase implements EventBus{
 
     void getCloseFlight() {
         FontLog.appendLog(TAG + "getCloseFlight: " + flightNumber, 'd');
-        set_flightState(FSTATE.CLOSING);
+        set_flightState(FLIGHT_STATE.CLOSING);
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
         //requestParams.put("speedlowflag", isSpeedAboveMin);
@@ -173,7 +189,7 @@ public class FlightBase implements EventBus{
                     }
                     @Override
                     public void onFinish() {
-                        set_flightState(FSTATE.CLOSED);
+                        set_flightState(FLIGHT_STATE.CLOSED);
                     }
                 }
         );

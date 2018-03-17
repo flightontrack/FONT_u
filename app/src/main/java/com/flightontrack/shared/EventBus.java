@@ -13,54 +13,8 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public interface EventBus {
-    enum EVENT {
-        DEFAULT_EVENT,
-        MACT_BIGBUTTON_ONCLICK_START,
-        MACT_BIGBUTTON_ONCLICK_STOP,
-        MACT_BACKBUTTON_ONCLICK,
-        MACT_MULTILEG_ONCLICK,
+public interface EventBus extends Events{
 
-        FLIGHT_GETNEWFLIGHT_STARTED,
-        FLIGHT_GETNEWFLIGHT_COMPLETED,
-        FLIGHT_FLIGHTTIME_STARTED,
-        FLIGHT_FLIGHTTIME_UPDATE_COMPLETED,
-        FLIGHT_CLOSEFLIGHT_COMPLETED,
-        FLIGHT_ONSPEEDABOVEMIN,
-        FLIGHT_ONSPEEDLOW,
-        FLIGHT_ONPOINTSLIMITREACHED,
-        FLIGHT_ONSENDCACHECOMPLETED,
-        FLIGHT_STATECHANGEDTO_READYTOSAVE,
-        FLIGHT_STATECHANGEDTO_READYTOSEND,
-        FLIGHTBASE_GETFLIGHTNUM,
-
-        CLOCK_SERVICESTARTED_MODELOCATION,
-        CLOCK_SERVICESELFSTOPPED,
-        CLOCK_ONTICK,
-        CLOCK_MODECLOCK_ONLY,
-
-        PROP_CHANGED_MULTILEG,
-        ROUTE_ONNEW,
-        ROUTE_ONLEGLIMITREACHED,
-        ROUTE_NOACTIVEROUTE,
-
-        ROUTE_ONRESTART,
-        SVCCOMM_ONSUCCESS_NOTIF,
-        SVCCOMM_ONSUCCESS_ACKN,
-        SVCCOMM_ONSUCCESS_COMMAND,
-        SVCCOMM_BATCHSIZE_CHANGED,
-
-        SVCCOMM_ONDESTROY,
-        SETTINGACT_BUTTONCLEARCACHE_CLICKED,
-
-        SETTINGACT_BUTTONSENDCACHE_CLICKED,
-        ALERT_SENTPOINTS,
-
-        ALERT_STOPAPP,
-        SQL_TEMPFLIGHTNUM_ALLOCATED,
-
-        SQL_ONCLEARCACHE_COMPLETED
-    }
     String TAG = "Bus:";
 
     static void distribute(EventMessage eventMessage){
@@ -108,11 +62,14 @@ public interface EventBus {
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
-                interfaceList.add(RouteBase.getInstance()); //remove flight
+                interfaceList.add(RouteBase.getInstance()); /// remove flight
                 break;
             case FLIGHT_ONSPEEDLOW:
                 if(!SessionProp.pIsMultileg) interfaceList.add(SvcLocationClock.getInstance());//TODO doing nothing
-                interfaceList.add(RouteBase.activeRoute);
+                interfaceList.add(RouteBase.activeRoute); /// restart new flight in the route
+                break;
+            case FLIGHT_ONSPEEDABOVEMIN:
+                interfaceList.add(SvcLocationClock.getInstance()); ///
                 break;
             case FLIGHT_ONPOINTSLIMITREACHED:
                 ///TODO
@@ -136,8 +93,8 @@ public interface EventBus {
                 switch (eventMessage.eventMessageValueInt){
                     case COMMAND_TERMINATEFLIGHT:
                         interfaceList.add(Props.getInstance()); //set multileg to false
-                        interfaceList.add(sqlHelper); // delete all locations on the flight
-                        // TODO flight should be deleted from the list of flights on the route
+                        //interfaceList.add(sqlHelper); // delete all locations on the flight
+                        interfaceList.add(RouteBase.activeFlight); // stop active flight
                         interfaceList.add(SvcLocationClock.getInstance()); //swithch to clockonly
                         break;
                     case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
@@ -151,7 +108,7 @@ public interface EventBus {
                 if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 interfaceList.add(Session.getInstance());
                 break;
-            case SVCCOMM_BATCHSIZE_CHANGED:
+            case SVCCOMM_LOCRECCOUNT_NOTZERO:
                 interfaceList.add(Session.getInstance());
                 break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
@@ -204,7 +161,7 @@ public interface EventBus {
                 interfaceList.add(new SvcLocationClock()); //start clock service in location mode
                 interfaceList.add(mainactivityInstance);
                 break;
-            case FLIGHT_STATECHANGEDTO_READYTOSEND:
+            case FLIGHT_REMOTENUMBER_RECEIVED:
                 interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist if it is not in
                 interfaceList.add(Session.getInstance());   /// start send locations for the flights with replaced flight number
                 break;
@@ -218,7 +175,7 @@ public interface EventBus {
         }
     }
 
-    default void eventReceiver(EventMessage eventMessage){};
+    default void eventReceiver(EventMessage eventMessage){}
 }
 
 

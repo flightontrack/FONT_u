@@ -5,11 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 
-import com.flightontrack.flight.Flight;
 import com.flightontrack.R;
-import com.flightontrack.flight.FlightBase;
-import com.flightontrack.flight.Route;
-import com.flightontrack.flight.RouteBase;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -117,8 +113,9 @@ public class SvcComm extends Service{
                     if (commBatchSize == COMM_BATCH_SIZE_MIN) {
                         /// need to call service again because the batch is smal to send all  location
                         commBatchSize = COMM_BATCH_SIZE_MAX;
-                        EventBus.distribute(new EventMessage(EVENT.SVCCOMM_BATCHSIZE_CHANGED)
-                                .setEventMessageValueInt(COMM_BATCH_SIZE_MAX));
+                        //EventBus.distribute(new EventMessage(EVENT.SVCCOMM_LOCRECCOUNT_NOTZERO)
+                                //.setEventMessageValueInt(COMM_BATCH_SIZE_MAX)
+                        //);
                     }
                     Response response = new Response(new String(responseBody));
                     //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
@@ -204,11 +201,13 @@ public class SvcComm extends Service{
                     ;//TODO
                     //stopSelf(minStartId);
                     if (requestIdDbItemIdMap.isEmpty()) {
-                        stopSelf();
+                        if (dbLocationRecCountNormal > 0) {
+                            EventBus.distribute(new EventMessage(EVENT.SVCCOMM_LOCRECCOUNT_NOTZERO));
+                        }
+                        else stopSelf();
                         // if still location to send left  - rethrow the call
-                        EventBus.distribute(new EventMessage(EVENT.SVCCOMM_BATCHSIZE_CHANGED)
-                                .setEventMessageValueInt(COMM_BATCH_SIZE_MAX));
-                    } else sendNext();
+                    }
+                    else sendNext();
                 }
             });
         } catch (Exception e) {
