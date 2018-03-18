@@ -60,7 +60,7 @@ public class FlightBase implements EventBus{
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
                 getNewFlightID();
                 break;
-            case READY_TOSAVELOCATIONS:
+            case STOPPED:
                 break;
             case READY_TOBECLOSED:
                 getCloseFlight();
@@ -75,7 +75,7 @@ public class FlightBase implements EventBus{
     public void set_flightNumber(String fn){
         FontLog.appendLog(TAG + "set_flightNumber super fn " + fn, 'd');
         replaceFlightNumber(fn);
-        //set_flightState(FLIGHT_STATE.READY_TOSENDLOCATIONS);
+        set_flightState(FLIGHT_STATE.STOPPED);
         set_flightNumStatus(FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
     }
     public void set_flightNumStatus(FLIGHTNUMBER_SRC fns) {
@@ -205,4 +205,14 @@ public class FlightBase implements EventBus{
     int getLocationFlightCount() {
          return sqlHelper.getLocationFlightCount(flightNumber);
     }
+    public void eventReceiver(EventMessage eventMessage) {
+        EVENT ev = eventMessage.event;
+        FontLog.appendLog(TAG + flightNumber + ":eventReceiver:" + ev, 'd');
+        switch (ev) {
+            case SQL_FLIGHTRECORDCOUNT_ZERO:
+                if (flightState == FLIGHT_STATE.STOPPED) set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
+                break;
+        }
+    }
+
 }

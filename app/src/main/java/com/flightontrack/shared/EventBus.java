@@ -156,6 +156,8 @@ public interface EventBus extends Events{
             case SQL_ONCLEARCACHE_COMPLETED:
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
+            case SQL_FLIGHTRECORDCOUNT_ZERO:
+                interfaceList.add((FlightBase)eventMessage.eventMessageValueObject);
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                 interfaceList.add(RouteBase.getInstance()); // set route number
                 interfaceList.add(new SvcLocationClock()); //start clock service in location mode

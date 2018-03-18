@@ -242,12 +242,6 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         requestParams = null;
     }
 
-//    public void set_flightNumberTemp(String fnt) {
-//        //flightNumberTemp = fnt;
-//        flightNumber = fnt;
-//        if (!fnt.equals(FLIGHT_NUMBER_DEFAULT)) isTempFlightNum = true;
-//    }
-
     public void saveLocCheckSpeed(final Location location) {
 
         float speedCurrent = location.getSpeed();
@@ -410,7 +404,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 //                        set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
 //                    }
                 }
-                if (flightState==FLIGHT_STATE.STOPPED && sqlHelper.getLocationFlightCount(flightNumber) == 0) {
+                if (flightState==FLIGHT_STATE.STOPPED && getLocationFlightCount() == 0) {
                     set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
                 }
                 break;
@@ -435,7 +429,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 if (flightState == FLIGHT_STATE.GETTINGFLIGHT) set_flightState(FLIGHT_STATE.CLOSED);
-                else set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
+                else set_flightState(FLIGHT_STATE.STOPPED);
                 //TODO remove flight points
                 break;
             case SQL_TEMPFLIGHTNUM_ALLOCATED:

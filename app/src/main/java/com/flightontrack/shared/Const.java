@@ -42,7 +42,7 @@ public abstract class Const {
     public static final String FLIGHT_NUMBER_DEFAULT = "00";
     public static final String ROUTE_NUMBER_DEFAULT = "00";
 
-    public static final int COMM_BATCH_SIZE_MAX = 50;
+    public static final int COMM_BATCH_SIZE_MAX = 100;
     public static final int COMM_BATCH_SIZE_MIN = 1;
     public static final String GLOBALTAG="FLIGHT_ON_TRACK";
 

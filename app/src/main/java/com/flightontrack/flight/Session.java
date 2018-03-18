@@ -297,7 +297,7 @@ public class Session implements EventBus{
                 break;
             case CLOCK_SERVICESELFSTOPPED:
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-                set_sAction(SACTION.CLOSE_FLIGHTS);
+                //set_sAction(SACTION.CLOSE_FLIGHTS);
                 break;
         }
     }

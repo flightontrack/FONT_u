@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.shared.EventMessage;
 
+import static com.flightontrack.flight.RouteBase.get_FlightInstanceByNumber;
 import static com.flightontrack.mysql.DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION;
 import static com.flightontrack.shared.Const.COMMAND_TERMINATEFLIGHT;
 import static com.flightontrack.shared.Props.*;
@@ -113,11 +114,18 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 selection,
                 selectionArgs
         );
+        selection = DBSchema.LOC_flightid +"= ?";
+        String[] selectionArgs1 = {flightId};
+        long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION,selection,selectionArgs1);
         dbw.close();
+        if (numRows==0){
+            EventBus.distribute(new EventMessage( EVENT.SQL_FLIGHTRECORDCOUNT_ZERO).setEventMessageValueObject(get_FlightInstanceByNumber(flightId)));
+        }
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-        dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+
+            dbLocationRecCountNormal = get_dbLocationRecCountNormal();
     }
     public void flightLocationsDelete(String flightId) {
         String selection = DBSchema.LOC_flightid +"= ?";
