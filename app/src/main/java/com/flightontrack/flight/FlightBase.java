@@ -124,7 +124,7 @@ public class FlightBase implements EventBus{
 
                     if (response.responseNotif != null) {
                         FontLog.appendLog(TAG + "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd');
-                        Toast.makeText(ctxApp, "Cant get flight number", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (response.responseFlightNum != null) {

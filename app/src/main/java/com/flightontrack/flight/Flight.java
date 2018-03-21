@@ -144,7 +144,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 
                         if (response.responseNotif != null) {
                             FontLog.appendLog(TAG + "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd');
-                            Toast.makeText(ctxApp, "Cant get flight number", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                             return;
                         }
                         if (response.responseFlightNum != null) {
@@ -396,13 +396,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                     saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
                 }
                 if (Util.isNetworkAvailable()) {
-                    //if (true) {
-                    //if (isTempFlightNum) getNewFlightID();
                     if (flightNumStatus== FLIGHTNUMBER_SRC.LOCAL) getNewFlightID();
-//                    if (lastAction == FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS) {
-//                        /// try close again, previouse attempt did not work
-//                        set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
-//                    }
                 }
                 if (flightState==FLIGHT_STATE.STOPPED && getLocationFlightCount() == 0) {
                     set_flightState(FLIGHT_STATE.READY_TOBECLOSED);

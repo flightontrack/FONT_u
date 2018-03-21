@@ -105,8 +105,9 @@ public interface EventBus extends Events{
                         break;
                 }
             case SVCCOMM_ONDESTROY:
-                if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
-                interfaceList.add(Session.getInstance());
+                //if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                //interfaceList.add(Session.getInstance());
                 break;
             case SVCCOMM_LOCRECCOUNT_NOTZERO:
                 interfaceList.add(Session.getInstance());
