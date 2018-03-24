@@ -119,12 +119,14 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION,selection,selectionArgs1);
         dbw.close();
         if (numRows==0){
-            EventBus.distribute(new EventMessage( EVENT.SQL_FLIGHTRECORDCOUNT_ZERO).setEventMessageValueObject(get_FlightInstanceByNumber(flightId)));
+            EventBus.distribute(new EventMessage( EVENT.SQL_FLIGHTRECORDCOUNT_ZERO)
+                    .setEventMessageValueObject(get_FlightInstanceByNumber(flightId))
+                    .setEventMessageValueString(flightId)
+            );
         }
         } catch (Exception e) {
             FontLog.appendLog(TAG + e.getMessage(), 'e');
         }
-
             dbLocationRecCountNormal = get_dbLocationRecCountNormal();
     }
     public void flightLocationsDelete(String flightId) {

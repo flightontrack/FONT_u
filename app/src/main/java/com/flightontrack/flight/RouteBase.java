@@ -21,7 +21,7 @@ public class RouteBase implements EventBus{
 
     final String TAG = "RouteBase:";
     //public static ArrayList<Route> routeList = new ArrayList<>();
-    static String routeNumber=ROUTE_NUMBER_DEFAULT;
+
     static RouteBase routeBaseInstance = null;
     public static Route activeRoute;
     public static Flight activeFlight;
@@ -53,7 +53,7 @@ public class RouteBase implements EventBus{
         return false;
     }
     void setToNull(){
-        RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
+        //RouteBase.routeNumber =  ROUTE_NUMBER_DEFAULT;
         RouteBase.activeFlight = null;
         RouteBase.activeRoute = null;
         EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
@@ -73,7 +73,7 @@ public class RouteBase implements EventBus{
                         }
                         if (flightList.isEmpty()) {
                             //if (activeRoute == this) activeRoute = null;
-                            FontLog.appendLog(TAG + "flightList.isEmpty()"+":r:"+routeNumber, 'd');
+                            FontLog.appendLog(TAG + "flightList isEmpty", 'd');
                             setToNull();
                         }
                     }
@@ -93,12 +93,9 @@ public class RouteBase implements EventBus{
 public void eventReceiver(EventMessage eventMessage){
     ev = eventMessage.event;
     this.eventMessage = eventMessage;
-    FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev, 'd');
+    FontLog.appendLog(TAG +"eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd');
     switch(ev){
-            //case FLIGHT_GETNEWFLIGHT_COMPLETED:
-            case FLIGHT_STATECHANGEDTO_READYTOSAVE:
-                if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
-                break;
+            //case FLIGHT_GETNEWFLIGHT_COMPLETED:;
             case CLOCK_ONTICK:
                 for (FlightBase f : flightList) {
                     if (f.flightState == FlightBase.FLIGHT_STATE.CLOSED) {

@@ -130,8 +130,8 @@ public class SvcComm extends Service{
                     }
                     try {
                         if (response.responseAckn != null) {
-                            FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn, 'd');
                             sqlHelper.rowLocationDelete(response.iresponseAckn, response.responseFlightNum);  /// TODO should be moved to Router
+                            FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn, 'd');
                             ///set_SessionRequest(SACTION.ON_COMMUNICATION_SUCCESS);
                         }
                         if (response.responseNotif != null) {
@@ -193,9 +193,9 @@ public class SvcComm extends Service{
                             FontLog.appendLog("requestId = " + entry.getKey() + ", dbItemId = " + entry.getValue(), 'd');
                         }
                     }
-                    FontLog.appendLog(TAG + "onFinish to remove ; startId= " + aSyncClient.getStartID(), 'd');
                     requestIdDbItemIdMap.remove(aSyncClient.getStartID());
                     requestIdToRequestMap.remove(aSyncClient.getStartID());
+                    FontLog.appendLog(TAG + "onFinish to remove ; startId= " + aSyncClient.getStartID(), 'd');
                     if (failureCounter > MAX_FAILURE_COUNT) {
                     }
                     ;//TODO

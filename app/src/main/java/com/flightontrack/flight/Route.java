@@ -12,6 +12,7 @@ public class Route extends RouteBase implements EventBus{
 
     private final String TAG = "Route:";
     int _legCount = 0;
+    String routeNumber=ROUTE_NUMBER_DEFAULT;
 
     public Route() {
         activeRoute = this;
@@ -72,13 +73,16 @@ public class Route extends RouteBase implements EventBus{
 @Override
 public void eventReceiver(EventMessage eventMessage){
     EVENT ev = eventMessage.event;
-    FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev, 'd');
-            switch(ev){
-            case MACT_BIGBUTTON_ONCLICK_START:
-                set_rAction(RACTION.OPEN_NEW_FLIGHT);
-                break;
-            case FLIGHT_ONSPEEDLOW:
-                set_rAction(RACTION.RESTART_NEW_FLIGHT);
+    FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd');
+    switch(ev){
+                case FLIGHT_STATECHANGEDTO_READYTOSAVE:
+                    if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
+                    break;
+                case MACT_BIGBUTTON_ONCLICK_START:
+                    set_rAction(RACTION.OPEN_NEW_FLIGHT);
+                    break;
+                case FLIGHT_ONSPEEDLOW:
+                    set_rAction(RACTION.RESTART_NEW_FLIGHT);
                 break;
             case SVCCOMM_ONSUCCESS_COMMAND:
                 //TODO -  see EventBus

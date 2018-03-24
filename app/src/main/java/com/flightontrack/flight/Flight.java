@@ -204,7 +204,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
 
     void getCloseFlight() {
-        FontLog.appendLog(TAG + "getCloseFlight", 'd');
+        FontLog.appendLog(TAG + "getCloseFlight: " + flightNumber, 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
         requestParams.put("speedlowflag", isSpeedAboveMin);
@@ -271,7 +271,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 if (!isSpeedAboveMin) {
                     //set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
                     set_flightState(FLIGHT_STATE.STOPPED);
-                    //EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDLOW));
+                    EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDLOW).setEventMessageValueString(flightNumber));
                 }
                 break;
         }
@@ -315,7 +315,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         flightTimeString = dateFormat.format(elapsedTime);
-        EventBus.distribute(new EventMessage(EVENT.FLIGHT_FLIGHTTIME_UPDATE_COMPLETED));
+        EventBus.distribute(new EventMessage(EVENT.FLIGHT_FLIGHTTIME_UPDATE_COMPLETED).setEventMessageValueString(flightNumber));
     }
 
     double get_cutoffSpeed() {
@@ -331,14 +331,14 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         Flight.super.set_flightState(fs);
         switch (fs) {
             case READY_TOSAVELOCATIONS:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_STATECHANGEDTO_READYTOSAVE));
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_STATECHANGEDTO_READYTOSAVE).setEventMessageValueString(flightNumber));
                 //raiseEventGetFlightComleted();
                 break;
             case INFLIGHT_SPEEDABOVEMIN:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDABOVEMIN));
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDABOVEMIN).setEventMessageValueString(flightNumber));
                 break;
             case STOPPED:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDLOW));
+                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDLOW).setEventMessageValueString(flightNumber));
                 if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
                     set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
                 }
@@ -385,6 +385,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + flightNumber + ":eventReceiver:" + ev, 'd');
+        super.eventReceiver(eventMessage);
         switch (ev) {
             case CLOCK_ONTICK:
                 if (    route.activeFlight == this
@@ -398,7 +399,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 if (Util.isNetworkAvailable()) {
                     if (flightNumStatus== FLIGHTNUMBER_SRC.LOCAL) getNewFlightID();
                 }
-                if (flightState==FLIGHT_STATE.STOPPED && getLocationFlightCount() == 0) {
+                if (flightState==FLIGHT_STATE.STOPPED && sqlHelper.getLocationFlightCount(flightNumber) == 0) {
                     set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
                 }
                 break;

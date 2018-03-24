@@ -260,7 +260,7 @@ public class Session implements EventBus{
         //Array eventReaction[EVENT];
         ev = eventMessage.event;
         this.eventMessage = eventMessage;
-        FontLog.appendLog(TAG + "eventReceiver: "+ev, 'd');
+        FontLog.appendLog(TAG + "eventReceiver: "+ev+":eventString:"+eventMessage.eventMessageValueString, 'd');
         switch (ev) {
             case MACT_BACKBUTTON_ONCLICK:
                 set_sAction(SACTION.CHECK_CACHE_FIRST);

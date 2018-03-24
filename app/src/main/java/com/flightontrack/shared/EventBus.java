@@ -20,7 +20,7 @@ public interface EventBus extends Events{
     static void distribute(EventMessage eventMessage){
         ArrayList<EventBus> interfaceList = new ArrayList();
         EVENT ev = eventMessage.event;
-        FontLog.appendLog(TAG + ev, 'd');
+        FontLog.appendLog(TAG + ev+":eventString:"+eventMessage.eventMessageValueString+":eventObject:"+eventMessage.eventMessageValueObject, 'd');
         switch(ev){
             case MACT_BIGBUTTON_ONCLICK_START:
                 interfaceList.add(new Route());
@@ -159,8 +159,9 @@ public interface EventBus extends Events{
                 break;
             case SQL_FLIGHTRECORDCOUNT_ZERO:
                 interfaceList.add((FlightBase)eventMessage.eventMessageValueObject);
+                break;
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:
-                interfaceList.add(RouteBase.getInstance()); // set route number
+                interfaceList.add(RouteBase.activeRoute); // set route number
                 interfaceList.add(new SvcLocationClock()); //start clock service in location mode
                 interfaceList.add(mainactivityInstance);
                 break;
