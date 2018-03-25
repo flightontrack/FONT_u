@@ -5,16 +5,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
-import static com.flightontrack.communication.SvcComm.commBatchSize;
+//import static com.flightontrack.communication.SvcComm.commBatchSize;
 import static com.flightontrack.flight.RouteBase.*;
 import static com.flightontrack.flight.FlightBase.*;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-import com.flightontrack.communication.SvcComm;
+import com.flightontrack.communication.LoopjAClient;
+import com.flightontrack.communication.Response;
+//import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.mysql.Location;
@@ -23,9 +26,15 @@ import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import cz.msebera.android.httpclient.Header;
 //import java.util.EnumMap;
 
 
@@ -36,16 +45,16 @@ import java.util.EnumMap;
 public class Session implements EventBus{
     public enum SACTION {
         SEND_CACHED_LOCATIONS,
-        //START_COMMUNICATION,
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
         GET_OFFLINE_FLIGHTS,
-        CLOSE_FLIGHTS,
-        LAST_CHANCE
+        CLOSE_FLIGHTS
     }
 
     static Session sessionInstance = null;
+    public static Integer commBatchSize = COMM_BATCH_SIZE_MAX;
     static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
+    Map<Integer,Location> locRequestList = new HashMap<Integer,Location>();
     EVENT ev;
     EventMessage eventMessage;
 
@@ -77,85 +86,104 @@ public class Session implements EventBus{
 //        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
-
-    static void startLocationCommService() {
-
-//        Cursor locations = sqlHelper.getCursorDataLocation();
-//        try {
-//            FontLog.appendLog(TAG + "SvcComm.commBatchSize :" + commBatchSize, 'd');
-//            while (locations.moveToNext()) {
-//                if (locations.getPosition() >= commBatchSize) break;
-//                Intent intentComm = new Intent(ctxApp, SvcComm.class);
-//                //Intent intentComm = new Intent(context, SvcIntentComm.class);
-//                Bundle bundle = new Bundle();
-//                bundle.putLong("itemId", locations.getLong(locations.getColumnIndexOrThrow(DBSchema._ID)));
-//                bundle.putInt("rc", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1)));
-//                bundle.putString("ft", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
-//                bundle.putBoolean("sl", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag)) == 1);
-//                bundle.putString("sd", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4)));
-//                bundle.putString("la", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6)));
-//                bundle.putString("lo", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7)));
-//                bundle.putString("ac", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8)));
-//                bundle.putString("al", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9)));
-//                bundle.putInt("wp", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_wpntnum)));
-//                bundle.putString("sg", locations.getString(locations.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11)));
-//                bundle.putString("dt", locations.getString(locations.getColumnIndexOrThrow(DBSchema.LOC_date)));
-//                bundle.putBoolean("irch", locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1);
-//
-//                intentComm.putExtras(bundle);
-//                ctxApp.startService(intentComm);
-//                if (locations.getInt(locations.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check)) == 1){delay(1000);}
-//            }
-//        }
-//        finally {
-//            locations.close();
-//            sqlHelper.dbw.close();
-//        }
-
-        ArrayList<Location> locList = sqlHelper.getDataLocationList();
-        for (Location l:locList) {
-            if (l.i >= commBatchSize) break;
-            Intent intentComm = new Intent(ctxApp, SvcComm.class);
-            Bundle bundle = new Bundle();
-            bundle.putLong("itemId", l.itemId);
-            bundle.putInt("rc", l.rc);
-            bundle.putString("ft", l.ft);
-            bundle.putBoolean("sl", l.sl==1);
-            bundle.putString("sd", l.sd);
-            bundle.putString("la", l.la);
-            bundle.putString("lo", l.lo);
-            bundle.putString("ac", l.ac);
-            bundle.putString("al", l.al);
-            bundle.putInt("wp", l.wp);
-            bundle.putString("sg", l.sg);
-            bundle.putString("dt", l.dt);
-            bundle.putBoolean("irch", l.irch == 1);
-
-            intentComm.putExtras(bundle);
-            ctxApp.startService(intentComm);
-            if (l.irch == 1){delay(1000);}
-        }
+    void addLocToRequestList(Location l){
+        if (locRequestList.containsKey((int) l.itemId)) return;
+        if (l.i >= commBatchSize) return;
+        locRequestList.put((int) l.itemId, l);
     }
-//    void sendStoredLocations(){
+    void startLocationRequest() {
+        ArrayList<Location> locList = sqlHelper.getDataLocationList();
+        for (Location l : locList) {
+            addLocToRequestList(l);
+        }
+        sendNext();
+    }
+    void startLocationRequest(String flightNum) {
+        ArrayList<Location> locList = sqlHelper.getFlightLocationList(flightNum);
+        for (Location l : locList) {
+            addLocToRequestList(l);
+        }
+        sendNext();
+    }
+    void sendNext(){
+        if (locRequestList.isEmpty()) {
+            EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+            return;
+        }
+        Map.Entry<Integer, Location> e = locRequestList.entrySet().iterator().next();
+        Location l = e.getValue();
+        int k = e.getKey();
+        FontLog.appendLog(TAG + "Entry : " + e.getValue(), 'd');
+        RequestParams requestParams = new RequestParams();
+        requestParams.put("isdebug", SessionProp.pIsDebug);
+        requestParams.put("speedlowflag", l.sl == 1);
+        requestParams.put("rcode", l.rc);
+        requestParams.put("latitude", l.la);
+        requestParams.put("longitude", l.lo);
+        requestParams.put("flightid", l.ft);
+        requestParams.put("accuracy", l.ac);
+        requestParams.put("extrainfo", l.al);
+        requestParams.put("wpntnum", l.wp);
+        requestParams.put("gsmsignal", l.sg);
+        requestParams.put("speed", l.sd);
+        requestParams.put("date", l.dt);
+        requestParams.put("elevcheck", l.irch == 1);
+        postLocation(k, requestParams);
+    }
+//    static void startLocationCommService() {
 //
-//        commBatchSize= dbLocationRecCountNormal;
-//        //SvcComm.commBatchSize= 50;
-//        int counter =0;
-//        //dbLocationRecCountNormal=sqlHelper.getCursorDataLocation().getCount();
-//        int MaxTryCount = 0; //dbLocationRecCountNormal/SvcComm.commBatchSize*2;
-//        while (dbLocationRecCountNormal>0){
-//            FontLog.appendLog(TAG + " dbLocationRecCountNormal to send: " + dbLocationRecCountNormal, 'd');
-//            if (counter >MaxTryCount) {
-//                //Toast.makeText(mainactivityInstance, R.string.unsentrecords_failed, Toast.LENGTH_SHORT).show();
-//                //sqlHelper.cl.close();
-//                break;
-//            }
-//            delay(2000);
-//            counter++;
-//            //Toast.makeText(mainactivityInstance, R.string.toast_cachesending, Toast.LENGTH_SHORT).show();
-//            set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+//        ArrayList<Location> locList = sqlHelper.getDataLocationList();
+//        for (Location l:locList) {
+//
+//            if (l.i >= commBatchSize) break;
+//            Intent intentComm = new Intent(ctxApp, SvcComm.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putLong("itemId", l.itemId);
+//            bundle.putInt("rc", l.rc);
+//            bundle.putString("ft", l.ft);
+//            bundle.putBoolean("sl", l.sl==1);
+//            bundle.putString("sd", l.sd);
+//            bundle.putString("la", l.la);
+//            bundle.putString("lo", l.lo);
+//            bundle.putString("ac", l.ac);
+//            bundle.putString("al", l.al);
+//            bundle.putInt("wp", l.wp);
+//            bundle.putString("sg", l.sg);
+//            bundle.putString("dt", l.dt);
+//            bundle.putBoolean("irch", l.irch == 1);
+//
+//            intentComm.putExtras(bundle);
+//            FontLog.appendLog(TAG + "startServiceComm request: " + l.itemId+"-"+l.ft+"-"+l.wp, 'd');
+//            ctxApp.startService(intentComm);
+//            if (l.irch == 1){delay(1000);}
 //        }
+//    }
+//    static void startLocationCommServiceForFlight(String flightNum) {
 //
+//        ArrayList<Location> locList = sqlHelper.getDataLocationList();
+//        for (Location l:locList) {
+//            if (l.i >= commBatchSize) break;
+//            Intent intentComm = new Intent(ctxApp, SvcComm.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putLong("itemId", l.itemId);
+//            bundle.putInt("rc", l.rc);
+//            bundle.putString("ft", l.ft);
+//            bundle.putBoolean("sl", l.sl==1);
+//            bundle.putString("sd", l.sd);
+//            bundle.putString("la", l.la);
+//            bundle.putString("lo", l.lo);
+//            bundle.putString("ac", l.ac);
+//            bundle.putString("al", l.al);
+//            bundle.putInt("wp", l.wp);
+//            bundle.putString("sg", l.sg);
+//            bundle.putString("dt", l.dt);
+//            bundle.putBoolean("irch", l.irch == 1);
+//
+//            intentComm.putExtras(bundle);
+//            FontLog.appendLog(TAG + "startServiceComm request: " + l.itemId+"-"+l.ft+"-"+l.wp, 'd');
+//            ctxApp.startService(intentComm);
+//            if (l.irch == 1){delay(1000);}
+//        }
 //    }
 
     static void delay(int millis) {
@@ -195,7 +223,8 @@ public class Session implements EventBus{
                 break;
             case SEND_CACHED_LOCATIONS:
                     if (Util.isNetworkAvailable()) {
-                        startLocationCommService();
+                        //startLocationCommService();
+                        startLocationRequest();
                     } else {
                         FontLog.appendLog(TAG + "Connectivity unavailable Can't send location", 'd');
                         EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
@@ -238,21 +267,91 @@ public class Session implements EventBus{
                     //new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.READY_TOSENDLOCATIONS);
                     new FlightBase(fn).set_flightNumStatus(FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
                 }
-
-//                try {
-//                    while (flights.moveToNext()) {
-//                        String fn = flights.getString(flights.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-//                        if (RouteBase.isFlightNumberInList(fn)) continue;
-//                        FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
-//                        new FlightBase(fn).set_flightState(FlightBase.FSTATE.READY_TOSENDLOCATIONS);
-//                    }
-//                }
-//                finally{
-//                    flights.close();
-//                    sqlHelper.dbw.close();
-//                }
                 break;
         }
+    }
+
+    void postLocation(int dbId,RequestParams requestParams){
+        if (Util.isNetworkAvailable()) {
+            try {
+                final LoopjAClient aSyncClient = new LoopjAClient(dbId);
+                FontLog.appendLog(TAG + "Post: requestParams: " + requestParams, 'd');
+                aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                        if (commBatchSize == COMM_BATCH_SIZE_MIN) {
+                            commBatchSize = COMM_BATCH_SIZE_MAX;
+                        }
+                        Response response = new Response(new String(responseBody));
+                        //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
+                        if (response.jsonErrorCount > 0) {
+                            FontLog.appendLog(TAG + "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd');
+                            if (response.jsonErrorCount > MAX_JSON_ERROR) {
+                                /// raise this event as NOTIF
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                            }
+                            return;
+                        }
+                        try {
+                            if (response.responseAckn != null) {
+                                sqlHelper.rowLocationDeleteOnId(aSyncClient.getID(), response.responseFlightNum);  /// TODO should be moved to Router
+                                FontLog.appendLog(TAG + "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn+ ": id" +aSyncClient.getID(), 'd');
+                            }
+                            if (response.responseNotif != null) {
+                                FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd');
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                            }
+                            if (response.responseCommand != null) {
+                                FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd');
+                                if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
+                                    return;
+                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_COMMAND)
+                                        .setEventMessageValueInt(response.iresponseCommand)
+                                        .setEventMessageValueString(response.responseFlightNum));
+//                                switch (response.iresponseCommand) {
+//                                    case COMMAND_TERMINATEFLIGHT:
+//                                          break;
+//                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
+//                                        break;
+//                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
+//                                        break;
+//                                    case COMMAND_FLIGHT_STATE_PENDING:
+//                                        break;
+//                                    case -1:
+//                                        break;
+//                                }
+                            }
+                            if (response.responseDataLoad != null) {
+                                FontLog.appendLog(TAG + "Data response : " + response.responseDataLoad, 'd');
+                            }
+                        } catch (Exception e) {
+                            FontLog.appendLog(TAG + "onSuccess : EXCEPTION :" + e.getMessage(), 'e');
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                        FontLog.appendLog(TAG + "onFailure; startId= " + aSyncClient.getID(), 'd');
+                        commBatchSize = COMM_BATCH_SIZE_MIN;
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        locRequestList.remove(aSyncClient.getID());
+                        FontLog.appendLog(TAG + "onFinish removed ID= " + aSyncClient.getID(), 'd');
+                        sendNext();
+                    }
+                });
+            } catch (Exception e) {
+                FontLog.appendLog(TAG + "aSyncClient" + e.getMessage(), 'd');
+                return;
+            }
+        }
+
+    }
+    @Override
+    public void onClock(EventMessage eventMessage){
+        if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
     }
 
     @Override
@@ -265,10 +364,10 @@ public class Session implements EventBus{
             case MACT_BACKBUTTON_ONCLICK:
                 set_sAction(SACTION.CHECK_CACHE_FIRST);
                 break;
-            case CLOCK_ONTICK:
-                if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-                //set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
-                break;
+//            case CLOCK_ONTICK:
+//                if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+//                //set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
+//                break;
             case ALERT_SENTPOINTS:
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
@@ -287,8 +386,7 @@ public class Session implements EventBus{
                 }
                 break;
             case FLIGHT_REMOTENUMBER_RECEIVED:
-                //flightList.add((FlightBase) eventMessage.eventMessageValueObject);
-                set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+                startLocationRequest(eventMessage.eventMessageValueString);
                 break;
 //            case SVCCOMM_ONDESTROY:
 //                set_sAction(SACTION.CLOSE_FLIGHTS);

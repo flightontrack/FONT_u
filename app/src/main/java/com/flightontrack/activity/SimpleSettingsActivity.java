@@ -227,11 +227,12 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
     EVENT ev = eventMessage.event;
     FontLog.appendLog(TAG + " eventReceiver : "+ev, 'd');
         switch(ev){
-            case SVCCOMM_ONDESTROY:
-                if (progressBar!=null) progressBar.dismiss();
-                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
-                break;
+//            case SVCCOMM_ONDESTROY:
+//                if (progressBar!=null) progressBar.dismiss();
+//                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
+//                break;
             case FLIGHT_ONSENDCACHECOMPLETED:
+                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
                 if (progressBar!=null)  progressBar.dismiss();
                 break;
             case SQL_ONCLEARCACHE_COMPLETED:

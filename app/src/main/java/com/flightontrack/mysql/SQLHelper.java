@@ -129,6 +129,32 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         }
             dbLocationRecCountNormal = get_dbLocationRecCountNormal();
     }
+    public void rowLocationDeleteOnId(int dbId, String flightId) {
+        String selection = DBSchema._ID + "= ?";
+        String[] selectionArgs = {String.valueOf(dbId)};
+
+        try{
+        dbw = getWritableDatabase();
+        dbw.delete(
+                DBSchema.TABLE_LOCATION,
+                selection,
+                selectionArgs
+        );
+        selection = DBSchema.LOC_flightid +"= ?";
+        String[] selectionArgs1 = {flightId};
+        long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION,selection,selectionArgs1);
+        dbw.close();
+        if (numRows==0){
+            EventBus.distribute(new EventMessage( EVENT.SQL_FLIGHTRECORDCOUNT_ZERO)
+                    .setEventMessageValueObject(get_FlightInstanceByNumber(flightId))
+                    .setEventMessageValueString(flightId)
+            );
+        }
+        } catch (Exception e) {
+            FontLog.appendLog(TAG + e.getMessage(), 'e');
+        }
+            dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+    }
     public void flightLocationsDelete(String flightId) {
         String selection = DBSchema.LOC_flightid +"= ?";
         String[] selectionArgs = {flightId};
@@ -269,6 +295,64 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         String sortOrder = DBSchema._ID;
         String selection = DBSchema.LOC_isTempFlight + "= ?";
         String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
+        dbw = getReadableDatabase();
+        Cursor cu = dbw.query(
+                DBSchema.TABLE_LOCATION,  // The table to query
+                projection,                               // The columns to return
+                selection,                               // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+        ArrayList<Location> locations = new ArrayList();
+        try {
+            while (cu.moveToNext()) {
+                Location l = new Location();
+                l.i = cu.getPosition();
+                l.itemId = cu.getLong(cu.getColumnIndexOrThrow(DBSchema._ID));
+                l.rc = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1));
+                l.ft = cu.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+                l.sl = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_speedlowflag));
+                l.sd = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL4));
+                l.la = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL6));
+                l.lo = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL7));
+                l.ac = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL8));
+                l.al = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL9));
+                l.wp = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_wpntnum));
+                l.sg = cu.getString(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL11));
+                l.dt = cu.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_date));
+                l.irch = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check));
+                locations.add(l);
+            }
+        }
+        finally {
+            cu.close();
+            dbw.close();
+        }
+        return locations;
+    }
+    public ArrayList<Location> getFlightLocationList(String flightNum) {
+
+        String[] projection = {
+                DBSchema._ID,
+                DBSchema.COLUMN_NAME_COL1,
+                DBSchema.LOC_flightid,
+                DBSchema.LOC_isTempFlight,
+                DBSchema.LOC_speedlowflag,
+                DBSchema.COLUMN_NAME_COL4,
+                DBSchema.COLUMN_NAME_COL6,
+                DBSchema.COLUMN_NAME_COL7,
+                DBSchema.COLUMN_NAME_COL8,
+                DBSchema.COLUMN_NAME_COL9,
+                DBSchema.LOC_wpntnum,
+                DBSchema.COLUMN_NAME_COL11,
+                DBSchema.LOC_date,
+                DBSchema.LOC_is_elevetion_check
+        };
+        String sortOrder = DBSchema._ID;
+        String selection = DBSchema.LOC_flightid + "= ?";
+        String[] selectionArgs = {flightNum}; // { String.valueOf(newRowId) };
         dbw = getReadableDatabase();
         Cursor cu = dbw.query(
                 DBSchema.TABLE_LOCATION,  // The table to query

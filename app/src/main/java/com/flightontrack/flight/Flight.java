@@ -24,6 +24,8 @@ import com.loopj.android.http.RequestParams;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
@@ -41,15 +43,16 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     public String flightTimeString;
     public int lastAltitudeFt;
     public int _wayPointsCount;
-    private Route route;
-    private float _speedCurrent = 0;
-    private float speedPrev = 0;
+    Route route;
+    float _speedCurrent = 0;
+    float speedPrev = 0;
+    int _flightTimeSec;
     private long _flightStartTimeGMT;
-    private int _flightTimeSec;
-    private boolean isElevationCheckDone;
-    private double cutoffSpeed;
+    boolean isElevationCheckDone;
+    double cutoffSpeed;
+    boolean isGettingFlight=false;
     boolean isGetFlightCallSuccess = false;
-
+    List<Integer> dbIdList = new ArrayList<>();
 
     public Flight(Route r) {
         route = r;
@@ -108,7 +111,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
 
     void getNewFlightID() {
-
+        isGettingFlight = true;
         FontLog.appendLog(TAG + "Flight - getNewFlightID:  " + flightNumber, 'd');
         RequestParams requestParams = new RequestParams();
 
@@ -188,9 +191,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                     @Override
                     public void onFinish() {
                         FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
-//                        if (flightState != FLIGHT_STATE.CLOSED){
-//                            //if (!isTempFlightNum) set_fAction(FACTION.CHANGE_IN_PENDING);
-//                            //if (!isTempFlightNum) raiseEventGetFlightComleted();
+                        isGettingFlight = false;
                     }
 
                     @Override
@@ -300,6 +301,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
             values.put(DBSchema.LOC_is_elevetion_check, iselevecheck);
             long r = sqlHelper.rowLocationInsert(values);
             if (r > 0) {
+                dbIdList.add((int)r);
                 lastAltitudeFt = (int) (Math.round(location.getAltitude() * 3.281));
                 set_wayPointsCount(p);
                 FontLog.appendLog(TAG + "saveLocation: dbLocationRecCountNormal: " + SessionProp.dbLocationRecCountNormal, 'd');
@@ -335,6 +337,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 //raiseEventGetFlightComleted();
                 break;
             case INFLIGHT_SPEEDABOVEMIN:
+                _flightStartTimeGMT = getTimeGMT();
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDABOVEMIN).setEventMessageValueString(flightNumber));
                 break;
             case STOPPED:
@@ -380,29 +383,45 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 ////                break;
 //        }
 //    }
+    @Override
+    public void onClock(EventMessage eventMessage){
 
+        FontLog.appendLog(TAG + flightNumber + "onClock", 'd');
+        if (route.activeFlight == this
+                && (flightState == FLIGHT_STATE.READY_TOSAVELOCATIONS || flightState == FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN)
+                && eventMessage.eventMessageValueLocation != null) {
+    //                    String s = Arrays.toString(Thread.currentThread().getStackTrace());
+    //                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
+            saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
+        }
+        if (Util.isNetworkAvailable() && !isGettingFlight) {
+            if (flightNumStatus== FLIGHTNUMBER_SRC.LOCAL) getNewFlightID();
+        }
+        if (flightState==FLIGHT_STATE.STOPPED && sqlHelper.getLocationFlightCount(flightNumber) == 0) {
+            set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
+        }
+    }
     @Override
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + flightNumber + ":eventReceiver:" + ev, 'd');
         super.eventReceiver(eventMessage);
         switch (ev) {
-            case CLOCK_ONTICK:
-                if (    route.activeFlight == this
-                        && (flightState == FLIGHT_STATE.READY_TOSAVELOCATIONS || flightState == FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN)
-                        //&& lastAction != FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS
-                        && eventMessage.eventMessageValueLocation != null) {
-//                    String s = Arrays.toString(Thread.currentThread().getStackTrace());
-//                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
-                    saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
-                }
-                if (Util.isNetworkAvailable()) {
-                    if (flightNumStatus== FLIGHTNUMBER_SRC.LOCAL) getNewFlightID();
-                }
-                if (flightState==FLIGHT_STATE.STOPPED && sqlHelper.getLocationFlightCount(flightNumber) == 0) {
-                    set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
-                }
-                break;
+//            case CLOCK_ONTICK:
+//                if (    route.activeFlight == this
+//                        && (flightState == FLIGHT_STATE.READY_TOSAVELOCATIONS || flightState == FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN)
+//                        && eventMessage.eventMessageValueLocation != null) {
+////                    String s = Arrays.toString(Thread.currentThread().getStackTrace());
+////                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
+//                    saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
+//                }
+//                if (Util.isNetworkAvailable()) {
+//                    if (flightNumStatus== FLIGHTNUMBER_SRC.LOCAL) getNewFlightID();
+//                }
+//                if (flightState==FLIGHT_STATE.STOPPED && sqlHelper.getLocationFlightCount(flightNumber) == 0) {
+//                    set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
+//                }
+//                break;
             case SVCCOMM_ONSUCCESS_COMMAND:
                 int server_command = eventMessage.eventMessageValueInt;
                 FontLog.appendLog(TAG + "server_command int: " + server_command, 'd');

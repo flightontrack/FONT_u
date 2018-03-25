@@ -19,6 +19,8 @@ public interface EventBus extends Events{
 
     static void distribute(EventMessage eventMessage){
         ArrayList<EventBus> interfaceList = new ArrayList();
+        ArrayList<EventBus> onClockList = new ArrayList();
+
         EVENT ev = eventMessage.event;
         FontLog.appendLog(TAG + ev+":eventString:"+eventMessage.eventMessageValueString+":eventObject:"+eventMessage.eventMessageValueObject, 'd');
         switch(ev){
@@ -105,8 +107,8 @@ public interface EventBus extends Events{
                         break;
                 }
             case SVCCOMM_ONDESTROY:
-                //if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
-                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                //interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 //interfaceList.add(Session.getInstance());
                 break;
             case SVCCOMM_LOCRECCOUNT_NOTZERO:
@@ -132,14 +134,11 @@ public interface EventBus extends Events{
                 //interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
-                interfaceList.add(RouteBase.getInstance()); /// delete closed flights from flightlist
+                onClockList.add(RouteBase.getInstance()); /// delete closed flights from flightlist
                 for (FlightBase f : Route.flightList) {
-                    interfaceList.add(f);                   /// check if any of them need to be replace temp flight num
-                                                            /// check if any of them need to be closed
+                    onClockList.add(f);                   /// check if any of them need to be replace temp flight num                     /// check if any of them need to be closed
                 }
-                interfaceList.add(Session.getInstance());   /// start communication service
-                                                            /// get online flight number for temp flights not in list
-                //FontLog.appendLog(TAG + interfaceList, 'd');
+                onClockList.add(Session.getInstance());   /// start communication service
                 break;
             case ALERT_SENTPOINTS:
                 interfaceList.add(RouteBase.activeRoute);
@@ -170,16 +169,21 @@ public interface EventBus extends Events{
                 interfaceList.add(Session.getInstance());   /// start send locations for the flights with replaced flight number
                 break;
             case FLIGHT_ONSENDCACHECOMPLETED:
-                interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                if (SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
         }
         for( EventBus i : interfaceList) {
             if(!(null==i))i.eventReceiver(eventMessage);
             else  FontLog.appendLog(TAG + " null interface ", 'd');
         }
+        for( EventBus i : onClockList) {
+            if(!(null==i))i.onClock(eventMessage);
+            else  FontLog.appendLog(TAG + " null interface ", 'd');
+        }
     }
 
     default void eventReceiver(EventMessage eventMessage){}
+    default void onClock(EventMessage eventMessage){}
 }
 
 

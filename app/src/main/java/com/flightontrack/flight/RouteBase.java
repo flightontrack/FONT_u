@@ -89,21 +89,30 @@ public class RouteBase implements EventBus{
                 }
         }
     }
+    @Override
+    public void onClock(EventMessage eventMessage) {
+        for (FlightBase f : flightList) {
+            if (f.flightState == FlightBase.FLIGHT_STATE.CLOSED) {
+                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+                break;
+            }
+        }
+    }
 @Override
 public void eventReceiver(EventMessage eventMessage){
     ev = eventMessage.event;
     this.eventMessage = eventMessage;
     FontLog.appendLog(TAG +"eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd');
     switch(ev){
-            //case FLIGHT_GETNEWFLIGHT_COMPLETED:;
-            case CLOCK_ONTICK:
-                for (FlightBase f : flightList) {
-                    if (f.flightState == FlightBase.FLIGHT_STATE.CLOSED) {
-                        set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
-                        break;
-                    }
-                }
-                break;
+//            //case FLIGHT_GETNEWFLIGHT_COMPLETED:;
+//            case CLOCK_ONTICK:
+//                for (FlightBase f : flightList) {
+//                    if (f.flightState == FlightBase.FLIGHT_STATE.CLOSED) {
+//                        set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
+//                        break;
+//                    }
+//                }
+//                break;
             case FLIGHT_REMOTENUMBER_RECEIVED:
                 set_rAction(RACTION.ADD_OR_UPDATE_FLIGHT);
                 break;

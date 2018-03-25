@@ -3,11 +3,11 @@ package com.flightontrack.communication;
 import com.loopj.android.http.*;
 
 public class LoopjAClient extends AsyncHttpClient{
-    private int startID;
-    LoopjAClient(int id){startID=id;}
+    private int ID;
+    public LoopjAClient(int id){ID=id;}
 
-    public int getStartID() {
-        return startID;
+    public int getID() {
+        return ID;
     }
 
 
