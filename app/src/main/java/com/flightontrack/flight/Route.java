@@ -84,15 +84,7 @@ public void eventReceiver(EventMessage eventMessage){
                 case FLIGHT_ONSPEEDLOW:
                     set_rAction(RACTION.RESTART_NEW_FLIGHT);
                 break;
-            case SVCCOMM_ONSUCCESS_COMMAND:
-                //TODO -  see EventBus
-                break;
-//            case FLIGHT_CLOSEFLIGHT_COMPLETED:
-//                set_rAction(RACTION.REMOVE_FLIGHT_IF_CLOSED);
-//                break;
-//            case CLOCK_SERVICESELFSTOPPED:
-//                setToNull();
-//                break;
+
         }
     }
 }

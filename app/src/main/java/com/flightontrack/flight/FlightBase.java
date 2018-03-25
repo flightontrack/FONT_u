@@ -199,6 +199,7 @@ public class FlightBase implements EventBus{
         if (sqlHelper.updateTempFlightNum(flightNumber, fnew) > 0) {
             FontLog.appendLog(TAG + "replaceFlightNumber: " + flightNumber+"->" +fnew, 'd');
         }
+        else FontLog.appendLog(TAG + "replaceFlightNumber: nothing to replace: " + flightNumber+"->" +fnew, 'd');
         flightNumber = fnew;
     }
 

@@ -1,15 +1,11 @@
 package com.flightontrack.flight;
 
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.Bundle;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
 //import static com.flightontrack.communication.SvcComm.commBatchSize;
-import static com.flightontrack.flight.RouteBase.*;
 import static com.flightontrack.flight.FlightBase.*;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
@@ -19,7 +15,6 @@ import com.flightontrack.communication.LoopjAClient;
 import com.flightontrack.communication.Response;
 //import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLog;
-import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.mysql.Location;
 import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.EventBus;
@@ -47,8 +42,7 @@ public class Session implements EventBus{
         SEND_CACHED_LOCATIONS,
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
-        GET_OFFLINE_FLIGHTS,
-        CLOSE_FLIGHTS
+        GET_OFFLINE_FLIGHTS
     }
 
     static Session sessionInstance = null;
@@ -76,15 +70,15 @@ public class Session implements EventBus{
 //        eventReaction.put(MACT_BACKBUTTON_ONCLICK,SACTION.CHECK_CACHE_FIRST);
 //        eventReaction.put(CLOCK_ONTICK,SACTION.START_COMMUNICATION);
 //        eventReaction.put(ALERT_SENTPOINTS:
-//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.SEND_STORED_LOCATIONS);
-//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_Action(SACTION.SEND_STORED_LOCATIONS);
+//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
 //        eventReaction.put(ALERT_STOPAPP:
-//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+//        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
 //        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
 //        eventReaction.put(FLIGHT_REMOTENUMBER_RECEIVED:
 //
 //        flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
-//        set_sAction(SACTION.SEND_CACHED_LOCATIONS);)
+//        set_Action(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
     void addLocToRequestList(Location l){
@@ -93,7 +87,7 @@ public class Session implements EventBus{
         locRequestList.put((int) l.itemId, l);
     }
     void startLocationRequest() {
-        ArrayList<Location> locList = sqlHelper.getDataLocationList();
+        ArrayList<Location> locList = sqlHelper.getAllLocationList();
         for (Location l : locList) {
             addLocToRequestList(l);
         }
@@ -106,13 +100,12 @@ public class Session implements EventBus{
             addLocToRequestList(l);
         }
         if(!isSendNextStarted)  sendNext();
-
     }
     void sendNext(){
 
         isSendNextStarted = true;
         if (locRequestList.isEmpty()) {
-            EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
             isSendNextStarted = false;
             return;
         }
@@ -139,61 +132,6 @@ public class Session implements EventBus{
         requestParams.put("elevcheck", l.irch == 1);
         postLocation(k, requestParams);
     }
-//    static void startLocationCommService() {
-//
-//        ArrayList<Location> locList = sqlHelper.getDataLocationList();
-//        for (Location l:locList) {
-//
-//            if (l.i >= commBatchSize) break;
-//            Intent intentComm = new Intent(ctxApp, SvcComm.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putLong("itemId", l.itemId);
-//            bundle.putInt("rc", l.rc);
-//            bundle.putString("ft", l.ft);
-//            bundle.putBoolean("sl", l.sl==1);
-//            bundle.putString("sd", l.sd);
-//            bundle.putString("la", l.la);
-//            bundle.putString("lo", l.lo);
-//            bundle.putString("ac", l.ac);
-//            bundle.putString("al", l.al);
-//            bundle.putInt("wp", l.wp);
-//            bundle.putString("sg", l.sg);
-//            bundle.putString("dt", l.dt);
-//            bundle.putBoolean("irch", l.irch == 1);
-//
-//            intentComm.putExtras(bundle);
-//            FontLog.appendLog(TAG + "startServiceComm request: " + l.itemId+"-"+l.ft+"-"+l.wp, 'd');
-//            ctxApp.startService(intentComm);
-//            if (l.irch == 1){delay(1000);}
-//        }
-//    }
-//    static void startLocationCommServiceForFlight(String flightNum) {
-//
-//        ArrayList<Location> locList = sqlHelper.getDataLocationList();
-//        for (Location l:locList) {
-//            if (l.i >= commBatchSize) break;
-//            Intent intentComm = new Intent(ctxApp, SvcComm.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putLong("itemId", l.itemId);
-//            bundle.putInt("rc", l.rc);
-//            bundle.putString("ft", l.ft);
-//            bundle.putBoolean("sl", l.sl==1);
-//            bundle.putString("sd", l.sd);
-//            bundle.putString("la", l.la);
-//            bundle.putString("lo", l.lo);
-//            bundle.putString("ac", l.ac);
-//            bundle.putString("al", l.al);
-//            bundle.putInt("wp", l.wp);
-//            bundle.putString("sg", l.sg);
-//            bundle.putString("dt", l.dt);
-//            bundle.putBoolean("irch", l.irch == 1);
-//
-//            intentComm.putExtras(bundle);
-//            FontLog.appendLog(TAG + "startServiceComm request: " + l.itemId+"-"+l.ft+"-"+l.wp, 'd');
-//            ctxApp.startService(intentComm);
-//            if (l.irch == 1){delay(1000);}
-//        }
-//    }
 
     static void delay(int millis) {
         try {
@@ -202,7 +140,7 @@ public class Session implements EventBus{
             Thread.currentThread().interrupt();
         }
     }
-    void set_sAction(SACTION request) {
+    void set_Action(SACTION request) {
         FontLog.appendLog(TAG + "reaction:" + request, 'd');
         switch (request) {
             case CHECK_CACHE_FIRST:
@@ -210,67 +148,55 @@ public class Session implements EventBus{
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountNormal);
                     FontLog.appendLog(TAG + " PointsUnsent: " + dbLocationRecCountNormal, 'd');
                 } else {
-                    set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+                    set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 }
                 break;
             case CLOSEAPP_NO_CACHE_CHECK:
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) mainactivityInstance.finishActivity();
                 break;
-
-            case CLOSE_FLIGHTS:
-                for(FlightBase f: flightList) {
-                    FontLog.appendLog(TAG + " flightList size: " + flightList.size(), 'd');
-                    if (activeFlight!=null && f==activeFlight) continue;
-                    FontLog.appendLog(TAG + " flight "+f.flightNumber+" iflightStatet:" + f.flightState, 'd');
-//                    if (f.getLocationFlightCount() == 0){
-////                        if (f.flightNumStatus == FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT) {
-////                            f.set_flightState(FlightBase.FLIGHT_STATE.READY_TOBECLOSED);
-////                            FontLog.appendLog(TAG + " flightToClose: " + f.flightNumber, 'd');
-////                        }
-//                    }
-                }
-                break;
             case SEND_CACHED_LOCATIONS:
                     if (Util.isNetworkAvailable()) {
-                        //startLocationCommService();
                         startLocationRequest();
                     } else {
                         FontLog.appendLog(TAG + "Connectivity unavailable Can't send location", 'd');
-                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
-                        //Toast.makeText(mainactivityInstance, R.string.toast_noconnectivity, Toast.LENGTH_SHORT).show();
+                        EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                     }
                 break;
             case GET_OFFLINE_FLIGHTS:
-//                /// get flights from flightlist
-//                for (FlightBase f : flightList){
-//                    if(f.isTempFlightNum) f..set_flightState(FlightBase.FSTATE.GETTINGFLIGHT);
-//                }
-
                 /// firsrt to check all temp flights in not ready to send state.
                 /// Get new flight and request flight number.
-                Cursor flightsTemp = sqlHelper.getCursorTempFlights();
-                try {
-                    while (flightsTemp.moveToNext()) {
-                        String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-                        //if (isFlightNumberInList(fn)) continue;
-                        FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
-                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
-                        else {
-                            FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
-                            EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
-                        }
+//                Cursor flightsTemp = sqlHelper.getCursorTempFlights();
+//                try {
+//                    while (flightsTemp.moveToNext()) {
+//                        String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
+//                        //if (isFlightNumberInList(fn)) continue;
+//                        FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
+//                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
+//                        else {
+//                            FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
+//                            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
+//                        }
+//                    }
+//                }
+//                finally{
+//                    flightsTemp.close();
+//                    sqlHelper.dbw.close();
+//                }
+
+                for (String flightNumTemp:sqlHelper.getTempFlightList()){
+                    FontLog.appendLog(TAG + "Get flightBase for " + flightNumTemp, 'd');
+                    if (Util.isNetworkAvailable()) new FlightBase(flightNumTemp).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
+                    else {
+                        FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
+                        EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                     }
-                }
-                finally{
-                    flightsTemp.close();
-                    sqlHelper.dbw.close();
                 }
 
                 /// second to check flights is ready to send which are for some reason not in flightList (may left from previous session).
                 /// Get new flight on existing flight number
-                //Cursor flights = sqlHelper.getCursorReadyToSendFlights();
-                ArrayList<String> flightNumberList = sqlHelper.getListReadyToSendFlights();
-                for (String fn : flightNumberList){
+
+                //ArrayList<String> flightNumberList = sqlHelper.getListReadyToSendFlights();
+                for (String fn : sqlHelper.getListReadyToSendFlights()){
                     if (RouteBase.isFlightNumberInList(fn)) continue;
                     FontLog.appendLog(TAG+"Get flight number for "+fn,'d');
                     //new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.READY_TOSENDLOCATIONS);
@@ -297,7 +223,7 @@ public class Session implements EventBus{
                             FontLog.appendLog(TAG + "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd');
                             if (response.jsonErrorCount > MAX_JSON_ERROR) {
                                 /// raise this event as NOTIF
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_NOTIF));
                             }
                             return;
                         }
@@ -308,13 +234,13 @@ public class Session implements EventBus{
                             }
                             if (response.responseNotif != null) {
                                 FontLog.appendLog(TAG + "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd');
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_NOTIF));
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_NOTIF));
                             }
                             if (response.responseCommand != null) {
                                 FontLog.appendLog(TAG + "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd');
                                 if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
                                     return;
-                                EventBus.distribute(new EventMessage(EVENT.SVCCOMM_ONSUCCESS_COMMAND)
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
                                         .setEventMessageValueInt(response.iresponseCommand)
                                         .setEventMessageValueString(response.responseFlightNum));
 //                                switch (response.iresponseCommand) {
@@ -361,7 +287,7 @@ public class Session implements EventBus{
     @Override
     public void onClock(EventMessage eventMessage){
         FontLog.appendLog(TAG + "onClock ", 'd');
-        if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+        if (dbLocationRecCountNormal > 0) set_Action(SACTION.SEND_CACHED_LOCATIONS);
     }
 
     @Override
@@ -372,42 +298,36 @@ public class Session implements EventBus{
         FontLog.appendLog(TAG + "eventReceiver: "+ev+":eventString:"+eventMessage.eventMessageValueString, 'd');
         switch (ev) {
             case MACT_BACKBUTTON_ONCLICK:
-                set_sAction(SACTION.CHECK_CACHE_FIRST);
+                set_Action(SACTION.CHECK_CACHE_FIRST);
                 break;
-//            case CLOCK_ONTICK:
-//                if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-//                //set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
-//                break;
             case ALERT_SENTPOINTS:
-                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_Action(SACTION.SEND_CACHED_LOCATIONS);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.NEG) set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 break;
             case ALERT_STOPAPP:
-                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
+                if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 break;
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
+                commBatchSize = COMM_BATCH_SIZE_MAX;
                 if (sqlHelper.getLocationTableCountTotal() ==0){
-                    EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+                    EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
                     break;
                 }
-                else if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-                if (dbTempFlightRecCount>0) set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
+                else if (dbLocationRecCountNormal > 0) set_Action(SACTION.SEND_CACHED_LOCATIONS);
+                if (dbTempFlightRecCount>0) set_Action(SACTION.GET_OFFLINE_FLIGHTS);
                 break;
-            case SVCCOMM_LOCRECCOUNT_NOTZERO:
-                //commBatchSize=(dbLocationRecCountNormal>COMM_BATCH_SIZE_MAX?dbLocationRecCountNormal:COMM_BATCH_SIZE_MAX);
-                if (dbLocationRecCountNormal > 0) {
-                    set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-                }
-                break;
+//            case SESSION_ONSENDCACHECOMPLETED:
+//                /// if still something to send
+//                if (dbLocationRecCountNormal > 0) {
+//                    set_Action(SACTION.SEND_CACHED_LOCATIONS);
+//                }
+//                break;
             case FLIGHT_REMOTENUMBER_RECEIVED:
                 startLocationRequest(eventMessage.eventMessageValueString);
                 break;
             case CLOCK_SERVICESELFSTOPPED:
-                set_sAction(SACTION.SEND_CACHED_LOCATIONS);
-                //set_sAction(SACTION.CLOSE_FLIGHTS);
+                set_Action(SACTION.SEND_CACHED_LOCATIONS);
                 break;
         }
     }
-    //session does react to events. it never initiate events
-
 }

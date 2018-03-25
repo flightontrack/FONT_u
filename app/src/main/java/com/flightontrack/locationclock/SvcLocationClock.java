@@ -236,14 +236,14 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
                 //if (!SvcLocationClock.isInstanceCreated()) ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 ctxApp.startService(new Intent(ctxApp, SvcLocationClock.class));
                 break;
-            case SVCCOMM_ONSUCCESS_NOTIF:
+            case SESSION_ONSUCCESS_NOTIF:
                 stopServiceSelf();
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 set_mode(MODE.CLOCK_ONLY);
                 stopServiceSelf();
                 break;
-            case SVCCOMM_ONSUCCESS_COMMAND:
+            case SESSION_ONSUCCESS_COMMAND:
                 if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) set_mode(MODE.CLOCK_ONLY);
                 break;
             case ROUTE_NOACTIVEROUTE:

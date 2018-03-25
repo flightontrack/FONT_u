@@ -30,6 +30,7 @@ import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.flightontrack.flight.FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
@@ -63,11 +64,16 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
 
     public void set_flightNumber(String fn) {
-        FontLog.appendLog(TAG + "set_flightNumber fn " + fn, 'd');
-        flightNumber = fn;
-        set_flightState(FLIGHT_STATE.READY_TOSAVELOCATIONS);
-        set_flightNumStatus(FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
-        //set_flightState(FLIGHT_STATE.READY_TOSENDLOCATIONS);
+        FontLog.appendLog(TAG + " set_flightNumber " + fn+ " flightNumStatus " + flightNumStatus, 'd');
+        replaceFlightNumber(fn);
+        switch (flightNumStatus) {
+            case REMOTE_DEFAULT:
+                set_flightState(FLIGHT_STATE.READY_TOSAVELOCATIONS);
+                break;
+            case LOCAL:
+                set_flightNumStatus(REMOTE_DEFAULT);
+            break;
+        }
     }
 
     void set_wayPointsCount(int pointsCount) {
@@ -154,15 +160,8 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 
                             isGetFlightCallSuccess = true;
                             route._legCount++;
-                            //if (flightNumber == FLIGHT_NUMBER_DEFAULT) {
-                            //if (!isTempFlightNum) {
-                            if (flightNumStatus== FLIGHTNUMBER_SRC.REMOTE_DEFAULT) {
-                                set_flightNumber(response.responseFlightNum);
-                            } else {
-                                //isTempFlightNum = false;
-                                flightNumStatus= FLIGHTNUMBER_SRC.LOCAL;
-                                Flight.super.set_flightNumber(response.responseFlightNum);
-                            }
+
+                            set_flightNumber(response.responseFlightNum);
                         }
                     }
 
@@ -171,7 +170,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                         //FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
                         //if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                         //if (!isTempFlightNum) if (mainactivityInstance != null) {
-                        if (flightNumStatus== FLIGHTNUMBER_SRC.REMOTE_DEFAULT) if (mainactivityInstance != null) {
+                        if (flightNumStatus== REMOTE_DEFAULT) if (mainactivityInstance != null) {
                             Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
                             raiseEventGetFlightComleted();
                         }
@@ -422,7 +421,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 //                    set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
 //                }
 //                break;
-            case SVCCOMM_ONSUCCESS_COMMAND:
+            case SESSION_ONSUCCESS_COMMAND:
                 int server_command = eventMessage.eventMessageValueInt;
                 FontLog.appendLog(TAG + "server_command int: " + server_command, 'd');
                 switch (server_command) {

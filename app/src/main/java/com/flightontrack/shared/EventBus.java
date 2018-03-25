@@ -40,13 +40,7 @@ public interface EventBus extends Events{
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
-                if(eventMessage.eventMessageValueBool){
-//                    interfaceList.add(RouteBase.getInstance()); // set route number
-//                    interfaceList.add(new SvcLocationClock()); //start clock service in location mode
-//                    interfaceList.add(mainactivityInstance);
-                }
-                else
-                {
+                if(!eventMessage.eventMessageValueBool){
                     interfaceList.add(sqlHelper);
                 }
                 break;
@@ -54,12 +48,7 @@ public interface EventBus extends Events{
                 if(!eventMessage.eventMessageValueBool){
                     interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 }
-                else
-                {
-                }
-                    //interfaceList.add(mainactivityInstance);
                 break;
-
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 interfaceList.add(mainactivityInstance);
                 break;
@@ -86,11 +75,11 @@ public interface EventBus extends Events{
             case ROUTE_ONRESTART:
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
-            case SVCCOMM_ONSUCCESS_NOTIF:
+            case SESSION_ONSUCCESS_NOTIF:
                 interfaceList.add(Props.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
-            case SVCCOMM_ONSUCCESS_COMMAND:
+            case SESSION_ONSUCCESS_COMMAND:
                 interfaceList.add(Route.get_FlightInstanceByNumber(eventMessage.eventMessageValueString));
                 switch (eventMessage.eventMessageValueInt){
                     case COMMAND_TERMINATEFLIGHT:
@@ -106,14 +95,9 @@ public interface EventBus extends Events{
                         interfaceList.add(RouteBase.activeRoute); //initiate a new flight if multileg
                         break;
                 }
-            case SVCCOMM_ONDESTROY:
-                if(SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
-                //interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
-                //interfaceList.add(Session.getInstance());
-                break;
-            case SVCCOMM_LOCRECCOUNT_NOTZERO:
-                interfaceList.add(Session.getInstance());
-                break;
+//            case SVCCOMM_LOCRECCOUNT_NOTZERO:
+//                interfaceList.add(Session.getInstance());
+//                break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
                 interfaceList.add(sqlHelper);
                 //SQLHelper.eventReceiver(eventMessage);
@@ -168,8 +152,9 @@ public interface EventBus extends Events{
                 interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist if it is not in
                 interfaceList.add(Session.getInstance());   /// start send locations for the flights with replaced flight number
                 break;
-            case FLIGHT_ONSENDCACHECOMPLETED:
+            case SESSION_ONSENDCACHECOMPLETED:
                 if (SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                //interfaceList.add(Session.getInstance()); /// if still location left send
                 break;
         }
         for( EventBus i : interfaceList) {

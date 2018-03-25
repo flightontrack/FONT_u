@@ -169,7 +169,7 @@ public final class Props implements EventBus{
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 SessionProp.set_isMultileg(false);
                 break;
-            case SVCCOMM_ONSUCCESS_COMMAND:
+            case SESSION_ONSUCCESS_COMMAND:
                 int server_command = eventMessage.eventMessageValueInt;
                 switch (server_command) {
                     case COMMAND_TERMINATEFLIGHT:

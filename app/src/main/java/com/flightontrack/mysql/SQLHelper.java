@@ -22,6 +22,7 @@ import com.flightontrack.shared.GetTime;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
@@ -274,7 +275,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         //dbw.close();
         return cu;
     }
-    public ArrayList<Location> getDataLocationList() {
+    public ArrayList<Location> getAllLocationList() {
 
         String[] projection = {
                 DBSchema._ID,
@@ -398,13 +399,30 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         //dbw.close();
         return c;
     }
+    public List<String> getTempFlightList() {
+
+        List<String> flightIdList = new ArrayList<String>();
+        dbw = getReadableDatabase();
+        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =1" ,new String[]{});
+
+        try {
+            while (c.moveToNext()) {
+                flightIdList.add(c.getString(c.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
+            }
+        }
+        finally{
+            c.close();
+            dbw.close();
+        }
+        return flightIdList;
+    }
 //    public Cursor getCursorReadyToSendFlights() {
 //        dbw = getReadableDatabase();
 //        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
 //        return c;
 //
 //    }
-    public ArrayList<String> getListReadyToSendFlights() {
+    public List<String> getListReadyToSendFlights() {
         dbw = getReadableDatabase();
         Cursor cu = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
         ArrayList<String> flightList = new ArrayList<>();
@@ -545,7 +563,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                     EventBus.distribute(new EventMessage(EVENT.SQL_ONCLEARCACHE_COMPLETED).setEventMessageValueBool(true));
                 }
                 break;
-            case SVCCOMM_ONSUCCESS_COMMAND:
+            case SESSION_ONSUCCESS_COMMAND:
                 if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) flightLocationsDelete(eventMessage.eventMessageValueString);
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
