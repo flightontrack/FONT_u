@@ -53,6 +53,7 @@ public class Session implements EventBus{
 
     static Session sessionInstance = null;
     public static Integer commBatchSize = COMM_BATCH_SIZE_MAX;
+    boolean isSendNextStarted = false;
     static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
     Map<Integer,Location> locRequestList = new HashMap<Integer,Location>();
     EVENT ev;
@@ -96,24 +97,32 @@ public class Session implements EventBus{
         for (Location l : locList) {
             addLocToRequestList(l);
         }
-        sendNext();
+        if(!isSendNextStarted)  sendNext();
     }
     void startLocationRequest(String flightNum) {
+
         ArrayList<Location> locList = sqlHelper.getFlightLocationList(flightNum);
         for (Location l : locList) {
             addLocToRequestList(l);
         }
-        sendNext();
+        if(!isSendNextStarted)  sendNext();
+
     }
     void sendNext(){
+
+        isSendNextStarted = true;
         if (locRequestList.isEmpty()) {
             EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+            isSendNextStarted = false;
             return;
+        }
+        for (Map.Entry<Integer, Location> e : locRequestList.entrySet()){
+            FontLog.appendLog(TAG + "Entrykey : " + e.getKey() + " Entryvalue : " + e.getValue(), 'd');
         }
         Map.Entry<Integer, Location> e = locRequestList.entrySet().iterator().next();
         Location l = e.getValue();
         int k = e.getKey();
-        FontLog.appendLog(TAG + "Entry : " + e.getValue(), 'd');
+        FontLog.appendLog(TAG + "Key : " + e.getKey()+ "Location : " + e.getValue(), 'd');
         RequestParams requestParams = new RequestParams();
         requestParams.put("isdebug", SessionProp.pIsDebug);
         requestParams.put("speedlowflag", l.sl == 1);
@@ -275,7 +284,7 @@ public class Session implements EventBus{
         if (Util.isNetworkAvailable()) {
             try {
                 final LoopjAClient aSyncClient = new LoopjAClient(dbId);
-                FontLog.appendLog(TAG + "Post: requestParams: " + requestParams, 'd');
+                FontLog.appendLog(TAG +"Post: ID:"+dbId+ "requestParams: " + requestParams, 'd');
                 aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -351,6 +360,7 @@ public class Session implements EventBus{
     }
     @Override
     public void onClock(EventMessage eventMessage){
+        FontLog.appendLog(TAG + "onClock ", 'd');
         if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
     }
 
@@ -376,8 +386,12 @@ public class Session implements EventBus{
                 if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_sAction(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 break;
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
-                set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
-                if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+                if (sqlHelper.getLocationTableCountTotal() ==0){
+                    EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+                    break;
+                }
+                else if (dbLocationRecCountNormal > 0) set_sAction(SACTION.SEND_CACHED_LOCATIONS);
+                if (dbTempFlightRecCount>0) set_sAction(SACTION.GET_OFFLINE_FLIGHTS);
                 break;
             case SVCCOMM_LOCRECCOUNT_NOTZERO:
                 //commBatchSize=(dbLocationRecCountNormal>COMM_BATCH_SIZE_MAX?dbLocationRecCountNormal:COMM_BATCH_SIZE_MAX);
@@ -388,9 +402,6 @@ public class Session implements EventBus{
             case FLIGHT_REMOTENUMBER_RECEIVED:
                 startLocationRequest(eventMessage.eventMessageValueString);
                 break;
-//            case SVCCOMM_ONDESTROY:
-//                set_sAction(SACTION.CLOSE_FLIGHTS);
-//                break;
             case CLOCK_SERVICESELFSTOPPED:
                 set_sAction(SACTION.SEND_CACHED_LOCATIONS);
                 //set_sAction(SACTION.CLOSE_FLIGHTS);
