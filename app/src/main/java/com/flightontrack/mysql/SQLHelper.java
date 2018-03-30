@@ -8,8 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import com.flightontrack.Entities.EntityLocation;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.shared.EventMessage;
 
 import static com.flightontrack.flight.RouteBase.get_FlightInstanceByNumber;
@@ -35,7 +36,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 
     public SQLHelper() {
         super(ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
-        new FontLogAsync().execute(new LogMessage(TAG, "SQLHelper:SQLHelper", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "SQLHelper:SQLHelper", 'd'));
         try {
             dbw = getWritableDatabase();
             //dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
@@ -62,18 +63,18 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, TABLE_FLIGHTNUMBER_ALLOCATION);
                 dbw.close();
             }
-            new FontLogAsync().execute(new LogMessage(TAG, "Unsent Locations from Previous Session :  " + dbLocationRecCountNormal, 'd'));
-            new FontLogAsync().execute(new LogMessage(TAG, "Temp Flights Previous Session :  " + dbTempFlightRecCount, 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "Unsent Locations from Previous Session :  " + dbLocationRecCountNormal, 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "Temp Flights Previous Session :  " + dbTempFlightRecCount, 'd'));
             dbw.close();
         }
         catch(Exception e){
-            new FontLogAsync().execute(new LogMessage(TAG, "EXCEPTION!!!!: "+e.toString(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "EXCEPTION!!!!: "+e.toString(), 'e'));
         }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        new FontLogAsync().execute(new LogMessage(TAG, "SQLHelper:onCreate", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "SQLHelper:onCreate", 'd'));
     }
 
     @Override
@@ -125,7 +126,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
         }
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
             dbLocationRecCountNormal = getLocationRecCountNormal();
     }
@@ -151,7 +152,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
         }
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
             dbLocationRecCountNormal = getLocationRecCountNormal();
     }
@@ -168,7 +169,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
             dbw.close();
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
         dbLocationRecCountNormal = getLocationRecCountNormal();
     }
@@ -181,7 +182,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
             dbw.close();
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
         dbLocationRecCountNormal = 0;
         dbTempFlightRecCount=0;
@@ -197,12 +198,12 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             dbw.close();
             //if (r>0)Route.isDbRecord=true;
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
         dbLocationRecCountNormal = getLocationRecCountNormal();
         return r;
     }
-    public ArrayList<Location> getAllLocationList() {
+    public ArrayList<EntityLocation> getAllLocationList() {
 
         String[] projection = {
                 DBSchema._ID,
@@ -233,10 +234,10 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
         );
-        ArrayList<Location> locations = new ArrayList();
+        ArrayList<EntityLocation> locations = new ArrayList();
         try {
             while (cu.moveToNext()) {
-                Location l = new Location();
+                EntityLocation l = new EntityLocation();
                 l.i = cu.getPosition();
                 l.itemId = cu.getLong(cu.getColumnIndexOrThrow(DBSchema._ID));
                 l.rc = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1));
@@ -260,7 +261,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         }
         return locations;
     }
-    public ArrayList<Location> getFlightLocationList(String flightNum) {
+    public ArrayList<EntityLocation> getFlightLocationList(String flightNum) {
 
         String[] projection = {
                 DBSchema._ID,
@@ -282,7 +283,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         String selection = DBSchema.LOC_flightid + "= ?";
         String[] selectionArgs = {flightNum}; // { String.valueOf(newRowId) };
         dbw = getReadableDatabase();
-        ArrayList<Location> locations = new ArrayList();
+        ArrayList<EntityLocation> locations = new ArrayList();
         try (Cursor cu = dbw.query(
                 DBSchema.TABLE_LOCATION,  // The table to query
                 projection,                               // The columns to return
@@ -293,7 +294,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 sortOrder                                 // The sort order
         )) {
             while (cu.moveToNext()) {
-                Location l = new Location();
+                EntityLocation l = new EntityLocation();
                 l.i = cu.getPosition();
                 l.itemId = cu.getLong(cu.getColumnIndexOrThrow(DBSchema._ID));
                 l.rc = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.COLUMN_NAME_COL1));
@@ -382,7 +383,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                     null,
                     values);
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
         finally {
             c.close();
@@ -391,7 +392,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 
         if (r > 0) {
             dbTempFlightRecCount = f;
-            new FontLogAsync().execute(new LogMessage(TAG, "getNewTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd'));
         }
         return (String.valueOf(f));
     }
@@ -421,7 +422,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 dbTempFlightRecCount -=1;
             }
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.getMessage(), 'e'));
         }
         finally {
             dbw.close();

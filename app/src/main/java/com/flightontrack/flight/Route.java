@@ -1,7 +1,7 @@
 package com.flightontrack.flight;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Props;
@@ -74,7 +74,7 @@ public class Route extends RouteBase implements EventBus{
 @Override
 public void eventReceiver(EventMessage eventMessage){
     EVENT ev = eventMessage.event;
-    new FontLogAsync().execute(new LogMessage(TAG, routeNumber+" :eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
+    new FontLogAsync().execute(new EntityLogMessage(TAG, routeNumber+" :eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
     switch(ev){
                 case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                     if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;

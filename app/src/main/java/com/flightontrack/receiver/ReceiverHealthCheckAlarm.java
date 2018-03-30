@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.R;
@@ -34,12 +34,12 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         isRestart = false;
         if(!MainActivity.isMainActivityExist()){
-            new FontLogAsync().execute(new LogMessage(TAG, "!!!! MainActivity is killed ...... returning",'d'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "!!!! MainActivity is killed ...... returning",'d'));
             return;
         }
 
         if(alarmDisable) {
-            new FontLogAsync().execute(new LogMessage(TAG, "!!!! Alarm Disabled",'d'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "!!!! Alarm Disabled",'d'));
             return;
         }
 
@@ -47,7 +47,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
             healthCheckComm(context);
 
             if (!SvcLocationClock.isInstanceCreated()) {
-                new FontLogAsync().execute(new LogMessage(TAG, "Restarting : performClick()",'d'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "Restarting : performClick()",'d'));
                 SessionProp.set_isMultileg(true);
                 mainactivityInstance.trackingButton.performClick();
                 isRestart = true;
@@ -61,7 +61,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
 
     }
     void healthCheckComm(Context ctx) {
-        new FontLogAsync().execute(new LogMessage(TAG, "getCloseFlight",'d'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight",'d'));
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_IS_CLOCK_ON);
         requestParams.put("isrestart", isRestart);
@@ -76,21 +76,21 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
         new AsyncHttpClient().post(Util.getTrackingURL() + ctx.getString(R.string.aspx_communication), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "healthCheckComm OnSuccess", 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "healthCheckComm OnSuccess", 'd'));
                         //String responseText = new String(responseBody);
                         Response response = new Response(new String(responseBody));
 
                         if (response.responseAckn != null) {
-                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess|HealthCheck: "+response.responseAckn,'d'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|HealthCheck: "+response.responseAckn,'d'));
                         }
                         if (response.responseNotif != null) {
-                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess|HealthCheck|RESPONSE_TYPE_NOTIF:" +response.responseNotif,'d'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|HealthCheck|RESPONSE_TYPE_NOTIF:" +response.responseNotif,'d'));
                         }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "onFailure|HealthCheck: " ,'d'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure|HealthCheck: " ,'d'));
 
                     }
                     public void onFinish() {

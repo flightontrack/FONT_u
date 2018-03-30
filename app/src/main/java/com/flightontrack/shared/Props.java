@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.mysql.SQLHelper;
 
 import static com.flightontrack.shared.Const.*;
@@ -161,7 +161,7 @@ public final class Props implements EventBus{
     }
     @Override
     public void eventReceiver(EventMessage eventMessage){
-        new FontLogAsync().execute(new LogMessage(TAG, " eventReceiver Interface is called on Props", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, " eventReceiver Interface is called on Props", 'd'));
         EVENT ev = eventMessage.event;
         switch(ev){
             case MACT_MULTILEG_ONCLICK:

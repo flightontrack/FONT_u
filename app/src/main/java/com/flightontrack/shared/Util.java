@@ -12,7 +12,7 @@ import com.flightontrack.R;
 import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.communication.ResponseP;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.loopj.android.http.AsyncHttpClient;
@@ -28,7 +28,6 @@ public class Util {
 
     public Util() {
     }
-
 
      public static String getTrackingURL() {
         String[] spinnerUrls = ctxApp.getResources().getStringArray(R.array.url_array);
@@ -115,7 +114,7 @@ public class Util {
         progressBar.setProgress(100);
         progressBar.show();
 
-        new FontLogAsync().execute(new LogMessage(TAG, "getCloudPsw Started", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw Started", 'd'));
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_PSW);
         requestParams.put("userid", Pilot.getUserID());
@@ -124,13 +123,13 @@ public class Util {
         new AsyncHttpClient().post(getTrackingURL() + ctxApp.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
                         ResponseP response = new ResponseP(new String(responseBody));
                         if (response.responseType.equals(RESPONSE_TYPE_DATA_WITHLOAD) && response.responseTypeLoad.equals(RESPONSE_TYPE_DATA_PSW)) {
                             //SimpleSettingsActivity.progressBar.isShowing();
                             progressBar.dismiss();
                             String psw = response.getValue(RESPONSE_TYPE_DATA_PSW);
-                            new FontLogAsync().execute(new LogMessage(TAG, "ap="+psw, 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "ap="+psw, 'd'));
                             setPsw(psw);
                         }
                         if (response.responseType.equals(RESPONSE_TYPE_NOTIF_WITHLOAD)) {
@@ -138,7 +137,7 @@ public class Util {
                     }
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "getCloudPsw onFailure:", 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw onFailure:", 'd'));
                         progressBar.dismiss();
                     }
                 }

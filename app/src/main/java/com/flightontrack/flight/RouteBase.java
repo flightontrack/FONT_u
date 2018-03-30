@@ -1,7 +1,7 @@
 package com.flightontrack.flight;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 
@@ -55,28 +55,28 @@ public class RouteBase implements EventBus{
         EventBus.distribute(new EventMessage(EVENT.ROUTE_NOACTIVEROUTE));
     }
     void set_rAction(RACTION request) {
-        new FontLogAsync().execute(new LogMessage(TAG, "reaction:" + request, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "reaction:" + request, 'd'));
         switch (request) {
             case REMOVE_FLIGHT_IF_CLOSED:
-                new FontLogAsync().execute(new LogMessage(TAG, "REMOVE_FLIGHT_IF_CLOSED: flightList: size : " + flightList.size(), 'd'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "REMOVE_FLIGHT_IF_CLOSED: flightList: size : " + flightList.size(), 'd'));
                     for (FlightBase f : new ArrayList<>(flightList)) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "f:" + f.flightNumber + ":" + request, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "f:" + f.flightNumber + ":" + request, 'd'));
                         if (f.flightState.equals(FlightBase.FLIGHT_STATE.CLOSED)) {
                             //if (activeFlight == f) activeFlight = null;
-                            new FontLogAsync().execute(new LogMessage(TAG, "reaction:" + request+":f:"+f, 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "reaction:" + request+":f:"+f, 'd'));
                             if (f==activeFlight) activeFlight =null;
                             flightList.remove(f);
                         }
                         if (flightList.isEmpty()) {
                             //if (activeRoute == this) activeRoute = null;
-                            new FontLogAsync().execute(new LogMessage(TAG, "flightList isEmpty", 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "flightList isEmpty", 'd'));
                             setToNull();
                         }
                     }
                 break;
             case ADD_OR_UPDATE_FLIGHT:
                 FlightBase fb = (FlightBase) eventMessage.eventMessageValueObject;
-                new FontLogAsync().execute(new LogMessage(TAG, "fb.fn"+fb.flightNumber, 'd'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "fb.fn"+fb.flightNumber, 'd'));
                 //new FontLogAsync().execute(new LogMessage(TAG, "fb.fnt"+fb.flightNumberTemp, 'd');
                 if (flightList.contains(fb)) break;
                 else {
@@ -98,7 +98,7 @@ public class RouteBase implements EventBus{
 public void eventReceiver(EventMessage eventMessage){
     ev = eventMessage.event;
     this.eventMessage = eventMessage;
-    new FontLogAsync().execute(new LogMessage(TAG,"eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
+    new FontLogAsync().execute(new EntityLogMessage(TAG,"eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
     switch(ev){
             case FLIGHT_REMOTENUMBER_RECEIVED:
                 set_rAction(RACTION.ADD_OR_UPDATE_FLIGHT);

@@ -8,7 +8,7 @@ import android.telephony.SmsManager;
 
 import com.flightontrack.R;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.shared.Util;
 
@@ -20,7 +20,7 @@ public class ReceiverBatteryLevel extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        new FontLogAsync().execute(new LogMessage(TAG, "onReceive intent: "+intent, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "onReceive intent: "+intent, 'd'));
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
@@ -34,7 +34,7 @@ public class ReceiverBatteryLevel extends BroadcastReceiver {
                     SMS_LOWBATTERY_TEXT+"\n"+
                     "Pilot : "+ Pilot.getPilotUserName()+"\n"+
                     "Aircraft : "+Util.getAcftNum(4)+"\n";
-            new FontLogAsync().execute(new LogMessage(TAG, "BatteryPct low: Level :"+level+" out of "+scale, 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "BatteryPct low: Level :"+level+" out of "+scale, 'd'));
 
             SmsManager smsManager = SmsManager.getDefault();
             String[] spinnerTextTo = ctxApp.getResources().getStringArray(R.array.textto_array);
@@ -44,7 +44,7 @@ public class ReceiverBatteryLevel extends BroadcastReceiver {
         }
         if (intent.getAction().contains("BATTERY_OKAY")) {
             setBattery(String.valueOf(level));
-            new FontLogAsync().execute(new LogMessage(TAG, "Battery Restored Level: "+level, 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "Battery Restored Level: "+level, 'd'));
         }
     }
 

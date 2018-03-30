@@ -15,8 +15,8 @@ import com.flightontrack.communication.LoopjAClient;
 import com.flightontrack.communication.Response;
 //import com.flightontrack.communication.SvcComm;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
-import com.flightontrack.mysql.Location;
+import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.Entities.EntityLocation;
 import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -52,7 +52,7 @@ public class Session implements EventBus{
     public static Integer commBatchSize = COMM_BATCH_SIZE_MAX;
     boolean isSendNextStarted = false;
     static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
-    Map<Integer,Location> locRequestList = new HashMap<Integer,Location>();
+    Map<Integer,EntityLocation> locRequestList = new HashMap<Integer,EntityLocation>();
     EVENT ev;
 
     EventMessage eventMessage;
@@ -83,22 +83,22 @@ public class Session implements EventBus{
 //        set_Action(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
-    void addLocToRequestList(Location l){
+    void addLocToRequestList(EntityLocation l){
         if (locRequestList.containsKey((int) l.itemId)) return;
         if (l.i >= commBatchSize) return;
         locRequestList.put((int) l.itemId, l);
     }
     void startLocationRequest() {
-        ArrayList<Location> locList = sqlHelper.getAllLocationList();
-        for (Location l : locList) {
+        ArrayList<EntityLocation> locList = sqlHelper.getAllLocationList();
+        for (EntityLocation l : locList) {
             addLocToRequestList(l);
         }
         if(!isSendNextStarted)  sendNext();
     }
     void startLocationRequest(String flightNum) {
 
-        ArrayList<Location> locList = sqlHelper.getFlightLocationList(flightNum);
-        for (Location l : locList) {
+        ArrayList<EntityLocation> locList = sqlHelper.getFlightLocationList(flightNum);
+        for (EntityLocation l : locList) {
             addLocToRequestList(l);
         }
         if(!isSendNextStarted)  sendNext();
@@ -111,13 +111,13 @@ public class Session implements EventBus{
             isSendNextStarted = false;
             return;
         }
-        for (Map.Entry<Integer, Location> e : locRequestList.entrySet()){
-            new FontLogAsync().execute(new LogMessage(TAG, "Entrykey : " + e.getKey() + " Entryvalue : " + e.getValue(), 'd'));
+        for (Map.Entry<Integer, EntityLocation> e : locRequestList.entrySet()){
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "Entrykey : " + e.getKey() + " Entryvalue : " + e.getValue(), 'd'));
         }
-        Map.Entry<Integer, Location> e = locRequestList.entrySet().iterator().next();
-        Location l = e.getValue();
+        Map.Entry<Integer, EntityLocation> e = locRequestList.entrySet().iterator().next();
+        EntityLocation l = e.getValue();
         int k = e.getKey();
-        new FontLogAsync().execute(new LogMessage(TAG, "Key : " + e.getKey()+ "Location : " + e.getValue(), 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "Key : " + e.getKey()+ "Location : " + e.getValue(), 'd'));
         RequestParams requestParams = new RequestParams();
         requestParams.put("isdebug", SessionProp.pIsDebug);
         requestParams.put("speedlowflag", l.sl == 1);
@@ -143,12 +143,12 @@ public class Session implements EventBus{
         }
     }
     void set_Action(SACTION request) {
-        new FontLogAsync().execute(new LogMessage(TAG, "reaction:" + request, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "reaction:" + request, 'd'));
         switch (request) {
             case CHECK_CACHE_FIRST:
                 if (dbLocationRecCountNormal > 0) {
                     new ShowAlertClass(mainactivityInstance).showUnsentPointsAlert(dbLocationRecCountNormal);
-                    new FontLogAsync().execute(new LogMessage(TAG, " PointsUnsent: " + dbLocationRecCountNormal, 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, " PointsUnsent: " + dbLocationRecCountNormal, 'd'));
                 } else {
                     set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
                 }
@@ -160,7 +160,7 @@ public class Session implements EventBus{
                     if (Util.isNetworkAvailable()) {
                         startLocationRequest();
                     } else {
-                        new FontLogAsync().execute(new LogMessage(TAG, "Connectivity unavailable Can't send location", 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "Connectivity unavailable Can't send location", 'd'));
                         EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                     }
                 break;
@@ -186,10 +186,10 @@ public class Session implements EventBus{
 //                }
 
                 for (String flightNumTemp:sqlHelper.getTempFlightList()){
-                    new FontLogAsync().execute(new LogMessage(TAG, "Get flightBase for " + flightNumTemp, 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "Get flightBase for " + flightNumTemp, 'd'));
                     if (Util.isNetworkAvailable()) new FlightBase(flightNumTemp).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
                     else {
-                        new FontLogAsync().execute(new LogMessage(TAG, "Connectivity unavailable Can't get flight number", 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "Connectivity unavailable Can't get flight number", 'd'));
                         EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
                     }
                 }
@@ -200,7 +200,7 @@ public class Session implements EventBus{
                 //ArrayList<String> flightNumberList = sqlHelper.getReadyToSendFlightList();
                 for (String fn : sqlHelper.getReadyToSendFlightList()){
                     if (RouteBase.isFlightNumberInList(fn)) continue;
-                    new FontLogAsync().execute(new LogMessage(TAG,"Get flight number for "+fn,'d'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG,"Get flight number for "+fn,'d'));
                     //new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.READY_TOSENDLOCATIONS);
                     new FlightBase(fn).set_flightNumStatus(FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
                 }
@@ -212,7 +212,7 @@ public class Session implements EventBus{
         if (Util.isNetworkAvailable()) {
             try {
                 final LoopjAClient aSyncClient = new LoopjAClient(dbId);
-                new FontLogAsync().execute(new LogMessage(TAG,"Post: ID:"+dbId+ "requestParams: " + requestParams, 'd'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG,"Post: ID:"+dbId+ "requestParams: " + requestParams, 'd'));
                 aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -222,7 +222,7 @@ public class Session implements EventBus{
                         Response response = new Response(new String(responseBody));
                         //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
                         if (response.jsonErrorCount > 0) {
-                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd'));
                             if (response.jsonErrorCount > MAX_JSON_ERROR) {
                                 /// raise this event as NOTIF
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_NOTIF));
@@ -232,14 +232,14 @@ public class Session implements EventBus{
                         try {
                             if (response.responseAckn != null) {
                                 sqlHelper.rowLocationDeleteOnId(aSyncClient.getID(), response.responseFlightNum);  /// TODO should be moved to Router
-                                new FontLogAsync().execute(new LogMessage(TAG, "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn+ ": id" +aSyncClient.getID(), 'd'));
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn+ ": id" +aSyncClient.getID(), 'd'));
                             }
                             if (response.responseNotif != null) {
-                                new FontLogAsync().execute(new LogMessage(TAG, "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd'));
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd'));
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_NOTIF));
                             }
                             if (response.responseCommand != null) {
-                                new FontLogAsync().execute(new LogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
                                 if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
                                     return;
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
@@ -259,28 +259,28 @@ public class Session implements EventBus{
 //                                }
                             }
                             if (response.responseDataLoad != null) {
-                                new FontLogAsync().execute(new LogMessage(TAG, "Data response : " + response.responseDataLoad, 'd'));
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "Data response : " + response.responseDataLoad, 'd'));
                             }
                         } catch (Exception e) {
-                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess : EXCEPTION :" + e.getMessage(), 'e'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : EXCEPTION :" + e.getMessage(), 'e'));
                         }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "onFailure; startId= " + aSyncClient.getID(), 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + aSyncClient.getID(), 'd'));
                         commBatchSize = COMM_BATCH_SIZE_MIN;
                     }
 
                     @Override
                     public void onFinish() {
                         locRequestList.remove(aSyncClient.getID());
-                        new FontLogAsync().execute(new LogMessage(TAG, "onFinish removed ID= " + aSyncClient.getID(), 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFinish removed ID= " + aSyncClient.getID(), 'd'));
                         sendNext();
                     }
                 });
             } catch (Exception e) {
-                new FontLogAsync().execute(new LogMessage(TAG, "aSyncClient" + e.getMessage(), 'd'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "aSyncClient" + e.getMessage(), 'd'));
                 return;
             }
         }
@@ -288,7 +288,7 @@ public class Session implements EventBus{
     }
     @Override
     public void onClock(EventMessage eventMessage){
-        new FontLogAsync().execute(new LogMessage(TAG, "onClock ", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "onClock ", 'd'));
         if (dbLocationRecCountNormal > 0) set_Action(SACTION.SEND_CACHED_LOCATIONS);
     }
 
@@ -297,7 +297,7 @@ public class Session implements EventBus{
         //Array eventReaction[EVENT];
         ev = eventMessage.event;
         this.eventMessage = eventMessage;
-        new FontLogAsync().execute(new LogMessage(TAG, "eventReceiver: "+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "eventReceiver: "+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
         switch (ev) {
             case MACT_BACKBUTTON_ONCLICK:
                 set_Action(SACTION.CHECK_CACHE_FIRST);

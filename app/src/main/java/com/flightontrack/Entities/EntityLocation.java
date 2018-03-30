@@ -1,10 +1,10 @@
-package com.flightontrack.mysql;
+package com.flightontrack.Entities;
 
 /**
  * Created by hotvk on 2/27/2018.
  */
 
-public class Location {
+public class EntityLocation {
     public int i;
     public long itemId;
     public int rc;

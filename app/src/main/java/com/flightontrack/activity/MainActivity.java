@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
 import com.flightontrack.shared.EventBus;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
         String flightN = FLIGHT_NUMBER_DEFAULT;
 
         if (RouteBase.activeRoute == null) {
-            new FontLogAsync().execute(new LogMessage(TAG, " setTextRed: flightId IS NULL", 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "setTextRed: activeRoute == null", 'd'));
         } else {
             if (RouteBase.activeFlight != null) {
                 flightN = RouteBase.activeFlight.flightNumber;
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             SessionProp.save();
             txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         } catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, "EXCEPTION!!!!: " + e.toString(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "EXCEPTION!!!!: " + e.toString(), 'e'));
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
 
     @Override
     public void onResume() {
-        new FontLogAsync().execute(new LogMessage(TAG, "onResume", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "onResume", 'd'));
         super.onResume();
 
         SessionProp.get();
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     public void onBackPressed() {
 
-        new FontLogAsync().execute(new LogMessage(TAG, "isToDestroy :" + isToDestroy, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "isToDestroy :" + isToDestroy, 'd'));
         if (isToDestroy) {
             new ShowAlertClass(this).showBackPressed();
         } else {
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        new FontLogAsync().execute(new LogMessage(TAG, "OnDestroy", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "OnDestroy", 'd'));
         SessionProp.save();
         SessionProp.clearOnDestroy();
         if (isToDestroy && alarmReceiver != null) {
@@ -303,14 +303,14 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     public void onPause() {
         super.onPause();
-        new FontLogAsync().execute(new LogMessage(TAG, "onPause", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "onPause", 'd'));
         SessionProp.save();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        new FontLogAsync().execute(new LogMessage(TAG, "onStop", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "onStop", 'd'));
         SessionProp.save();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -544,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
-        new FontLogAsync().execute(new LogMessage(TAG, " eventReceiver : " + ev, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "eventReceiver : " + ev, 'd'));
         txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         switch (ev) {
             case PROP_CHANGED_MULTILEG:
@@ -560,11 +560,6 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             case FLIGHT_FLIGHTTIME_STARTED:
                 //swithch to green
                 break;
-//            case FLIGHT_GETNEWFLIGHT_COMPLETED:
-//                if (eventMessage.eventMessageValueBool)
-//                    setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
-//                else setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
-//                break;
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                     setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
                 break;

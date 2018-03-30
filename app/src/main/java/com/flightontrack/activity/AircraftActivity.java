@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.flightontrack.R;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.shared.Props;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.pilot.Pilot;
@@ -64,7 +64,7 @@ public class AircraftActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onCreate", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "AircraftActivity onCreate", 'd'));
         setContentView(Props.AppConfig.pIsNFCcapable ? R.layout.activity_acraft : R.layout.activity_acraft_no_nfc);
     }
 
@@ -77,7 +77,7 @@ public class AircraftActivity extends Activity {
 
     @Override
     public void onResume() {
-        new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onResume", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "AircraftActivity onResume", 'd'));
         txtUserName = (TextView) findViewById(R.id.txtUserName);
         txtUserName.setText(Pilot.getPilotUserName());
         txtAcftName = (EditText) findViewById(R.id.txtAcftName);
@@ -146,7 +146,7 @@ public class AircraftActivity extends Activity {
         if (Props.AppConfig.pIsNFCcapable) {
             enableNfcForegroundMode();
             nfcSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onCheckedChanged", 'd'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "AircraftActivity onCheckedChanged", 'd'));
                 setTagNFCState(buttonView.isChecked());
             });
         }
@@ -181,7 +181,7 @@ public class AircraftActivity extends Activity {
     //void setAcft(String AcftMake,String AcftModel,String AcftSeries,String AcftRegNum,String AcftTagId){
     void setAcft(JSONObject json) {
         try {
-            new FontLogAsync().execute(new LogMessage(TAG, json.toString(), 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, json.toString(), 'd'));
             String AcftMake = json.getString("AcftMake");
             String AcftModel = json.getString("AcftModel").replace(" ", "");
             String AcftSeries = json.getString("AcftSeries").replace(" ", "");
@@ -210,7 +210,7 @@ public class AircraftActivity extends Activity {
 
     void setAcft_nonfc(JSONObject json) {
         try {
-            new FontLogAsync().execute(new LogMessage(TAG, json.toString(), 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, json.toString(), 'd'));
             String AcftRegNum = json.getString("AcftRegNum").replace(" ", "");
             String AcftName = json.getString("AcftName");
             Props.editor.putString("AcftRegNum", AcftRegNum.trim());
@@ -304,7 +304,7 @@ public class AircraftActivity extends Activity {
 
     @Override
     public void onNewIntent(Intent intent) {
-        new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onNewIntent", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "AircraftActivity onNewIntent", 'd'));
         //Util.appendLog(TAG+ intent.getAction());
         if ((intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
                 || intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) && getTagNFCState()) {
@@ -317,7 +317,7 @@ public class AircraftActivity extends Activity {
                 j.put("AcftName", txtAcftName.getText().toString());
                 setAcft(j);
             } catch (JSONException e) {
-                new FontLogAsync().execute(new LogMessage(TAG, "Couldn't create json from NFC: " + e.getMessage(), 'e'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "Couldn't create json from NFC: " + e.getMessage(), 'e'));
             }
         }
     }

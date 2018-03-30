@@ -6,7 +6,7 @@ import com.flightontrack.flight.RouteBase;
 import com.flightontrack.flight.Session;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ public interface EventBus extends Events{
         ArrayList<EventBus> onClockList = new ArrayList();
 
         EVENT ev = eventMessage.event;
-        new FontLogAsync().execute(new LogMessage(TAG, ev+":eventString:"+eventMessage.eventMessageValueString+":eventObject:"+eventMessage.eventMessageValueObject, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, ev+":eventString:"+eventMessage.eventMessageValueString+":eventObject:"+eventMessage.eventMessageValueObject, 'd'));
         switch(ev){
             case MACT_BIGBUTTON_ONCLICK_START:
                 interfaceList.add(new Route());
@@ -95,12 +95,8 @@ public interface EventBus extends Events{
                         interfaceList.add(RouteBase.activeRoute); //initiate a new flight if multileg
                         break;
                 }
-//            case SVCCOMM_LOCRECCOUNT_NOTZERO:
-//                interfaceList.add(Session.getInstance());
-//                break;
             case SETTINGACT_BUTTONCLEARCACHE_CLICKED:
                 interfaceList.add(sqlHelper);
-                //SQLHelper.eventReceiver(eventMessage);
                 break;
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
                 interfaceList.add(Session.getInstance());
@@ -115,7 +111,6 @@ public interface EventBus extends Events{
             case CLOCK_SERVICESELFSTOPPED:
                 interfaceList.add(RouteBase.getInstance());
                 interfaceList.add(Session.getInstance());
-                //interfaceList.add(mainactivityInstance);
                 break;
             case CLOCK_ONTICK:
                 onClockList.add(RouteBase.getInstance()); /// delete closed flights from flightlist
@@ -159,11 +154,11 @@ public interface EventBus extends Events{
         }
         for( EventBus i : interfaceList) {
             if(!(null==i))i.eventReceiver(eventMessage);
-            else  new FontLogAsync().execute(new LogMessage(TAG, " null interface ", 'd'));
+            else  new FontLogAsync().execute(new EntityLogMessage(TAG, " null interface ", 'd'));
         }
         for( EventBus i : onClockList) {
             if(!(null==i))i.onClock(eventMessage);
-            else  new FontLogAsync().execute(new LogMessage(TAG, " null interface ", 'd'));
+            else  new FontLogAsync().execute(new EntityLogMessage(TAG, " null interface ", 'd'));
         }
     }
 

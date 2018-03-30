@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
@@ -224,7 +224,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
 @Override
     public void eventReceiver(EventMessage eventMessage){
     EVENT ev = eventMessage.event;
-    new FontLogAsync().execute(new LogMessage(TAG, " eventReceiver : "+ev, 'd'));
+    new FontLogAsync().execute(new EntityLogMessage(TAG, " eventReceiver : "+ev, 'd'));
         switch(ev){
             case SESSION_ONSENDCACHECOMPLETED:
                 txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));

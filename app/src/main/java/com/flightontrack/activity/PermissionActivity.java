@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.flight.Route;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 
 import static com.flightontrack.shared.Const.*;
 
@@ -36,17 +36,17 @@ public class PermissionActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         try {
-            new FontLogAsync().execute(new LogMessage(TAG, "onCreate", 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "onCreate", 'd'));
             thisAct = this;
             set_Permissions(permissionType);
         }
         catch (Exception e) {
-            new FontLogAsync().execute(new LogMessage(TAG, e.toString(), 'e'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, e.toString(), 'e'));
         }
     }
     @Override
     public void onResume() {
-        new FontLogAsync().execute(new LogMessage(TAG, "onResume", 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "onResume", 'd'));
         super.onResume();
     }
 

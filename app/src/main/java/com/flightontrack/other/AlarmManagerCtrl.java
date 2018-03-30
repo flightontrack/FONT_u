@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.shared.Props;
 
 import java.util.Date;
@@ -31,14 +31,14 @@ public class AlarmManagerCtrl {
     }
 
     public static void setAlarm() {
-        new FontLogAsync().execute(new LogMessage(TAG, "setAlarm",'d'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "setAlarm",'d'));
         alarmManager.set(AlarmManager.RTC_WAKEUP,
                 getAlarmNextTimeUTCmsec(),
                 pendingReceiverIntent);
     }
 
     public static void stopAlarm() {
-        new FontLogAsync().execute(new LogMessage(TAG, "stopAlarm",'d'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "stopAlarm",'d'));
         //initIntent();
         alarmManager.cancel(pendingReceiverIntent);
     }

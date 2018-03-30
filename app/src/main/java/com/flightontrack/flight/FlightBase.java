@@ -5,7 +5,7 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.communication.Response;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.log.LogMessage;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.shared.Const;
@@ -53,7 +53,7 @@ public class FlightBase implements EventBus{
     }
 
     public void set_flightState(FLIGHT_STATE fs){
-        new FontLogAsync().execute(new LogMessage(TAG, "flightState : " + fs, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "flightState : " + fs, 'd'));
         if (flightState == fs) return;
         flightState = fs;
         switch(fs){
@@ -74,7 +74,7 @@ public class FlightBase implements EventBus{
         }
     }
     public void set_flightNumber(String fn){
-        new FontLogAsync().execute(new LogMessage(TAG, "set_flightNumber super fn " + fn, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "set_flightNumber super fn " + fn, 'd'));
         replaceFlightNumber(fn);
         set_flightState(FLIGHT_STATE.STOPPED);
         set_flightNumStatus(FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
@@ -94,7 +94,7 @@ public class FlightBase implements EventBus{
     }
     void getNewFlightID() {
 
-        new FontLogAsync().execute(new LogMessage(TAG, "FlightBase-getNewFlightID: " +flightNumber, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "FlightBase-getNewFlightID: " +flightNumber, 'd'));
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
@@ -118,13 +118,13 @@ public class FlightBase implements EventBus{
         client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    new FontLogAsync().execute(new LogMessage(TAG, "FlightBase-getNewFlightID OnSuccess", 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "FlightBase-getNewFlightID OnSuccess", 'd'));
                     //String responseText = new String(responseBody);
                     Response response = new Response(new String(responseBody));
                     //char responseType = response.responseType;
 
                     if (response.responseNotif != null) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd'));
                         Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -149,7 +149,7 @@ public class FlightBase implements EventBus{
 
                 @Override
                 public void onRetry(int retryNo) {
-                    new FontLogAsync().execute(new LogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
                 }
             }
         );
@@ -158,7 +158,7 @@ public class FlightBase implements EventBus{
     }
 
     void getCloseFlight() {
-        new FontLogAsync().execute(new LogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
         set_flightState(FLIGHT_STATE.CLOSING);
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
@@ -171,20 +171,20 @@ public class FlightBase implements EventBus{
         new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "getNewFlightID OnSuccess", 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID OnSuccess", 'd'));
                         //String responseText = new String(responseBody);
                         Response response = new Response(new String(responseBody));
 
                         if (response.responseAckn != null) {
-                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
                         }
                         if (response.responseNotif != null) {
-                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd'));
                         }
                     }
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new LogMessage(TAG, "getNewFlightID onFailure: " + flightNumber, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onFailure: " + flightNumber, 'd'));
 
                     }
                     @Override
@@ -197,9 +197,9 @@ public class FlightBase implements EventBus{
 
     void replaceFlightNumber(String fnew) {
         if (sqlHelper.updateTempFlightNum(flightNumber, fnew) > 0) {
-            new FontLogAsync().execute(new LogMessage(TAG, "replaceFlightNumber: " + flightNumber+"->" +fnew, 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "replaceFlightNumber: " + flightNumber+"->" +fnew, 'd'));
         }
-        else new FontLogAsync().execute(new LogMessage(TAG, "replaceFlightNumber: nothing to replace: " + flightNumber+"->" +fnew, 'd'));
+        else new FontLogAsync().execute(new EntityLogMessage(TAG, "replaceFlightNumber: nothing to replace: " + flightNumber+"->" +fnew, 'd'));
         flightNumber = fnew;
     }
 
@@ -208,7 +208,7 @@ public class FlightBase implements EventBus{
     }
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
-        new FontLogAsync().execute(new LogMessage(TAG, flightNumber + ":eventReceiver:" + ev, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, flightNumber + ":eventReceiver:" + ev, 'd'));
         switch (ev) {
             case SQL_FLIGHTRECORDCOUNT_ZERO:
                 if (flightState == FLIGHT_STATE.STOPPED) set_flightState(FLIGHT_STATE.READY_TOBECLOSED);

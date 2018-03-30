@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
-import com.flightontrack.flight.Route;
+import com.flightontrack.Entities.EntityLogMessage;
 import com.flightontrack.flight.RouteBase;
 import com.flightontrack.shared.Props;
 
@@ -18,24 +18,29 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static com.flightontrack.pilot.MyPhone._myPhoneId;
-import static com.flightontrack.shared.Const.FLIGHT_NUMBER_DEFAULT;
 import static com.flightontrack.shared.Const.GLOBALTAG;
 
 /**
  * Created by hotvk on 3/29/2018.
  */
 
-public class FontLogAsync extends AsyncTask<LogMessage, Void, Boolean> {
+public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> {
     private static final String TAG = "FontLogAsync";
 
     @Override
-    protected Boolean doInBackground(LogMessage... msgobj) {
-        String text =  String.format("%1$-20s", msgobj[0].tag);
-        text +=":";
-        text +=" af:"+RouteBase.activeFlight==null?"null":RouteBase.activeFlight.flightNumber+" afs:"+RouteBase.activeFlight.flightState+": ";
-        text += msgobj[0].msg;
-        appendLogcat(text,msgobj[0].msgType);
-        if (Props.SessionProp.pIsDebug) appendCustomLog(text);
+    protected Boolean doInBackground(EntityLogMessage... msgobj) {
+        try {
+            String text = String.format("%1$-20s", msgobj[0].tag);
+            text += ":";
+            //text += String.format("%1$-20s","af-" +RouteBase.getInstance().activeFlight.flightNumber + "-afs-" + RouteBase.activeFlight.flightState + ":");
+            text += msgobj[0].msg;
+            appendLogcat(text, msgobj[0].msgType);
+            if (Props.SessionProp.pIsDebug) appendCustomLog(text);
+        }
+        catch(Exception e){
+            Log.d(TAG,"FontLogAsync Exception");
+            //e.printStackTrace();
+        }
         return true;
 }
     public void appendLogcat(String text,char type) {
