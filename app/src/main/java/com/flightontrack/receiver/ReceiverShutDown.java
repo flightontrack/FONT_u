@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.util.Log;
 
 public class ReceiverShutDown extends BroadcastReceiver {
-    private static final String TAG = "ReceiverShutDown:";
+    private static final String TAG = "ReceiverShutDown";
 
     @Override
     public void onReceive(Context context, Intent intent) {

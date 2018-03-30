@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
-import com.flightontrack.flight.Flight;
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.mysql.SQLHelper;
 
 import static com.flightontrack.shared.Const.*;
@@ -14,6 +14,8 @@ import static com.flightontrack.shared.Props.AppConfig.*;
 
 
 public final class Props implements EventBus{
+    private static final String TAG = "Props";
+
     private static Props propsInstance = null;
     public static Props getInstance() {
         if(propsInstance == null) {
@@ -21,7 +23,6 @@ public final class Props implements EventBus{
         }
         return propsInstance;
     }
-    private static final String TAG = "Props:";
     public static Context ctxApp;
     public static MainActivity mainactivityInstance;
     public static SharedPreferences sharedPreferences;
@@ -103,7 +104,7 @@ public final class Props implements EventBus{
 
         public static void set_isMultileg(boolean isMultileg) {
             //String s = Arrays.toString(Thread.currentThread().getStackTrace());
-            //FontLog.appendLog(TAG + "StackTrace: "+s,'d');
+            //new FontLogAsync().execute(new LogMessage(TAG, "StackTrace: "+s,'d');
             pIsMultileg=isMultileg;
             EventBus.distribute(new EventMessage(EVENT.PROP_CHANGED_MULTILEG).setEventMessageValueBool(isMultileg));
             //MainActivity.chBoxIsMultiLeg.setChecked(isMultileg);
@@ -117,7 +118,7 @@ public final class Props implements EventBus{
 
         }
         public static void set_pIntervalLocationUpdateSecPos(int pos) {
-            //FontLog.appendLog(TAG + "set_pIntervalLocationUpdateSecPos:"+pos,'d');
+            //new FontLogAsync().execute(new LogMessage(TAG, "set_pIntervalLocationUpdateSecPos:"+pos,'d');
             pIntervalSelectedItem =pos;
             pIntervalLocationUpdateSec =pUpdateIntervalSec[pos];
             mainactivityInstance.spinnerUpdFreq.setSelection(pos);
@@ -160,7 +161,7 @@ public final class Props implements EventBus{
     }
     @Override
     public void eventReceiver(EventMessage eventMessage){
-        FontLog.appendLog(TAG + " eventReceiver Interface is called on Props", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, " eventReceiver Interface is called on Props", 'd'));
         EVENT ev = eventMessage.event;
         switch(ev){
             case MACT_MULTILEG_ONCLICK:

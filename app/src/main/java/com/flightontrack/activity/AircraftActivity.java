@@ -18,7 +18,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.flightontrack.R;
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.shared.Props;
 import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.pilot.Pilot;
@@ -29,7 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AircraftActivity extends Activity {
-    private static final String TAG = "AircraftActivity:";
+    private static final String TAG = "AircraftActivity";
 
     TextView txtBlueText;
     TextView txtAcftMake;
@@ -63,7 +64,7 @@ public class AircraftActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FontLog.appendLog(TAG + "AircraftActivity onCreate", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onCreate", 'd'));
         setContentView(Props.AppConfig.pIsNFCcapable ? R.layout.activity_acraft : R.layout.activity_acraft_no_nfc);
     }
 
@@ -76,7 +77,7 @@ public class AircraftActivity extends Activity {
 
     @Override
     public void onResume() {
-        FontLog.appendLog(TAG + "AircraftActivity onResume", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onResume", 'd'));
         txtUserName = (TextView) findViewById(R.id.txtUserName);
         txtUserName.setText(Pilot.getPilotUserName());
         txtAcftName = (EditText) findViewById(R.id.txtAcftName);
@@ -145,7 +146,7 @@ public class AircraftActivity extends Activity {
         if (Props.AppConfig.pIsNFCcapable) {
             enableNfcForegroundMode();
             nfcSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                FontLog.appendLog(TAG + "AircraftActivity onCheckedChanged", 'd');
+                new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onCheckedChanged", 'd'));
                 setTagNFCState(buttonView.isChecked());
             });
         }
@@ -180,7 +181,7 @@ public class AircraftActivity extends Activity {
     //void setAcft(String AcftMake,String AcftModel,String AcftSeries,String AcftRegNum,String AcftTagId){
     void setAcft(JSONObject json) {
         try {
-            FontLog.appendLog(TAG + json.toString(), 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, json.toString(), 'd'));
             String AcftMake = json.getString("AcftMake");
             String AcftModel = json.getString("AcftModel").replace(" ", "");
             String AcftSeries = json.getString("AcftSeries").replace(" ", "");
@@ -209,7 +210,7 @@ public class AircraftActivity extends Activity {
 
     void setAcft_nonfc(JSONObject json) {
         try {
-            FontLog.appendLog(TAG + json.toString(), 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, json.toString(), 'd'));
             String AcftRegNum = json.getString("AcftRegNum").replace(" ", "");
             String AcftName = json.getString("AcftName");
             Props.editor.putString("AcftRegNum", AcftRegNum.trim());
@@ -303,7 +304,7 @@ public class AircraftActivity extends Activity {
 
     @Override
     public void onNewIntent(Intent intent) {
-        FontLog.appendLog(TAG + "AircraftActivity onNewIntent", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "AircraftActivity onNewIntent", 'd'));
         //Util.appendLog(TAG+ intent.getAction());
         if ((intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
                 || intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) && getTagNFCState()) {
@@ -316,7 +317,7 @@ public class AircraftActivity extends Activity {
                 j.put("AcftName", txtAcftName.getText().toString());
                 setAcft(j);
             } catch (JSONException e) {
-                FontLog.appendLog(TAG + "Couldn't create json from NFC: " + e.getMessage(), 'e');
+                new FontLogAsync().execute(new LogMessage(TAG, "Couldn't create json from NFC: " + e.getMessage(), 'e'));
             }
         }
     }

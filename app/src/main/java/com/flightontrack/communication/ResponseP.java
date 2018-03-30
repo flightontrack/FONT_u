@@ -8,11 +8,11 @@ import org.json.JSONObject;
 import static com.flightontrack.shared.Const.*;
 
 public class ResponseP {
+    private static final String TAG = "ResponseP";
 
     public String           responseType;
-    public String           responseTypeLoad;
 
-    private static final String TAG = "ResponseP:";
+    public String           responseTypeLoad;
     private JSONObject      responseJsonData;
     private JSONArray       responseJsonArray;
 

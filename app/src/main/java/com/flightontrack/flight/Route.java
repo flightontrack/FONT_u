@@ -1,6 +1,7 @@
 package com.flightontrack.flight;
 
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Props;
@@ -9,8 +10,8 @@ import static com.flightontrack.shared.Const.*;
 
 
 public class Route extends RouteBase implements EventBus{
+    private final String TAG = "Route";
 
-    private final String TAG = "Route:";
     int _legCount = 0;
     String routeNumber=ROUTE_NUMBER_DEFAULT;
 
@@ -19,7 +20,7 @@ public class Route extends RouteBase implements EventBus{
     }
 
     void set_rAction(RACTION request) {
-        //FontLog.appendLog(TAG + "reaction:" + request, 'd');
+        //new FontLogAsync().execute(new LogMessage(TAG, "reaction:" + request, 'd');
         switch (request) {
             case OPEN_NEW_FLIGHT:
                 flightList.add(new Flight(this));
@@ -65,7 +66,7 @@ public class Route extends RouteBase implements EventBus{
 //                }
 //            }
 //        } catch (Exception e) {
-//            //FontLog.appendLog(TAG + "checkIfAnyFlightNeedClose: " + e.getMessage() + "\n" + e.getCause(), 'e');
+//            //new FontLogAsync().execute(new LogMessage(TAG, "checkIfAnyFlightNeedClose: " + e.getMessage() + "\n" + e.getCause(), 'e');
 //        }
 //    }
 
@@ -73,7 +74,7 @@ public class Route extends RouteBase implements EventBus{
 @Override
 public void eventReceiver(EventMessage eventMessage){
     EVENT ev = eventMessage.event;
-    FontLog.appendLog(TAG + routeNumber+" :eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd');
+    new FontLogAsync().execute(new LogMessage(TAG, routeNumber+" :eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
     switch(ev){
                 case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                     if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;

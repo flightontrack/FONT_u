@@ -5,7 +5,8 @@ import com.flightontrack.flight.Route;
 import com.flightontrack.flight.RouteBase;
 import com.flightontrack.flight.Session;
 import com.flightontrack.locationclock.SvcLocationClock;
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 
 import java.util.ArrayList;
 
@@ -14,15 +15,14 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public interface EventBus extends Events{
-
-    String TAG = "Bus:";
+    String TAG = "Bus";
 
     static void distribute(EventMessage eventMessage){
         ArrayList<EventBus> interfaceList = new ArrayList();
         ArrayList<EventBus> onClockList = new ArrayList();
 
         EVENT ev = eventMessage.event;
-        FontLog.appendLog(TAG + ev+":eventString:"+eventMessage.eventMessageValueString+":eventObject:"+eventMessage.eventMessageValueObject, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, ev+":eventString:"+eventMessage.eventMessageValueString+":eventObject:"+eventMessage.eventMessageValueObject, 'd'));
         switch(ev){
             case MACT_BIGBUTTON_ONCLICK_START:
                 interfaceList.add(new Route());
@@ -159,11 +159,11 @@ public interface EventBus extends Events{
         }
         for( EventBus i : interfaceList) {
             if(!(null==i))i.eventReceiver(eventMessage);
-            else  FontLog.appendLog(TAG + " null interface ", 'd');
+            else  new FontLogAsync().execute(new LogMessage(TAG, " null interface ", 'd'));
         }
         for( EventBus i : onClockList) {
             if(!(null==i))i.onClock(eventMessage);
-            else  FontLog.appendLog(TAG + " null interface ", 'd');
+            else  new FontLogAsync().execute(new LogMessage(TAG, " null interface ", 'd'));
         }
     }
 

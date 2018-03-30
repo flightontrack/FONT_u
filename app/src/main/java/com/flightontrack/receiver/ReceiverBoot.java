@@ -15,7 +15,7 @@ import com.flightontrack.shared.Props;
 import static com.flightontrack.shared.Const.*;
 
 public class ReceiverBoot extends BroadcastReceiver {
-    private static final String TAG = "ReceiverBoot:";
+    private static final String TAG = "ReceiverBoot";
 
     @Override
     public void onReceive(Context context, Intent intent) {

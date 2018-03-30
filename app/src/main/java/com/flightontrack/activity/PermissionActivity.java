@@ -11,18 +11,19 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.log.FontLog;
 import com.flightontrack.flight.Route;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 
 import static com.flightontrack.shared.Const.*;
 
 public class PermissionActivity extends Activity {
-    private static final String TAG = "PermissionActivity:";
+    private static final String TAG = "PermissionActivity";
+
     private static Activity thisAct = null;
     protected Route route;
     protected static boolean autostart = false;
-
-
+    
     //public static boolean productionRelease = false;
     //public static boolean productionRelease = true;
 
@@ -35,17 +36,17 @@ public class PermissionActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         try {
-            FontLog.appendLog(TAG + "onCreate", 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, "onCreate", 'd'));
             thisAct = this;
             set_Permissions(permissionType);
         }
         catch (Exception e) {
-            FontLog.appendLog(TAG + e.toString(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.toString(), 'e'));
         }
     }
     @Override
     public void onResume() {
-        FontLog.appendLog(TAG + "onResume", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "onResume", 'd'));
         super.onResume();
     }
 

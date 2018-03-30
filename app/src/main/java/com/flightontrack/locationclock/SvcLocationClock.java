@@ -14,7 +14,8 @@ import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.flightontrack.flight.RouteBase;
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.other.PhoneListener;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
@@ -27,7 +28,7 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.shared.Props.ctxApp;
 
 public class SvcLocationClock extends Service implements EventBus, LocationListener,GetTime {
-    static final String TAG = "SvcLocationClock:";
+    static final String TAG = "SvcLocationClock";
     //private static Context ctx;
     static LocationManager locationManager;
     public static PhoneListener phStateListener;
@@ -55,18 +56,18 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     }
 
     public static void stopLocationUpdates() {
-        FontLog.appendLog(TAG + "stopLocationUpdates : instanceSvcLocationClock = " + instanceSvcLocationClock, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG,"stopLocationUpdates : instanceSvcLocationClock = " + instanceSvcLocationClock, 'd'));
         try {
             locationManager.removeUpdates(instanceSvcLocationClock);
         }
         catch(SecurityException e ){
-            FontLog.appendLog(TAG + e, 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
     }
 
     public void requestLocationUpdate(int timeSec, long distance) {
 
-        FontLog.appendLog(TAG + "requestLocationUpdate: interval: " + timeSec + " dist: " + distance, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "requestLocationUpdate: interval: " + timeSec + " dist: " + distance, 'd'));
         SvcLocationClock.stopLocationUpdates();
         set_intervalClockSecCurrent(timeSec);
         setClockNextTimeLocalMsec(0);
@@ -74,7 +75,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, _intervalClockSecCurrent * 1000, distance, this);
         }
         catch(SecurityException e ){
-            FontLog.appendLog(TAG + e, 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
     }
     public void set_mode(MODE m){
@@ -94,11 +95,13 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
         _intervalClockSecCurrent = timeSec;
         //Util.appendLog(TAG + "set_intervalClockSecCurrent: "+_intervalClockSecCurrent, 'd');
     }
+
     @Override
     public void onLocationChanged(final Location location) {
         if(_mode==MODE.CLOCK_ONLY && RouteBase.activeFlight==null){
             tryCounter++;
-            FontLog.appendLog(TAG + "_TIMER :  tryCounter:" + tryCounter, 'd');
+            new FontLogAsync().execute(new LogMessage(TAG,"TimerCounter:" + tryCounter,'d'));
+            //FontLog.appendLog(TAG + "TimerCounter:" + tryCounter, 'd');
             if(tryCounter >TRY_NUMBER || dbLocationRecCountNormal <1) {
                 tryCounter = 0;
                 stopServiceSelf();
@@ -152,7 +155,8 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
             stopSelf();
             return;
         }
-        FontLog.appendLog(TAG + "onCreate",'d');
+        //FontLog.appendLog(TAG + "onCreate",'d');
+        new FontLogAsync().execute(new LogMessage(TAG,"onCreate",'d'));
         instanceSvcLocationClock =this;
         _mode = MODE.CLOCK_LOCATION;
         EventBus.distribute(new EventMessage(EVENT.CLOCK_SERVICESTARTED_MODELOCATION));
@@ -188,7 +192,8 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FontLog.appendLog(TAG + "onDestroy", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG,"onDestroy",'d'));
+        //FontLog.appendLog(TAG + "onDestroy", 'd');
         setToNull();
     }
 
@@ -197,17 +202,14 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     {
         super.onTaskRemoved(rootIntent);
         setSignalStrengthListener(false);
-        FontLog.appendLog(TAG + "onTaskRemoved: ",'d');
-//        if(!(instanceSvcLocationClock ==null)){
-//            stopLocationUpdates();
-//            setToNull();
-//        }
-//        stopSelf();
+        //FontLog.appendLog(TAG + "onTaskRemoved: ",'d');
+        new FontLogAsync().execute(new LogMessage(TAG,"onTaskRemoved",'d'));
         stopServiceSelf();
 
     }
     public void stopServiceSelf() {
-        FontLog.appendLog(TAG + "stopServiceSelf",'d');
+        //FontLog.appendLog(TAG + "stopServiceSelf",'d');
+        new FontLogAsync().execute(new LogMessage(TAG,"stopServiceSelf",'d'));
         setSignalStrengthListener(false);
         if(!(instanceSvcLocationClock ==null)){
             stopLocationUpdates();
@@ -229,7 +231,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
     @Override
     public void eventReceiver(EventMessage eventMessage){
         EVENT ev = eventMessage.event;
-        FontLog.appendLog(TAG + " eventReceiver:"+ev, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG,"eventReceiver:"+ev,'d'));
         switch(ev){
             //case FLIGHT_GETNEWFLIGHT_COMPLETED:
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:

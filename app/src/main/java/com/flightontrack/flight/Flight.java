@@ -7,7 +7,8 @@ import android.widget.Toast;
 import com.flightontrack.R;
 import com.flightontrack.communication.Response;
 import com.flightontrack.locationclock.SvcLocationClock;
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
@@ -36,8 +37,8 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class Flight extends FlightBase implements GetTime, EventBus {
+    static final String TAG = "Flight";
 
-    static final String TAG = "Flight:";
     public boolean isGetFlightNumber = true;
     //FACTION lastAction = FACTION.DEFAULT_REQUEST;
     boolean isSpeedAboveMin = false;
@@ -64,7 +65,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
 
     public void set_flightNumber(String fn) {
-        FontLog.appendLog(TAG + " set_flightNumber " + fn+ " flightNumStatus " + flightNumStatus, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, " set_flightNumber " + fn+ " flightNumStatus " + flightNumStatus, 'd'));
         replaceFlightNumber(fn);
         switch (flightNumStatus) {
             case REMOTE_DEFAULT:
@@ -92,9 +93,9 @@ public class Flight extends FlightBase implements GetTime, EventBus {
             _speedCurrent = speed + (float) 0.01;
         } else {
             /// this condition never happen when writing a log file because SessionProp.pIsDebug == true
-            // FontLog.appendLog(TAG + "set_speedCurrent: Reported speed is ZERO", 'd');
+            // new FontLogAsync().execute(new LogMessage(TAG, "set_speedCurrent: Reported speed is ZERO", 'd');
         }
-        // FontLog.appendLog(TAG + "set_speedCurrent: " + _speedCurrent, 'd');
+        // new FontLogAsync().execute(new LogMessage(TAG, "set_speedCurrent: " + _speedCurrent, 'd');
     }
 
 
@@ -102,11 +103,11 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         cutoffSpeed = get_cutoffSpeed();
         boolean isCurrSpeedAboveMin = (_speedCurrent >= cutoffSpeed);
         boolean isPrevSpeedAboveMin = (speedPrev >= cutoffSpeed);
-        //FontLog.appendLog(TAG + "isDoubleSpeedAboveMin: cutoffSpeed: " + cutoffSpeed, 'd');
+        //new FontLogAsync().execute(new LogMessage(TAG, "isDoubleSpeedAboveMin: cutoffSpeed: " + cutoffSpeed, 'd');
         if (isCurrSpeedAboveMin && isPrevSpeedAboveMin) return true;
         //else if (RouteBase.activeFlight.lastAction == FACTION.CHANGE_IN_FLIGHT && (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin)) {
         else if (isCurrSpeedAboveMin ^ isPrevSpeedAboveMin) {
-            FontLog.appendLog(TAG + "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, "isCurrSpeedAboveMin:" + isCurrSpeedAboveMin + " isPrevSpeedAboveMin:" + isPrevSpeedAboveMin, 'd'));
             if (isPrevSpeedAboveMin)
                 SvcLocationClock.instanceSvcLocationClock.requestLocationUpdate(SPEEDLOW_TIME_BW_GPS_UPDATES_SEC, DISTANCE_CHANGE_FOR_UPDATES_ZERO);
             else if (isCurrSpeedAboveMin)
@@ -118,7 +119,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 
     void getNewFlightID() {
         isGettingFlight = true;
-        FontLog.appendLog(TAG + "Flight - getNewFlightID:  " + flightNumber, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "Flight - getNewFlightID:  " + flightNumber, 'd'));
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
@@ -146,13 +147,13 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        FontLog.appendLog(TAG + "Flight - getNewFlightID OnSuccess", 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "Flight - getNewFlightID OnSuccess", 'd'));
                         //String responseText = new String(responseBody);
                         Response response = new Response(new String(responseBody));
                         //char responseType = response.responseType;
 
                         if (response.responseNotif != null) {
-                            FontLog.appendLog(TAG + "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd');
+                            new FontLogAsync().execute(new LogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd'));
                             Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -167,7 +168,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        //FontLog.appendLog(TAG + "getNewFlightID onFailure:" + flightRequestCounter, 'd');
+                        //new FontLogAsync().execute(new LogMessage(TAG, "getNewFlightID onFailure:" + flightRequestCounter, 'd');
                         //if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                         //if (!isTempFlightNum) if (mainactivityInstance != null) {
                         if (flightNumStatus== REMOTE_DEFAULT) if (mainactivityInstance != null) {
@@ -189,13 +190,13 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 
                     @Override
                     public void onFinish() {
-                        FontLog.appendLog(TAG + "onFinish: FlightNumber: " + flightNumber, 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "onFinish: FlightNumber: " + flightNumber, 'd'));
                         isGettingFlight = false;
                     }
 
                     @Override
                     public void onRetry(int retryNo) {
-                        FontLog.appendLog(TAG + "getNewFlightID onRetry:" + retryNo, 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
                     }
                 }
         );
@@ -204,7 +205,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
 
     void getCloseFlight() {
-        FontLog.appendLog(TAG + "getCloseFlight: " + flightNumber, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
         requestParams.put("speedlowflag", isSpeedAboveMin);
@@ -216,21 +217,21 @@ public class Flight extends FlightBase implements GetTime, EventBus {
         new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        FontLog.appendLog(TAG + "getCloseFlight OnSuccess", 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "getCloseFlight OnSuccess", 'd'));
                         //String responseText = new String(responseBody);
                         Response response = new Response(new String(responseBody));
 
                         if (response.responseAckn != null) {
-                            FontLog.appendLog(TAG + "onSuccess|Flight closed: " + flightNumber, 'd');
+                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
                         }
                         if (response.responseNotif != null) {
-                            FontLog.appendLog(TAG + "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd');
+                            new FontLogAsync().execute(new LogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd'));
                         }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        FontLog.appendLog(TAG + "getCloseFlight onFailure: " + flightNumber, 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "getCloseFlight onFailure: " + flightNumber, 'd'));
 
                     }
 
@@ -245,7 +246,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     public void saveLocCheckSpeed(final Location location) {
 
         float speedCurrent = location.getSpeed();
-        FontLog.appendLog(TAG + "saveLocCheckSpeed: reported speed: " + speedCurrent, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "saveLocCheckSpeed: reported speed: " + speedCurrent, 'd'));
         set_speedCurrent(speedCurrent);
 
         isSpeedAboveMin = isDoubleSpeedAboveMin();
@@ -303,10 +304,10 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 dbIdList.add((int)r);
                 lastAltitudeFt = (int) (Math.round(location.getAltitude() * 3.281));
                 set_wayPointsCount(p);
-                FontLog.appendLog(TAG + "saveLocation: dbLocationRecCountNormal: " + SessionProp.dbLocationRecCountNormal, 'd');
+                new FontLogAsync().execute(new LogMessage(TAG, "saveLocation: dbLocationRecCountNormal: " + SessionProp.dbLocationRecCountNormal, 'd'));
             }
         } catch (Exception e) {
-            FontLog.appendLog(TAG + "SQLite Exception Placeholder", 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, "SQLite Exception Placeholder", 'e'));
         }
     }
 
@@ -349,10 +350,10 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
     public void set_flightState(FLIGHT_STATE fs, String descr) {
         set_flightState(fs);
-        FontLog.appendLog(TAG + "flightState reasoning : " +fs +' '+ descr, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "flightState reasoning : " +fs +' '+ descr, 'd'));
     }
 //    void set_fAction(FACTION request) {
-//        FontLog.appendLog(TAG + flightNumber + ":fACTION :" + request, 'd');
+//        new FontLogAsync().execute(new LogMessage(TAG, flightNumber + ":fACTION :" + request, 'd');
 //        lastAction = request;
 ////        switch (fStatus) {
 ////            case ACTIVE:
@@ -385,12 +386,12 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     @Override
     public void onClock(EventMessage eventMessage){
 
-        FontLog.appendLog(TAG + flightNumber + "onClock", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, flightNumber + "onClock", 'd'));
         if (route.activeFlight == this
                 && (flightState == FLIGHT_STATE.READY_TOSAVELOCATIONS || flightState == FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN)
                 && eventMessage.eventMessageValueLocation != null) {
     //                    String s = Arrays.toString(Thread.currentThread().getStackTrace());
-    //                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
+    //                    new FontLogAsync().execute(new LogMessage(TAG, "StackTrace: "+s,'d');
             saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
         }
         if (Util.isNetworkAvailable() && !isGettingFlight) {
@@ -403,7 +404,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     @Override
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
-        FontLog.appendLog(TAG + flightNumber + ":eventReceiver:" + ev, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, flightNumber + ":eventReceiver:" + ev, 'd'));
         super.eventReceiver(eventMessage);
         switch (ev) {
 //            case CLOCK_ONTICK:
@@ -411,7 +412,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 //                        && (flightState == FLIGHT_STATE.READY_TOSAVELOCATIONS || flightState == FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN)
 //                        && eventMessage.eventMessageValueLocation != null) {
 ////                    String s = Arrays.toString(Thread.currentThread().getStackTrace());
-////                    FontLog.appendLog(TAG + "StackTrace: "+s,'d');
+////                    new FontLogAsync().execute(new LogMessage(TAG, "StackTrace: "+s,'d');
 //                    saveLocCheckSpeed(eventMessage.eventMessageValueLocation);
 //                }
 //                if (Util.isNetworkAvailable()) {
@@ -423,7 +424,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 //                break;
             case SESSION_ONSUCCESS_COMMAND:
                 int server_command = eventMessage.eventMessageValueInt;
-                FontLog.appendLog(TAG + "server_command int: " + server_command, 'd');
+                new FontLogAsync().execute(new LogMessage(TAG, "server_command int: " + server_command, 'd'));
                 switch (server_command) {
                     case COMMAND_TERMINATEFLIGHT:
                         Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();

@@ -8,7 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.shared.EventMessage;
 
 import static com.flightontrack.flight.RouteBase.get_FlightInstanceByNumber;
@@ -26,17 +27,15 @@ import java.util.List;
 
 
 public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
-
-    private static final String TAG = "SQLHelper:";
+    private static final String TAG = "SQLHelper";
+    
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "FONTLOCATION.dbw";
     public SQLiteDatabase dbw;
-    public static Cursor cl;
-    public static Cursor ctf;
 
     public SQLHelper() {
         super(ctxApp, DATABASE_NAME, null, DATABASE_VERSION);
-        FontLog.appendLog(TAG + "SQLHelper:SQLHelper", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "SQLHelper:SQLHelper", 'd'));
         try {
             dbw = getWritableDatabase();
             //dbw.execSQL(DBSchema.SQL_DROP_TABLE_LOCATION);
@@ -46,7 +45,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_LOCATION_IF_NOT_EXISTS);
             dbw.execSQL(DBSchema.SQL_CREATE_TABLE_FLIGHTNUM_ALLOC_IF_NOT_EXISTS);
             dbw.close();
-            dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+            dbLocationRecCountNormal = getLocationRecCountNormal();
             //if (dbLocationRecCountNormal == 0 && getLocationTableCountTemp() == 0) {
             if (getLocationTableCountTotal() == 0) {
                 /// TODO - to come up with something... - reset ids to 1
@@ -63,18 +62,18 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 dbTempFlightRecCount = (int) DatabaseUtils.queryNumEntries(dbw, TABLE_FLIGHTNUMBER_ALLOCATION);
                 dbw.close();
             }
-            FontLog.appendLog(TAG + "Unsent Locations from Previous Session :  " + dbLocationRecCountNormal, 'd');
-            FontLog.appendLog(TAG + "Temp Flights Previous Session :  " + dbTempFlightRecCount, 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, "Unsent Locations from Previous Session :  " + dbLocationRecCountNormal, 'd'));
+            new FontLogAsync().execute(new LogMessage(TAG, "Temp Flights Previous Session :  " + dbTempFlightRecCount, 'd'));
             dbw.close();
         }
         catch(Exception e){
-            FontLog.appendLog(TAG + "EXCEPTION!!!!: "+e.toString(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, "EXCEPTION!!!!: "+e.toString(), 'e'));
         }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        FontLog.appendLog(TAG + "SQLHelper:onCreate", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "SQLHelper:onCreate", 'd'));
     }
 
     @Override
@@ -126,9 +125,9 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
         }
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
-            dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+            dbLocationRecCountNormal = getLocationRecCountNormal();
     }
     public void rowLocationDeleteOnId(int dbId, String flightId) {
         String selection = DBSchema._ID + "= ?";
@@ -152,9 +151,9 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
         }
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
-            dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+            dbLocationRecCountNormal = getLocationRecCountNormal();
     }
     public void flightLocationsDelete(String flightId) {
         String selection = DBSchema.LOC_flightid +"= ?";
@@ -169,9 +168,9 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
             dbw.close();
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
-        dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+        dbLocationRecCountNormal = getLocationRecCountNormal();
     }
     public int allLocationsDelete() {
         int i =0;
@@ -182,7 +181,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             );
             dbw.close();
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
         dbLocationRecCountNormal = 0;
         dbTempFlightRecCount=0;
@@ -198,82 +197,10 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             dbw.close();
             //if (r>0)Route.isDbRecord=true;
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
-        dbLocationRecCountNormal = get_dbLocationRecCountNormal();
+        dbLocationRecCountNormal = getLocationRecCountNormal();
         return r;
-    }
-
-    public void setCursorDataLocation() {
-
-        String[] projection = {
-                DBSchema._ID,
-                DBSchema.COLUMN_NAME_COL1,
-                DBSchema.LOC_flightid,
-                DBSchema.LOC_isTempFlight,
-                DBSchema.LOC_speedlowflag,
-                DBSchema.COLUMN_NAME_COL4,
-                DBSchema.COLUMN_NAME_COL6,
-                DBSchema.COLUMN_NAME_COL7,
-                DBSchema.COLUMN_NAME_COL8,
-                DBSchema.COLUMN_NAME_COL9,
-                DBSchema.LOC_wpntnum,
-                DBSchema.COLUMN_NAME_COL11,
-                DBSchema.LOC_date,
-                DBSchema.LOC_is_elevetion_check
-        };
-        String sortOrder = DBSchema._ID;
-        //String selection = null; //DBSchema._ID + "= ?";
-        String selection = DBSchema.LOC_isTempFlight + "= ?";
-        //String[] selectionArgs = null; // { String.valueOf(newRowId) };
-        String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
-        dbw = getWritableDatabase();
-        cl = dbw.query(
-                DBSchema.TABLE_LOCATION,  // The table to query
-                projection,                               // The columns to return
-                selection,                               // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-        cl.moveToFirst();
-        dbw.close();
-    }
-    public Cursor getCursorDataLocation() {
-
-        String[] projection = {
-                DBSchema._ID,
-                DBSchema.COLUMN_NAME_COL1,
-                DBSchema.LOC_flightid,
-                DBSchema.LOC_isTempFlight,
-                DBSchema.LOC_speedlowflag,
-                DBSchema.COLUMN_NAME_COL4,
-                DBSchema.COLUMN_NAME_COL6,
-                DBSchema.COLUMN_NAME_COL7,
-                DBSchema.COLUMN_NAME_COL8,
-                DBSchema.COLUMN_NAME_COL9,
-                DBSchema.LOC_wpntnum,
-                DBSchema.COLUMN_NAME_COL11,
-                DBSchema.LOC_date,
-                DBSchema.LOC_is_elevetion_check
-        };
-        String sortOrder = DBSchema._ID;
-        String selection = DBSchema.LOC_isTempFlight + "= ?";
-        String[] selectionArgs = {"0"}; // { String.valueOf(newRowId) };
-        dbw = getReadableDatabase();
-        Cursor cu = dbw.query(
-                DBSchema.TABLE_LOCATION,  // The table to query
-                projection,                               // The columns to return
-                selection,                               // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-        //cu.moveToFirst();
-        //dbw.close();
-        return cu;
     }
     public ArrayList<Location> getAllLocationList() {
 
@@ -355,7 +282,8 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
         String selection = DBSchema.LOC_flightid + "= ?";
         String[] selectionArgs = {flightNum}; // { String.valueOf(newRowId) };
         dbw = getReadableDatabase();
-        Cursor cu = dbw.query(
+        ArrayList<Location> locations = new ArrayList();
+        try (Cursor cu = dbw.query(
                 DBSchema.TABLE_LOCATION,  // The table to query
                 projection,                               // The columns to return
                 selection,                               // The columns for the WHERE clause
@@ -363,9 +291,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
-        );
-        ArrayList<Location> locations = new ArrayList();
-        try {
+        )) {
             while (cu.moveToNext()) {
                 Location l = new Location();
                 l.i = cu.getPosition();
@@ -384,104 +310,51 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 l.irch = cu.getInt(cu.getColumnIndexOrThrow(DBSchema.LOC_is_elevetion_check));
                 locations.add(l);
             }
-        }
-        finally {
-            cu.close();
+        } finally {
             dbw.close();
         }
         return locations;
     }
-    public Cursor getCursorTempFlights() {
-
-        dbw = getReadableDatabase();
-        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =1" ,new String[]{});
-        //c.moveToFirst();
-        //dbw.close();
-        return c;
-    }
     public List<String> getTempFlightList() {
 
-        List<String> flightIdList = new ArrayList<String>();
+        List<String> flightIdList = new ArrayList<>();
         dbw = getReadableDatabase();
-        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =1" ,new String[]{});
 
-        try {
+        try (Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =1", new String[]{})) {
             while (c.moveToNext()) {
                 flightIdList.add(c.getString(c.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
             }
-        }
-        finally{
-            c.close();
+        } finally {
             dbw.close();
         }
         return flightIdList;
     }
-//    public Cursor getCursorReadyToSendFlights() {
-//        dbw = getReadableDatabase();
-//        Cursor c = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
-//        return c;
-//
-//    }
-    public List<String> getListReadyToSendFlights() {
+    public List<String> getReadyToSendFlightList() {
         dbw = getReadableDatabase();
-        Cursor cu = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0" ,new String[]{});
         ArrayList<String> flightList = new ArrayList<>();
-        try {
+        try (Cursor cu = dbw.rawQuery("select distinct flightid from Location where istempflightnum =0", new String[]{})) {
             while (cu.moveToNext()) {
                 flightList.add(cu.getString(cu.getColumnIndexOrThrow(DBSchema.LOC_flightid)));
             }
-        }
-        finally{
-            cu.close();
+        } finally {
             sqlHelper.dbw.close();
         }
         return flightList;
     }
-    public static int getCursorCountLocation() {
-        return cl.getCount();
-    }
-//    public int getCursorCountFlight() {
-//        return cf.getCount();
-//    }
-
     public int getLocationTableCountTotal() {
         dbw = getWritableDatabase();
         long numRows = DatabaseUtils.queryNumEntries(dbw, DBSchema.TABLE_LOCATION);
         dbw.close();
         return (int) numRows;
     }
-    int getLocationTableCountTemp() {
-        dbw = getWritableDatabase();
-        Cursor c = dbw.rawQuery("select _id from Location where istempflightnum =1" ,new String[]{});
-        c.moveToFirst();
-        int numRows = c.getCount();
-        c.close();
-        dbw.close();
-        return (int) numRows;
-    }
-    int get_dbLocationRecCountNormal(){
+    int getLocationRecCountNormal(){
         dbw = getReadableDatabase();
         Cursor c = dbw.rawQuery("select _id from Location where istempflightnum =0" ,new String[]{});
         c.moveToFirst();
         int numRows = c.getCount();
         c.close();
         dbw.close();
-        return (int) numRows;
-    }
-    public int get_dbLocationRecCountFlight(String fn){
-        dbw = getReadableDatabase();
-        Cursor c = dbw.rawQuery("select _id from Location where flightid ="+fn ,new String[]{});
-        c.moveToFirst();
-        int numRows = c.getCount();
-        c.close();
-        dbw.close();
-        return (int) numRows;
-    }
-    int getTempFlightTableCount() {
-        dbw = getWritableDatabase();
-        long numRows = DatabaseUtils.queryNumEntries(dbw, TABLE_FLIGHTNUMBER_ALLOCATION);
-        dbw.close();
-        return (int) numRows;
+        return numRows;
     }
     public int getLocationFlightCount(String flightId) {
         dbw = getWritableDatabase();
@@ -492,7 +365,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
 
         return (int) numRows;
     }
-    public String getNewTempFlightNum(String dateTime){
+    String getNewTempFlightNum(String dateTime){
         dbw = getWritableDatabase();
 
         Cursor c = dbw.rawQuery("select max(ifnull(flightNumber,0)) from "+TABLE_FLIGHTNUMBER_ALLOCATION ,new String[]{});
@@ -509,15 +382,16 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                     null,
                     values);
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
         finally {
+            c.close();
             dbw.close();
         }
 
         if (r > 0) {
             dbTempFlightRecCount = f;
-            FontLog.appendLog(TAG + "getNewTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, "getNewTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd'));
         }
         return (String.valueOf(f));
     }
@@ -537,7 +411,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
             dbLocationRecCountNormal+=rn;
             if (rn > 0) {
 //                rn=0;
-//                FontLog.appendLog(TAG + "updateTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd');
+//                new FontLogAsync().execute(new LogMessage(TAG, "updateTempFlightNum: dbTempFlightRecCount: " + dbTempFlightRecCount, 'd');
 //                rn = dbw.delete(
 //                        DBSchema.TABLE_FLIGHTNUMBER_ALLOCATION,
 //                        DBSchema.FLIGHTNUM_FlightNumber+"="+temp_fn,
@@ -547,7 +421,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 dbTempFlightRecCount -=1;
             }
         } catch (Exception e) {
-            FontLog.appendLog(TAG + e.getMessage(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, e.getMessage(), 'e'));
         }
         finally {
             dbw.close();

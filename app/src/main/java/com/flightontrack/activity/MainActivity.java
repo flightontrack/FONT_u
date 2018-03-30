@@ -24,7 +24,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
 import com.flightontrack.shared.EventBus;
@@ -48,7 +49,8 @@ import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.flight.Session.*;
 
 public class MainActivity extends AppCompatActivity implements EventBus {
-    static final String TAG = "MainActivity:";
+    static final String TAG = "MainActivity";
+
     public static boolean isToDestroy = true;
     public TextView txtAcftNum;
     public Spinner spinnerUpdFreq;
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
         String flightN = FLIGHT_NUMBER_DEFAULT;
 
         if (RouteBase.activeRoute == null) {
-            FontLog.appendLog(TAG + " setTextRed: flightId IS NULL", 'd');
+            new FontLogAsync().execute(new LogMessage(TAG, " setTextRed: flightId IS NULL", 'd'));
         } else {
             if (RouteBase.activeFlight != null) {
                 flightN = RouteBase.activeFlight.flightNumber;
@@ -128,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             cardLayout1.setOnClickListener(v-> {
                 //@Override
                 //public void onClick(View view) {
-                    //FontLog.appendLog(TAG + "Method1", 'd');
+                    //new FontLogAsync().execute(new LogMessage(TAG, "Method1", 'd');
                     Intent intent = new Intent(ctxApp, AircraftActivity.class);
                     startActivity(intent);
                 //}
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             SessionProp.get();
 
 //            if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
-//                FontLog.appendLog(TAG + "New App Context", 'd');
+//                new FontLogAsync().execute(new LogMessage(TAG, "New App Context", 'd');
 //                Util.setCurrAppContext(ctxApp.toString());
 //                RouteBase.activeRoute = null;
 //            }
@@ -170,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             SessionProp.save();
             txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         } catch (Exception e) {
-            FontLog.appendLog(TAG + "EXCEPTION!!!!: " + e.toString(), 'e');
+            new FontLogAsync().execute(new LogMessage(TAG, "EXCEPTION!!!!: " + e.toString(), 'e'));
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -179,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
 
     @Override
     public void onResume() {
-        FontLog.appendLog(TAG + "onResume", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "onResume", 'd'));
         super.onResume();
 
         SessionProp.get();
@@ -249,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     public void onBackPressed() {
 
-        FontLog.appendLog(TAG + "isToDestroy :" + isToDestroy, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "isToDestroy :" + isToDestroy, 'd'));
         if (isToDestroy) {
             new ShowAlertClass(this).showBackPressed();
         } else {
@@ -268,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        FontLog.appendLog(TAG + "OnDestroy", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "OnDestroy", 'd'));
         SessionProp.save();
         SessionProp.clearOnDestroy();
         if (isToDestroy && alarmReceiver != null) {
@@ -301,14 +303,14 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     public void onPause() {
         super.onPause();
-        FontLog.appendLog(TAG + "onPause", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "onPause", 'd'));
         SessionProp.save();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        FontLog.appendLog(TAG + "onStop", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "onStop", 'd'));
         SessionProp.save();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -317,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     }
 
     public void onCheckboxClicked(View view) {
-       //FontLog.appendLog(TAG + "!!!!! CheckBox clicked !!!!!", 'd');
+       //new FontLogAsync().execute(new LogMessage(TAG, "!!!!! CheckBox clicked !!!!!", 'd');
         EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_ONCLICK).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
     }
 
@@ -542,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
-        FontLog.appendLog(TAG + " eventReceiver : " + ev, 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, " eventReceiver : " + ev, 'd'));
         txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         switch (ev) {
             case PROP_CHANGED_MULTILEG:

@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import static com.flightontrack.shared.Const.GLOBALTAG;
 
 public class Response {
-;
+
     public String  responseFlightNum;
     public String  responseDataLoad;
     public String  responseCommand;

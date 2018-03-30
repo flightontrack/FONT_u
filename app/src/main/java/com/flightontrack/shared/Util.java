@@ -9,70 +9,31 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.activity.MainActivity;
 import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.communication.ResponseP;
-import com.flightontrack.log.FontLog;
+import com.flightontrack.log.FontLogAsync;
+import com.flightontrack.log.LogMessage;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 
 public class Util {
+    private static final String TAG = "Util";
+
     public Util() {
-//        ctx = c;
-//        sharedPreferences = ctx.getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE);
-//        editor = sharedPreferences.edit();
     }
 
-//        public static void init(Context c,MainActivity a) {
-//        Util.ctx = c;
-//        sharedPreferences = ctx.getSharedPreferences("com.flightontrack", Context.MODE_PRIVATE);
-//        editor = sharedPreferences.edit();
-//    }
-
-    private static final String TAG = "Util:";
-//    private static Context ctx;
-//    static SharedPreferences sharedPreferences;
-//    static SharedPreferences.Editor editor;
-//    static int versionCode;
-//    static String deviceMmnufacturer = "unknown";
-//    static String deviceBrand = "unknown";
-//    static String deviceProduct = "unknown";
-//    static String deviceModel = "unknown";
-
-//    static boolean isEmptyAcftOk() {
-//        return sharedPreferences.getBoolean("a_isEmptyAcftOk", false);
-//    }
-//
-//    static void setIsEmptyAcftOk(boolean isEmptyAcftOk) {
-//        editor.putBoolean("a_isEmptyAcftOk", isEmptyAcftOk).commit();
-//    }
 
      public static String getTrackingURL() {
         String[] spinnerUrls = ctxApp.getResources().getStringArray(R.array.url_array);
-        //FontLog.appendLog(TAG + "getTrackingUR : " + spinnerUrls[SessionProp.pSpinnerUrlsPos].trim(),'d');
-        //return sharedPreferences.getString("trackingURL", spinnerUrls[getSpinnerUrlsPos()]).trim();
         return "http://"+spinnerUrls[SessionProp.pSpinnerUrlsPos].trim();
     }
-
-//    static int getSpinnerUrlsPos() {
-//        return sharedPreferences.getInt("spinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
-//    }
-//
-//    static void setSpinnerUrlsPos(int pos) {
-//        //SimpleSettingsActivity.spinnerUrls.setSelection(pos);
-//        editor.putInt("spinnerUrlsPos", pos).commit();
-//    }
 
     public static int getWayPointLimit() {
         return sharedPreferences.getInt("wayPointLimit", WAY_POINT_HARD_LIMIT);
@@ -81,10 +42,6 @@ public class Util {
     public static void setWayPointLimit(int wp_limit) {
         editor.putInt("wayPointLimit", WAY_POINT_HARD_LIMIT > wp_limit ? WAY_POINT_HARD_LIMIT : wp_limit).commit();
     }
-
-//    public static void setAcftNum(String an) {
-//        MainActivity.txtAcftNum.setText(an);
-//    }
 
     public static String getAcftNum(int a) {
         String acft;
@@ -116,97 +73,13 @@ public class Util {
         return acft;
     }
 
-//    static String getMyAndroidID() {
-//        return Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.ANDROID_ID);
-//    }
-//
-//    static String   getMyAndroidVersion() {
-//        return  Build.VERSION.CODENAME +' ' +Build.VERSION.RELEASE+' ' +Build.VERSION.SDK_INT;
-//    }
-//    static int getVersionCode() {
-//        try {
-//            versionCode = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionCode;
-//        } catch (PackageManager.NameNotFoundException e) {
-//            versionCode = -1;
-//        }
-//        return versionCode;
-//    }
-//
-//    static void getMyDevice() {
-//        deviceMmnufacturer = Build.MANUFACTURER;
-//        deviceBrand        = Build.BRAND;
-//        deviceProduct      = Build.PRODUCT;
-//        deviceModel        = Build.MODEL;
-//    }
-//
-//    static String getMyPhoneID() {
-//        String strId = (MainActivity._phoneNumber == null||MainActivity._phoneNumber.isEmpty()) ? MainActivity._myDeviceId : MainActivity._phoneNumber;
-//        return strId.substring(strId.length() - 10);
-//    }
-
     public static String getPsw() {
         return sharedPreferences.getString("cloudpsw",null);
-//        if (psw==null) {
-//            getCloudPsw();
-//        }
-//        else SimpleSettingsActivity.txtPsw.setText(psw);
     }
     public static void setPsw(String psw) {
         editor.putString("cloudpsw", psw).commit();
         SimpleSettingsActivity.txtPsw.setText(psw);
     }
-//    public static String getTrackingSpeed() {
-//        return sharedPreferences.getString("a_speed_min", ctxApp.getString(R.string.default_tracking_speed));
-//    }
-
-//    public static double getTrackingSpeedIntMeterSec() {
-//        return Double.parseDouble(getTrackingSpeed()) * 0.44704;
-//    }
-
-//    public static void setTrackingSpeed(String speed) {
-//        editor.putString("a_speed_min", speed).commit();
-//    }
-
-//    public static void setSpinnerSpeedPos(int pos) {
-//        editor.putInt("a_spinnerSpeedPos", pos).commit();
-//        MainActivity.spinnerMinSpeed.setSelection(pos);
-//    }
-
-//    public static int getSpinnerSpeedPos() {
-//        return sharedPreferences.getInt("a_spinnerSpeedPos", DEFAULT_SPEED_SPINNER_POS);
-//    }
-
-//    static void uiResume() {
-//            setAcftNum(getAcftNum(4));
-//            MainActivity.set_pIntervalLocationUpdateSecPos(MainActivity.AppConfig.pIntervalSelectedItem);
-//            setSpinnerSpeedPos(getSpinnerSpeedPos());
-//
-//        if (!(MainActivity._phoneNumber==null)&&!(MainActivity._myDeviceId==null)) {
-//            setUserName(getUserName());
-//        }
-//        MainActivity.AppConfig.get();
-//        Route.SessionProp.get();
-//        Route.setTrackingButtonState(Route.trackingButtonState);
-//    }
-
-//    static void clearSettingPreferences() {
-//        //Log.d.d(TAG, "clearPref()");
-//
-//        //editor.remove("trackingURL").commit();
-//        editor.remove("speed_thresh").commit();
-//        editor.remove("spinnerSpeedPos").commit();
-//        editor.remove("pIsMultileg").commit();
-//        editor.remove("pIntervalLocationUpdateSec").commit();
-//        editor.remove("pIntervalSelectedItem").commit();
-//        editor.remove("pIsMultileg").commit();
-//        editor.remove("pIsEmptyAcftOk").commit();
-//        editor.remove("pSpinnerUrlsPos").commit();
-//        editor.remove("pUserName").commit();
-//        editor.remove("cloudpsw").commit();
-//        editor.remove("pIsDebug").commit();
-//        MainActivity.AppConfig.get();
-//    }
-
 
     public static void setSignalStregth(String name, int value) {
         try {
@@ -219,14 +92,10 @@ public class Util {
         return sharedPreferences.getInt("gsmsignalstrength", -1);
     }
 
-
     public static Boolean getIsOnBoot() {
         return sharedPreferences.getBoolean("a_isOnBoot", false);
     }
 
-//    public static void setIsOnBoot(Boolean isDebug) {
-//        editor.putBoolean("a_isOnBoot", isDebug).commit();
-//    }
     public static boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ctxApp.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
@@ -246,7 +115,7 @@ public class Util {
         progressBar.setProgress(100);
         progressBar.show();
 
-        FontLog.appendLog(TAG + "getCloudPsw Started", 'd');
+        new FontLogAsync().execute(new LogMessage(TAG, "getCloudPsw Started", 'd'));
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_PSW);
         requestParams.put("userid", Pilot.getUserID());
@@ -255,13 +124,13 @@ public class Util {
         new AsyncHttpClient().post(getTrackingURL() + ctxApp.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        FontLog.appendLog(TAG + "getCloudPsw OnSuccess", 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
                         ResponseP response = new ResponseP(new String(responseBody));
                         if (response.responseType.equals(RESPONSE_TYPE_DATA_WITHLOAD) && response.responseTypeLoad.equals(RESPONSE_TYPE_DATA_PSW)) {
                             //SimpleSettingsActivity.progressBar.isShowing();
                             progressBar.dismiss();
                             String psw = response.getValue(RESPONSE_TYPE_DATA_PSW);
-                            FontLog.appendLog(TAG + "ap="+psw, 'd');
+                            new FontLogAsync().execute(new LogMessage(TAG, "ap="+psw, 'd'));
                             setPsw(psw);
                         }
                         if (response.responseType.equals(RESPONSE_TYPE_NOTIF_WITHLOAD)) {
@@ -269,7 +138,7 @@ public class Util {
                     }
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        FontLog.appendLog(TAG + "getCloudPsw onFailure:", 'd');
+                        new FontLogAsync().execute(new LogMessage(TAG, "getCloudPsw onFailure:", 'd'));
                         progressBar.dismiss();
                     }
                 }
