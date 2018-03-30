@@ -1,4 +1,4 @@
-package com.flightontrack.Entities;
+package com.flightontrack.entities;
 
 /**
  * Created by hotvk on 2/27/2018.

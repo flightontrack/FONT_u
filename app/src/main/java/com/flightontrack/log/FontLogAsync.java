@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.flight.RouteBase;
 import com.flightontrack.shared.Props;
 

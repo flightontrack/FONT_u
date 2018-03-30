@@ -1,4 +1,4 @@
-package com.flightontrack.Entities;
+package com.flightontrack.entities;
 
 public class EntityAcft {
     public String AcftNum;

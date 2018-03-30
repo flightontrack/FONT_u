@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.activity.MainActivity;
 import com.flightontrack.R;

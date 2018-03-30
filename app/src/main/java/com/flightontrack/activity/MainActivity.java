@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
 import com.flightontrack.shared.EventBus;

@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-import com.flightontrack.Entities.EntityLocation;
+import com.flightontrack.entities.EntityLocation;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.shared.EventMessage;
 
 import static com.flightontrack.flight.RouteBase.get_FlightInstanceByNumber;
@@ -445,7 +445,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 if(!eventMessage.eventMessageValueBool)
                     try {
                         String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
-                        EventBus.distribute(new EventMessage(EVENT.SQL_TEMPFLIGHTNUM_ALLOCATED).setEventMessageValueString(getNewTempFlightNum(dt)));
+                        EventBus.distribute(new EventMessage(EVENT.SQL_LOCALFLIGHTNUM_ALLOCATED).setEventMessageValueString(getNewTempFlightNum(dt)));
 
                     } catch (UnsupportedEncodingException e1) {
                         e1.printStackTrace();

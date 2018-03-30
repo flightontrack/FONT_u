@@ -6,7 +6,7 @@ import com.flightontrack.flight.RouteBase;
 import com.flightontrack.flight.Session;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 
 import java.util.ArrayList;
 
@@ -129,7 +129,7 @@ public interface EventBus extends Events{
             case ALERT_STOPAPP:
                 interfaceList.add(Session.getInstance());
                 break;
-            case SQL_TEMPFLIGHTNUM_ALLOCATED:
+            case SQL_LOCALFLIGHTNUM_ALLOCATED:
                 interfaceList.add(Route.activeFlight);
                 break;
             case SQL_ONCLEARCACHE_COMPLETED:

@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.shared.Props;
 
 import java.util.Date;

@@ -12,7 +12,7 @@ import com.flightontrack.R;
 import com.flightontrack.activity.SimpleSettingsActivity;
 import com.flightontrack.communication.ResponseP;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.loopj.android.http.AsyncHttpClient;

@@ -8,7 +8,7 @@ import com.flightontrack.R;
 import com.flightontrack.communication.Response;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
@@ -435,11 +435,8 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 else set_flightState(FLIGHT_STATE.STOPPED);
                 //TODO remove flight points
                 break;
-            case SQL_TEMPFLIGHTNUM_ALLOCATED:
-                //set_flightNumberTemp(eventMessage.eventMessageValueString);
+            case SQL_LOCALFLIGHTNUM_ALLOCATED:
                 flightNumber = eventMessage.eventMessageValueString;
-                //if (!fnt.equals(FLIGHT_NUMBER_DEFAULT))
-                //isTempFlightNum = true;
                 flightNumStatus = FLIGHTNUMBER_SRC.LOCAL;
                 isGetFlightCallSuccess = true;
                 route._legCount++;

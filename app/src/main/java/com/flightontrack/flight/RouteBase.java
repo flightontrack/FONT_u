@@ -1,7 +1,7 @@
 package com.flightontrack.flight;
 
 import com.flightontrack.log.FontLogAsync;
-import com.flightontrack.Entities.EntityLogMessage;
+import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 
