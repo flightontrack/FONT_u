@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:drawable="@drawable/bttn_status_red"
+        android:maxLevel="0" />
+    <item
+        android:drawable="@drawable/bttn_status_yellow"
+        android:maxLevel="1" />
+    <item
+        android:drawable="@drawable/bttn_status_green"
+        android:maxLevel="1" />
+</level-list>
