@@ -1,9 +1,5 @@
 package com.flightontrack.entities;
 
-/**
- * Created by hotvk on 3/29/2018.
- */
-
 public class EntityLogMessage {
     public String tag;
     public String msg;

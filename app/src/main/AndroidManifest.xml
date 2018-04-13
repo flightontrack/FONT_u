@@ -143,6 +143,11 @@
             android:exported="true"
             android:stopWithTask="false"></service>
         <service
+            android:name=".other.SvcBackground"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="false"></service>
+        <service
             android:name=".locationclock.SvcLocationClock"
             android:enabled="true"
             android:exported="true"
