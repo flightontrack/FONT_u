@@ -10,18 +10,15 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
-public class ResponseJsonObj {
+public class ResponseJsonObj implements AutoCloseable{
     static final String TAG = "ResponseJsonObj";
-    public String responseCurrentFlightNum;
+    public String  responseCurrentFlightNum;
     public String  responseNewFlightNum;
-    public String  responseDataLoad;
     public String  responseCommand;
-    public String  responseNotif;
+    public String  responseException;
     public String  responseAckn;
-    public int     iresponseData;
-    public int     iresponseAckn;
     public int     iresponseCommand;
-    public int     jsonErrorCount  = 0;
+    public boolean isException = false;
 
     public ResponseJsonObj(JSONObject jsonObject) {
 
@@ -46,12 +43,12 @@ public class ResponseJsonObj {
 //                        Log.e(GLOBALTAG, "Couldn't Int.Parse JSON responseAckn: " + responseAckn);
 //                    }
                     break;
-                case "c":
+                case "Command":
                     responseCommand= getValue(jsonObject,jkey);
                     iresponseCommand=Integer.parseInt(responseCommand);
                     break;
-                case "n":
-                    responseNotif= getValue(jsonObject,jkey);
+                case "Exception":
+                    responseException = getValue(jsonObject,jkey);
                     break;
             }
         }
@@ -65,8 +62,14 @@ public class ResponseJsonObj {
         }
         catch (JSONException e){
             Log.e(TAG,"JSONException");
+            isException = true;
             return null;
         }
+    }
+    @Override
+    public void close() throws Exception {
+        new FontLogAsync().execute(new EntityLogMessage(TAG," From Close -  AutoCloseable  ", 'd'));
+        //System.out.println(" From Close -  AutoCloseable  ");
     }
 }
 

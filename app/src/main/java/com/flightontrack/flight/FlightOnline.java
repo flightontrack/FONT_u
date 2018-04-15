@@ -33,18 +33,17 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.flightontrack.flight.FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
+import static com.flightontrack.flight.FlightOffline.FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class Flight extends FlightBase implements GetTime, EventBus {
+public class FlightOnline extends FlightOffline implements GetTime, EventBus {
     static final String TAG = "Flight";
 
     public boolean isGetFlightNumber = true;
@@ -64,7 +63,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     boolean isGetFlightCallSuccess = false;
     List<Integer> dbIdList = new ArrayList<>();
 
-    public Flight(Route r) {
+    public FlightOnline(Route r) {
         route = r;
         flightTimeString = FLIGHT_TIME_ZERO;
         isElevationCheckDone = false;
@@ -156,8 +155,8 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
                     //Log.i("TAG", "onSuccessjsonObject: " + jsonObject);
                     ResponseJsonObj response = new ResponseJsonObj(jsonObject);
-                    if (response.responseNotif != null) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd'));
+                    if (response.responseException != null) {
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
                         Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -169,8 +168,8 @@ public class Flight extends FlightBase implements GetTime, EventBus {
                 }
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                    Log.i(TAG, "onFailure response: "+response);
-                    Log.i(TAG, "onFailure e: "+e);
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + response, 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: "+e, 'd'));
                     if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
                         Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
                         EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
@@ -218,8 +217,8 @@ public class Flight extends FlightBase implements GetTime, EventBus {
 //                        Response response = new Response(new String(responseBody));
 //                        //char responseType = response.responseType;
 //
-//                        if (response.responseNotif != null) {
-//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseNotif, 'd'));
+//                        if (response.responseException != null) {
+//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
 //                            Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
 //                            return;
 //                        }
@@ -397,7 +396,7 @@ public class Flight extends FlightBase implements GetTime, EventBus {
     }
 
     public void set_flightState(FLIGHT_STATE fs) {
-        Flight.super.set_flightState(fs);
+        FlightOnline.super.set_flightState(fs);
         switch (fs) {
             case READY_TOSAVELOCATIONS:
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_STATECHANGEDTO_READYTOSAVE).setEventMessageValueString(flightNumber));

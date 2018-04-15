@@ -23,14 +23,14 @@ public class Route extends RouteBase implements EventBus{
         //new FontLogAsync().execute(new LogMessage(TAG, "reaction:" + request, 'd');
         switch (request) {
             case OPEN_NEW_FLIGHT:
-                flightList.add(new Flight(this));
+                flightList.add(new FlightOnline(this));
                 break;
             case SWITCH_TO_PENDING:
                 break;
             case RESTART_NEW_FLIGHT:
                 if (Props.SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
                     /// ignore request to close route
-                    flightList.add(new Flight(this));
+                    flightList.add(new FlightOnline(this));
                 } else {
                     EventBus.distribute(new EventMessage(EVENT.ROUTE_ONRESTART).setEventMessageValueBool(false));
                 }

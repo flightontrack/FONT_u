@@ -6,14 +6,17 @@ import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
 //import static com.flightontrack.communication.SvcComm.commBatchSize;
-import static com.flightontrack.flight.FlightBase.*;
+import static com.flightontrack.flight.FlightOffline.*;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
+import com.flightontrack.communication.HttpJsonClient;
 import com.flightontrack.communication.LoopjAClient;
 import com.flightontrack.communication.Response;
 //import com.flightontrack.communication.SvcComm;
+import com.flightontrack.communication.ResponseJsonObj;
+import com.flightontrack.entities.EntityRequestPostLocation;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.entities.EntityLocation;
@@ -23,7 +26,10 @@ import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -33,11 +39,6 @@ import java.util.Map;
 import cz.msebera.android.httpclient.Header;
 //import java.util.EnumMap;
 
-
-/**
- * Created by hotvk on 7/6/2017.
- */
-
 public class Session implements EventBus{
     static final String TAG = "Session";
 
@@ -46,12 +47,11 @@ public class Session implements EventBus{
         CLOSEAPP_NO_CACHE_CHECK,
         CHECK_CACHE_FIRST,
         GET_OFFLINE_FLIGHTS
-
     }
     static Session sessionInstance = null;
     public static Integer commBatchSize = COMM_BATCH_SIZE_MAX;
     boolean isSendNextStarted = false;
-    static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
+    //static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
     Map<Integer,EntityLocation> locRequestList = new HashMap<Integer,EntityLocation>();
     EVENT ev;
 
@@ -78,9 +78,7 @@ public class Session implements EventBus{
 //        if(eventMessage.eventMessageValueAlertResponse== ALERT_RESPONSE.POS) set_Action(SACTION.CLOSEAPP_NO_CACHE_CHECK);
 //        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
 //        eventReaction.put(FLIGHT_REMOTENUMBER_RECEIVED:
-//
-//        flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
-//        set_Action(SACTION.SEND_CACHED_LOCATIONS);)
+
 
     }
     void addLocToRequestList(EntityLocation l){
@@ -132,7 +130,9 @@ public class Session implements EventBus{
         requestParams.put("speed", l.sd);
         requestParams.put("date", l.dt);
         requestParams.put("elevcheck", l.irch == 1);
-        postLocation(k, requestParams);
+
+        //postLocation(k, requestParams);
+        postLocationNew(k, l);
     }
 
     static void delay(int millis) {
@@ -173,7 +173,7 @@ public class Session implements EventBus{
 //                        String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
 //                        //if (isFlightNumberInList(fn)) continue;
 //                        FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
-//                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
+//                        if (Util.isNetworkAvailable()) new FlightOffline(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
 //                        else {
 //                            FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
 //                            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
@@ -187,7 +187,7 @@ public class Session implements EventBus{
 
                 for (String flightNumTemp:sqlHelper.getTempFlightList()){
                     new FontLogAsync().execute(new EntityLogMessage(TAG, "Get flightBase for " + flightNumTemp, 'd'));
-                    if (Util.isNetworkAvailable()) new FlightBase(flightNumTemp).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
+                    if (Util.isNetworkAvailable()) new FlightOffline(flightNumTemp).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
                     else {
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "Connectivity unavailable Can't get flight number", 'd'));
                         EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
@@ -201,8 +201,8 @@ public class Session implements EventBus{
                 for (String fn : sqlHelper.getReadyToSendFlightList()){
                     if (RouteBase.isFlightNumberInList(fn)) continue;
                     new FontLogAsync().execute(new EntityLogMessage(TAG,"Get flight number for "+fn,'d'));
-                    //new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.READY_TOSENDLOCATIONS);
-                    new FlightBase(fn).set_flightNumStatus(FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
+                    //new FlightOffline(fn).set_flightState(FlightOffline.FLIGHT_STATE.READY_TOSENDLOCATIONS);
+                    new FlightOffline(fn).set_flightNumStatus(FlightOffline.FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
                 }
                 break;
         }
@@ -225,7 +225,7 @@ public class Session implements EventBus{
                             new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd'));
                             if (response.jsonErrorCount > MAX_JSON_ERROR) {
                                 /// raise this event as NOTIF
-                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_NOTIF));
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));
                             }
                             return;
                         }
@@ -236,7 +236,7 @@ public class Session implements EventBus{
                             }
                             if (response.responseNotif != null) {
                                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd'));
-                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_NOTIF));
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));
                             }
                             if (response.responseCommand != null) {
                                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
@@ -281,6 +281,82 @@ public class Session implements EventBus{
                 });
             } catch (Exception e) {
                 new FontLogAsync().execute(new EntityLogMessage(TAG, "aSyncClient" + e.getMessage(), 'd'));
+                return;
+            }
+        }
+
+    }
+    void postLocationNew(int k,EntityLocation loc){
+        String TAG = "NEWFONT";
+        if (Util.isNetworkAvailable()) {
+            try (
+                    EntityRequestPostLocation entityRequestPostLocation = new EntityRequestPostLocation(loc);
+                    HttpJsonClient client= new HttpJsonClient(entityRequestPostLocation)
+            ){
+                new FontLogAsync().execute(new EntityLogMessage(TAG,"Post: ID:"+loc.itemId, 'd'));
+                client.post(new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                        if (commBatchSize == COMM_BATCH_SIZE_MIN) {
+                            commBatchSize = COMM_BATCH_SIZE_MAX;
+                        }
+
+                        try (ResponseJsonObj response = new ResponseJsonObj(jsonObject);) {
+                            if (response.isException) {
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :isException", 'd'));
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));
+                                return;
+                            }
+                            if (response.responseAckn != null) {
+                                sqlHelper.rowLocationDeleteOnId((int)loc.itemId, response.responseCurrentFlightNum);
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseCurrentFlightNum + ":" + response.responseAckn+ ": id" +response.responseAckn, 'd'));
+                            }
+                            if (response.responseException != null) {
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :RESPONSE_TYPE_Exception :" + response.responseException, 'd'));
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));
+                            }
+                            if (response.responseCommand != null) {
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
+                                if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
+                                    return;
+                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
+                                        .setEventMessageValueInt(response.iresponseCommand)
+                                        .setEventMessageValueString(response.responseCurrentFlightNum));
+//                                switch (response.iresponseCommand) {
+//                                    case COMMAND_TERMINATEFLIGHT:
+//                                          break;
+//                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
+//                                        break;
+//                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
+//                                        break;
+//                                    case COMMAND_FLIGHT_STATE_PENDING:
+//                                        break;
+//                                    case -1:
+//                                        break;
+//                                }
+                            }
+                        } catch (Exception e) {
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : EXCEPTION :" + e.getMessage(), 'e'));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + response, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: "+e, 'd'));
+                        locRequestList.clear();
+                        commBatchSize = COMM_BATCH_SIZE_MIN;
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        locRequestList.remove(k);
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFinish locRequestList removed key= " + k, 'd'));
+                        sendNext();
+                    }
+                });
+            } catch (Exception e) {
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "postLocationNew " + e.getMessage(), 'd'));
                 return;
             }
         }

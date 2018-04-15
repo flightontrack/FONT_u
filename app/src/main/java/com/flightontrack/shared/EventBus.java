@@ -1,6 +1,6 @@
 package com.flightontrack.shared;
 import com.flightontrack.activity.SimpleSettingsActivity;
-import com.flightontrack.flight.FlightBase;
+import com.flightontrack.flight.FlightOffline;
 import com.flightontrack.flight.Route;
 import com.flightontrack.flight.RouteBase;
 import com.flightontrack.flight.Session;
@@ -75,7 +75,7 @@ public interface EventBus extends Events{
             case ROUTE_ONRESTART:
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
-            case SESSION_ONSUCCESS_NOTIF:
+            case SESSION_ONSUCCESS_EXCEPTION:
                 interfaceList.add(Props.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
@@ -114,7 +114,7 @@ public interface EventBus extends Events{
                 break;
             case CLOCK_ONTICK:
                 onClockList.add(RouteBase.getInstance()); /// delete closed flights from flightlist
-                for (FlightBase f : Route.flightList) {
+                for (FlightOffline f : Route.flightList) {
                     onClockList.add(f);                   /// check if any of them need to be replace temp flight num                     /// check if any of them need to be closed
                 }
                 onClockList.add(Session.getInstance());   /// start communication service
@@ -136,7 +136,7 @@ public interface EventBus extends Events{
                 interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
                 break;
             case SQL_FLIGHTRECORDCOUNT_ZERO:
-                interfaceList.add((FlightBase)eventMessage.eventMessageValueObject);
+                interfaceList.add((FlightOffline)eventMessage.eventMessageValueObject);
                 break;
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                 interfaceList.add(RouteBase.activeRoute); // set route number

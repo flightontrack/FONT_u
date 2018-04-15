@@ -79,7 +79,7 @@ public class Session implements EventBus{
 //        eventReaction.put(SETTINGACT_BUTTONSENDCACHE_CLICKED,SACTION.GET_OFFLINE_FLIGHTS);
 //        eventReaction.put(FLIGHT_REMOTENUMBER_RECEIVED:
 //
-//        flightToClose.add((FlightBase) eventMessage.eventMessageValueObject);
+//        flightToClose.add((FlightOffline) eventMessage.eventMessageValueObject);
 //        set_Action(SACTION.SEND_CACHED_LOCATIONS);)
 
     }
@@ -173,7 +173,7 @@ public class Session implements EventBus{
 //                        String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
 //                        //if (isFlightNumberInList(fn)) continue;
 //                        FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
-//                        if (Util.isNetworkAvailable()) new FlightBase(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
+//                        if (Util.isNetworkAvailable()) new FlightOffline(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
 //                        else {
 //                            FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
 //                            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
@@ -201,7 +201,7 @@ public class Session implements EventBus{
                 for (String fn : sqlHelper.getReadyToSendFlightList()){
                     if (RouteBase.isFlightNumberInList(fn)) continue;
                     new FontLogAsync().execute(new EntityLogMessage(TAG,"Get flight number for "+fn,'d'));
-                    //new FlightBase(fn).set_flightState(FlightBase.FLIGHT_STATE.READY_TOSENDLOCATIONS);
+                    //new FlightOffline(fn).set_flightState(FlightOffline.FLIGHT_STATE.READY_TOSENDLOCATIONS);
                     new FlightBase(fn).set_flightNumStatus(FlightBase.FLIGHTNUMBER_SRC.REMOTE_DEFAULT);
                 }
                 break;

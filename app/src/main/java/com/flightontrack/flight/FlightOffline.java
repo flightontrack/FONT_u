@@ -23,8 +23,8 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.shared.Props.*;
 
-public class FlightBase implements EventBus{
-    static final String TAG = "FlightBase";
+public class FlightOffline implements EventBus{
+    static final String TAG = "FlightOffline";
 
     public enum FLIGHT_STATE {
         DEFAULT,
@@ -46,9 +46,9 @@ public class FlightBase implements EventBus{
     public FLIGHTNUMBER_SRC flightNumStatus = FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
     boolean isLimitReached  = false;
 
-    public FlightBase(){}
+    public FlightOffline(){}
 
-    FlightBase(String fn) {
+    FlightOffline(String fn) {
         flightNumber = fn;
     }
 
@@ -94,7 +94,7 @@ public class FlightBase implements EventBus{
     }
     void getNewFlightID() {
 
-        new FontLogAsync().execute(new EntityLogMessage(TAG, "FlightBase-getNewFlightID: " +flightNumber, 'd'));
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "FlightOffline-getNewFlightID: " +flightNumber, 'd'));
         RequestParams requestParams = new RequestParams();
 
         requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
@@ -118,7 +118,7 @@ public class FlightBase implements EventBus{
         client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    new FontLogAsync().execute(new EntityLogMessage(TAG, "FlightBase-getNewFlightID OnSuccess", 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "FlightOffline-getNewFlightID OnSuccess", 'd'));
                     //String responseText = new String(responseBody);
                     Response response = new Response(new String(responseBody));
                     //char responseType = response.responseType;

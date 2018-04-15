@@ -553,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             case FLIGHT_GETNEWFLIGHT_STARTED:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
                 break;
-            case SESSION_ONSUCCESS_NOTIF:
+            case SESSION_ONSUCCESS_EXCEPTION:
                 Toast.makeText(mainactivityInstance, R.string.toast_server_error, Toast.LENGTH_LONG).show();
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
                 break;

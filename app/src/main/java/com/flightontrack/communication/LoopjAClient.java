@@ -2,7 +2,7 @@ package com.flightontrack.communication;
 
 import com.loopj.android.http.*;
 
-public class LoopjAClient extends AsyncHttpClient{
+public class LoopjAClient extends AsyncHttpClient {
     private int ID;
     public LoopjAClient(int id){ID=id;}
 
