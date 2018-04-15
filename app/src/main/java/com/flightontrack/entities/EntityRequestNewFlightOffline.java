@@ -4,14 +4,15 @@ import com.flightontrack.shared.Const;
 import com.loopj.android.http.RequestParams;
 
 
-public class EntityRequestNewFlight  extends RequestParams {
+public class EntityRequestNewFlightOffline  extends RequestParams {
 
-    public EntityRequestNewFlight() {
+    public EntityRequestNewFlightOffline() {
         put("rcode", Const.REQUEST_FLIGHT_NUMBER);
     }
 
-    public EntityRequestNewFlight set(String k, String v){
+    public EntityRequestNewFlightOffline set(String k, String v){
         put(k, v);
         return this;
     }
+
 }

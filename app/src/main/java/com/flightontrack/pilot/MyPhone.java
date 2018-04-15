@@ -40,7 +40,7 @@ public class MyPhone {
         codeSDK             = Build.VERSION.SDK_INT;
     }
 
-    public int getVersionCode() {
+    public static int getVersionCode() {
         try {
             versionCode = Props.ctxApp.getPackageManager().getPackageInfo(Props.ctxApp.getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {

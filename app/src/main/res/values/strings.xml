@@ -21,6 +21,7 @@
     <string name="email_support">support@flightontrack.com</string>
     <string name="email_crash">support@flightontrack.com</string>
     <string name="aspx_rootpage">/Router.aspx</string>
+    <string name="webapi_controller">/api/router/</string>
     <string name="aspx_requestpage">/OffFlightRequest.aspx</string>
     <string name="aspx_communication">/Communication.aspx</string>
 

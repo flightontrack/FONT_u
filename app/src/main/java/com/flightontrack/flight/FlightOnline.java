@@ -125,16 +125,13 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
 
     void getNewFlightID() {
         isGettingFlight = true;
-
-        {
-            String TAG = "NEWFONT";
             EntityRequestNewFlight entityRequestNewFlight = new EntityRequestNewFlight()
             .set("phonenumber", MyPhone._myPhoneId)
             .set("username", Pilot.getPilotUserName())
             .set("userid", Pilot.getUserID())
             .set("deviceid", MyPhone._myDeviceId)
             .set("aid", MyPhone.getMyAndroidID())
-            .set("versioncode", String.valueOf(MyPhone.versionCode))
+            .set("versioncode", String.valueOf(MyPhone.getVersionCode()))
             .set("AcftNum", Util.getAcftNum(4))
             .set("AcftTagId", Util.getAcftNum(5))
             .set("AcftName", Util.getAcftNum(6))
@@ -142,73 +139,82 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
             .set("freq", Integer.toString(SessionProp.pIntervalLocationUpdateSec))
             .set("speed_thresh", String.valueOf(Math.round(SessionProp.pSpinnerMinSpeed)))
             .set("isdebug", String.valueOf(SessionProp.pIsDebug))
-            .set("routeid", route.routeNumber);
-            new HttpJsonClient(entityRequestNewFlight).post(new JsonHttpResponseHandler() {
+            .set("routeid", route.routeNumber.equals(ROUTE_NUMBER_DEFAULT)?null:route.routeNumber);
+            try(HttpJsonClient client = new HttpJsonClient(entityRequestNewFlight)) {
+                client.post(new JsonHttpResponseHandler() {
 
-                @Override
-                public void onStart() {
-                    Log.i(TAG, "oonStart");
-                }
+                    @Override
+                    public void onStart() {
+                        Log.i(TAG, "oonStart " + client.urlLink   );
+                    }
 
-                @Override
-                public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
-                    //Log.i("TAG", "onSuccessjsonObject: " + jsonObject);
-                    ResponseJsonObj response = new ResponseJsonObj(jsonObject);
-                    if (response.responseException != null) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
-                        Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
-                        return;
+                    @Override
+                    public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                        //Log.i("TAG", "onSuccessjsonObject: " + jsonObject);
+                        ResponseJsonObj response = new ResponseJsonObj(jsonObject);
+                        if (response.responseException != null) {
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
+                            Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (response.responseNewFlightNum != null) {
+                            isGetFlightCallSuccess = true;
+                            route._legCount++;
+                            set_flightNumber(response.responseNewFlightNum);
+                        }
                     }
-                    if (response.responseNewFlightNum != null) {
-                        isGetFlightCallSuccess = true;
-                        route._legCount++;
-                        set_flightNumber(response.responseNewFlightNum);
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + response, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e, 'd'));
+                        if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
+                            Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
+                            EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
+                                    .setEventMessageValueBool(isGetFlightCallSuccess)
+                                    .setEventMessageValueString(flightNumber));
+                        }
                     }
-                }
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                    new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + response, 'd'));
-                    new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: "+e, 'd'));
-                    if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
-                        Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
-                        EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
-                                .setEventMessageValueBool(isGetFlightCallSuccess)
-                                .setEventMessageValueString(flightNumber));
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String s, Throwable e) {
+                        Log.i(TAG, "onFailure: " + e.getMessage());
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e, 'd'));
                     }
-                }
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String s, Throwable e) {
-                    Log.i(TAG, "onFailure: ");
-                }
-                @Override
-                public void onRetry(int retryNo) {
-                    // called when request is retried
-                }
-            });
+
+                    @Override
+                    public void onRetry(int retryNo) {
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
+                    }
+                });
+            }
+            catch(Exception e) {
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "onException e: ", 'e'));
+            }
         }
-        new FontLogAsync().execute(new EntityLogMessage(TAG, "Flight - getNewFlightID:  " + flightNumber, 'd'));
-        RequestParams requestParams = new RequestParams();
-
-        requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
-        requestParams.put("phonenumber", MyPhone._myPhoneId); // Util.getMyPhoneID());
-        requestParams.put("username", Pilot.getPilotUserName());
-        requestParams.put("userid", Pilot.getUserID());
-        requestParams.put("deviceid", MyPhone._myDeviceId);
-        requestParams.put("aid", MyPhone.getMyAndroidID());
-        requestParams.put("versioncode", String.valueOf(MyPhone.versionCode));
-        requestParams.put("AcftNum", Util.getAcftNum(4));
-        requestParams.put("AcftTagId", Util.getAcftNum(5));
-        requestParams.put("AcftName", Util.getAcftNum(6));
-        requestParams.put("isFlyingPattern", Props.SessionProp.pIsMultileg);
-        requestParams.put("freq", Integer.toString(SessionProp.pIntervalLocationUpdateSec));
-        long speed_thresh = Math.round(SessionProp.pSpinnerMinSpeed);
-        requestParams.put("speed_thresh", String.valueOf(speed_thresh));
-        requestParams.put("isdebug", SessionProp.pIsDebug);
-        if (route.routeNumber != ROUTE_NUMBER_DEFAULT) requestParams.put("routeid", route.routeNumber);
-        isGetFlightNumber = false;
-//        requestParams.setUseJsonStreamer(true);
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.setMaxRetriesAndTimeout(2, 2000);
+//        new FontLogAsync().execute(new EntityLogMessage(TAG, "Flight - getNewFlightID:  " + flightNumber, 'd'));
+//        RequestParams requestParams = new RequestParams();
+//
+//        requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
+//        requestParams.put("phonenumber", MyPhone._myPhoneId); // Util.getMyPhoneID());
+//        requestParams.put("username", Pilot.getPilotUserName());
+//        requestParams.put("userid", Pilot.getUserID());
+//        requestParams.put("deviceid", MyPhone._myDeviceId);
+//        requestParams.put("aid", MyPhone.getMyAndroidID());
+//        requestParams.put("versioncode", String.valueOf(MyPhone.versionCode));
+//        requestParams.put("AcftNum", Util.getAcftNum(4));
+//        requestParams.put("AcftTagId", Util.getAcftNum(5));
+//        requestParams.put("AcftName", Util.getAcftNum(6));
+//        requestParams.put("isFlyingPattern", Props.SessionProp.pIsMultileg);
+//        requestParams.put("freq", Integer.toString(SessionProp.pIntervalLocationUpdateSec));
+//        long speed_thresh = Math.round(SessionProp.pSpinnerMinSpeed);
+//        requestParams.put("speed_thresh", String.valueOf(speed_thresh));
+//        requestParams.put("isdebug", SessionProp.pIsDebug);
+//        if (route.routeNumber != ROUTE_NUMBER_DEFAULT) requestParams.put("routeid", route.routeNumber);
+//        isGetFlightNumber = false;
+////        requestParams.setUseJsonStreamer(true);
+//        AsyncHttpClient client = new AsyncHttpClient();
+//        client.setMaxRetriesAndTimeout(2, 2000);
 //        client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
 //                    @Override
 //                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -264,9 +270,9 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
 //                    }
 //                }
 //        );
-        client = null;
-        requestParams = null;
-    }
+//        client = null;
+//        requestParams = null;
+//    }
 
 //    void getCloseFlight() {
 //        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
