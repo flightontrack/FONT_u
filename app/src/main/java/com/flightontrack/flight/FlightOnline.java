@@ -9,6 +9,7 @@ import com.flightontrack.R;
 import com.flightontrack.communication.HttpJsonClient;
 import com.flightontrack.communication.Response;
 import com.flightontrack.communication.ResponseJsonObj;
+import com.flightontrack.entities.EntityRequestCloseFlight;
 import com.flightontrack.entities.EntityRequestNewFlight;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLogAsync;
@@ -47,8 +48,6 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
     static final String TAG = "Flight";
 
     public boolean isGetFlightNumber = true;
-    //FACTION lastAction = FACTION.DEFAULT_REQUEST;
-    boolean isSpeedAboveMin = false;
     public String flightTimeString;
     public int lastAltitudeFt;
     public int _wayPointsCount;
@@ -269,44 +268,44 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
         requestParams = null;
     }
 
-    void getCloseFlight() {
-        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
-        RequestParams requestParams = new RequestParams();
-        requestParams.put("rcode", REQUEST_STOP_FLIGHT);
-        requestParams.put("speedlowflag", isSpeedAboveMin);
-        requestParams.put("isLimitReached", isLimitReached);
-        requestParams.put("flightid", flightNumber);
-        //requestParams.put("isdebug", Util.getIsDebug());
-        requestParams.put("isdebug", SessionProp.pIsDebug);
-
-        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight OnSuccess", 'd'));
-                        //String responseText = new String(responseBody);
-                        Response response = new Response(new String(responseBody));
-
-                        if (response.responseAckn != null) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
-                        }
-                        if (response.responseNotif != null) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd'));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight onFailure: " + flightNumber, 'd'));
-
-                    }
-
-                    public void onFinish() {
-                        set_flightState(FLIGHT_STATE.CLOSED);
-                    }
-                }
-        );
-        requestParams = null;
-    }
+//    void getCloseFlight() {
+//        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
+//        RequestParams requestParams = new RequestParams();
+//        requestParams.put("rcode", REQUEST_STOP_FLIGHT);
+//        requestParams.put("speedlowflag", isSpeedAboveMin);
+//        requestParams.put("isLimitReached", isLimitReached);
+//        requestParams.put("flightid", flightNumber);
+//        //requestParams.put("isdebug", Util.getIsDebug());
+//        requestParams.put("isdebug", SessionProp.pIsDebug);
+//
+//        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
+//                    @Override
+//                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+//                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight OnSuccess", 'd'));
+//                        //String responseText = new String(responseBody);
+//                        Response response = new Response(new String(responseBody));
+//
+//                        if (response.responseAckn != null) {
+//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
+//                        }
+//                        if (response.responseNotif != null) {
+//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd'));
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+//                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight onFailure: " + flightNumber, 'd'));
+//
+//                    }
+//
+//                    public void onFinish() {
+//                        set_flightState(FLIGHT_STATE.CLOSED);
+//                    }
+//                }
+//        );
+//        requestParams = null;
+//    }
 
     public void saveLocCheckSpeed(final Location location) {
 
@@ -351,7 +350,6 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
             ContentValues values = new ContentValues();
             values.put(DBSchema.COLUMN_NAME_COL1, REQUEST_LOCATION_UPDATE); //rcode
             values.put(DBSchema.LOC_flightid, flightNumber); //flightid
-            //values.put(DBSchema.LOC_isTempFlight, isTempFlightNum); //istempflightnum
             values.put(DBSchema.LOC_isTempFlight, flightNumStatus == FLIGHTNUMBER_SRC.LOCAL); //istempflightnum
             values.put(DBSchema.LOC_speedlowflag, !isSpeedAboveMin); /// speed low
             //values.put(DBSchema.COLUMN_NAME_COL4, Integer.toString(speedCurrentInt)); //speed
@@ -477,10 +475,11 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
         super.eventReceiver(eventMessage);
         switch (ev) {
             case SESSION_ONSUCCESS_COMMAND:
-                int server_command = eventMessage.eventMessageValueInt;
+                String server_command = eventMessage.eventMessageValueString;
                 new FontLogAsync().execute(new EntityLogMessage(TAG, "server_command int: " + server_command, 'd'));
                 switch (server_command) {
                     case COMMAND_TERMINATEFLIGHT:
+                        isJunkFlight = true;
                         Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
                         set_flightState(FLIGHT_STATE.STOPPED, "Terminate flight server command");
                         //set_fAction(FACTION.TERMINATE_FLIGHT);

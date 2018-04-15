@@ -439,7 +439,7 @@ public class SQLHelper extends SQLiteOpenHelper implements EventBus,GetTime {
                 }
                 break;
             case SESSION_ONSUCCESS_COMMAND:
-                if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) flightLocationsDelete(eventMessage.eventMessageValueString);
+                if (eventMessage.eventMessageValueString.equals(COMMAND_TERMINATEFLIGHT)) flightLocationsDelete(eventMessage.eventMessageValueString);
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(!eventMessage.eventMessageValueBool)

@@ -17,7 +17,7 @@ public class ResponseJsonObj implements AutoCloseable{
     public String  responseCommand;
     public String  responseException;
     public String  responseAckn;
-    public int     iresponseCommand;
+    //public int     iresponseCommand;
     public boolean isException = false;
 
     public ResponseJsonObj(JSONObject jsonObject) {
@@ -45,7 +45,7 @@ public class ResponseJsonObj implements AutoCloseable{
                     break;
                 case "Command":
                     responseCommand= getValue(jsonObject,jkey);
-                    iresponseCommand=Integer.parseInt(responseCommand);
+                    //iresponseCommand=Integer.parseInt(responseCommand);
                     break;
                 case "Exception":
                     responseException = getValue(jsonObject,jkey);

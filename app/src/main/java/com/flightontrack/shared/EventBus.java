@@ -80,8 +80,8 @@ public interface EventBus extends Events{
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
             case SESSION_ONSUCCESS_COMMAND:
-                interfaceList.add(Route.get_FlightInstanceByNumber(eventMessage.eventMessageValueString));
-                switch (eventMessage.eventMessageValueInt){
+                //interfaceList.add(Route.get_FlightInstanceByNumber(eventMessage.eventMessageValueString));
+                switch (eventMessage.eventMessageValueString){
                     case COMMAND_TERMINATEFLIGHT:
                         interfaceList.add(Props.getInstance()); //set multileg to false
                         //interfaceList.add(sqlHelper); // delete all locations on the flight

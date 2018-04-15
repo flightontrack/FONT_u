@@ -5,12 +5,8 @@ import com.flightontrack.shared.Const;
 import com.flightontrack.shared.Props;
 import com.loopj.android.http.RequestParams;
 
-/**
- * Created by hotvk on 4/12/2018.
- */
-
 public class EntityRequestPostLocation   extends RequestParams implements AutoCloseable{
-    static final String TAG = "EntityRequestPostLocation";
+    final String TAG = "EntityRequestPostLocation";
 
     public EntityRequestPostLocation(EntityLocation l) {
         put("rcode", Const.REQUEST_LOCATION_UPDATE);

@@ -12,7 +12,8 @@ import com.loopj.android.http.RequestParams;
 public class HttpJsonClient  extends AsyncHttpClient implements AutoCloseable{
     static final String TAG = "HttpJsonClient";
     //String url = Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage);
-    final String url = "http://10.0.2.2/PostngetWebApi/api/router/";
+    //final String url = "http://10.0.2.2/PostngetWebApi/api/router/";
+    final String url = "http://192.168.1.2/PostngetWebApi/api/router/";
     String controllerMethod;
     String urlLink;
     RequestParams requestParams;

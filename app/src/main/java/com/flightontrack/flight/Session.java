@@ -240,7 +240,7 @@ public class Session implements EventBus{
                             }
                             if (response.responseCommand != null) {
                                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
-                                if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
+                                if (response.responseCommand.equals(COMMAND_TERMINATEFLIGHT) && SessionProp.pIsRoad)
                                     return;
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
                                         .setEventMessageValueInt(response.iresponseCommand)
@@ -317,11 +317,11 @@ public class Session implements EventBus{
                             }
                             if (response.responseCommand != null) {
                                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
-                                if (response.iresponseCommand == COMMAND_TERMINATEFLIGHT && SessionProp.pIsRoad)
+                                if (response.responseCommand.equals(COMMAND_TERMINATEFLIGHT) && SessionProp.pIsRoad)
                                     return;
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
-                                        .setEventMessageValueInt(response.iresponseCommand)
-                                        .setEventMessageValueString(response.responseCurrentFlightNum));
+                                        .setEventMessageValueString(response.responseCommand));
+                                        //.setEventMessageValueString(response.responseCurrentFlightNum));
 //                                switch (response.iresponseCommand) {
 //                                    case COMMAND_TERMINATEFLIGHT:
 //                                          break;

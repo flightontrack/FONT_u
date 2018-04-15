@@ -16,10 +16,10 @@ public abstract class Const {
 
 
 
-    public static final int COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN = -10;
-    public static final int COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED = -9;
+    public static final String COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN = "TerminateFlightLowSpeed";
+    public static final String COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED = "TerminateFlightMaxPointsReached";
     public static final int COMMAND_FLIGHT_STATE_PENDING = -7;
-    public static final int COMMAND_TERMINATEFLIGHT = -6;
+    public static final String COMMAND_TERMINATEFLIGHT = "TerminateFlightOnAltitude";
 
     public static final long DISTANCE_CHANGE_FOR_UPDATES_MIN = 0; //20; //  meters
     public static final long DISTANCE_CHANGE_FOR_UPDATES_ZERO = 0; //  meters

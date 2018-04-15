@@ -171,7 +171,7 @@ public final class Props implements EventBus{
                 SessionProp.set_isMultileg(false);
                 break;
             case SESSION_ONSUCCESS_COMMAND:
-                int server_command = eventMessage.eventMessageValueInt;
+                String server_command = eventMessage.eventMessageValueString;
                 switch (server_command) {
                     case COMMAND_TERMINATEFLIGHT:
                         SessionProp.set_isMultileg(false);

@@ -246,7 +246,7 @@ public class SvcLocationClock extends Service implements EventBus, LocationListe
                 stopServiceSelf();
                 break;
             case SESSION_ONSUCCESS_COMMAND:
-                if (eventMessage.eventMessageValueInt==COMMAND_TERMINATEFLIGHT) set_mode(MODE.CLOCK_ONLY);
+                if (eventMessage.eventMessageValueString.equals(COMMAND_TERMINATEFLIGHT)) set_mode(MODE.CLOCK_ONLY);
                 break;
             case ROUTE_NOACTIVEROUTE:
                 set_mode(MODE.CLOCK_ONLY);

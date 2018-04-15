@@ -3,7 +3,10 @@ package com.flightontrack.flight;
 import android.widget.Toast;
 
 import com.flightontrack.R;
+import com.flightontrack.communication.HttpJsonClient;
 import com.flightontrack.communication.Response;
+import com.flightontrack.communication.ResponseJsonObj;
+import com.flightontrack.entities.EntityRequestCloseFlight;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.pilot.MyPhone;
@@ -15,7 +18,10 @@ import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -41,10 +47,11 @@ public class FlightOffline implements EventBus{
         LOCAL
     }
     public String flightNumber = FLIGHT_NUMBER_DEFAULT;
-    //boolean isTempFlightNum = false;
     public FLIGHT_STATE flightState = FLIGHT_STATE.DEFAULT;
     public FLIGHTNUMBER_SRC flightNumStatus = FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
+    boolean isSpeedAboveMin = false;
     boolean isLimitReached  = false;
+    boolean isJunkFlight = false;
 
     public FlightOffline(){}
 
@@ -64,7 +71,8 @@ public class FlightOffline implements EventBus{
             case STOPPED:
                 break;
             case READY_TOBECLOSED:
-                getCloseFlight();
+                //getCloseFlight();
+                getCloseFlightNew();
                 break;
             case CLOSING:
                 break;
@@ -157,9 +165,55 @@ public class FlightOffline implements EventBus{
         requestParams = null;
     }
 
+    void getCloseFlightNew() {
+        String TAG = "getCloseFlightNew";
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
+        set_flightState(FLIGHT_STATE.CLOSING);
+        EntityRequestCloseFlight entityRequestCloseFlight = new EntityRequestCloseFlight()
+                .set("flightid", flightNumber)
+                .set("isdebug", SessionProp.pIsDebug)
+                .set("speedlowflag", !isSpeedAboveMin)
+                .set("isLimitReached", isLimitReached)
+                .set("isJunkFlight", isJunkFlight);
+        try (
+                HttpJsonClient client= new HttpJsonClient(entityRequestCloseFlight)
+        )
+        {
+            client.post(new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight OnSuccess", 'd'));
+                                ResponseJsonObj response = new ResponseJsonObj(jsonObject);
+
+                                if (response.responseAckn != null) {
+                                    new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
+                                }
+                                if (response.responseException != null) {
+                                    new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseException, 'd'));
+                                }
+                            }
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight onFailure: " + flightNumber, 'd'));
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                set_flightState(FLIGHT_STATE.CLOSED);
+                            }
+                        }
+            );
+        }
+        catch (Exception e) {
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlightNew " + e.getMessage(), 'd'));
+            return;
+        }
+    }
+
     void getCloseFlight() {
         new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
         set_flightState(FLIGHT_STATE.CLOSING);
+
         RequestParams requestParams = new RequestParams();
         requestParams.put("rcode", REQUEST_STOP_FLIGHT);
         //requestParams.put("speedlowflag", isSpeedAboveMin);
