@@ -24,7 +24,7 @@ import static com.flightontrack.shared.Const.GLOBALTAG;
  * Created by hotvk on 3/29/2018.
  */
 
-public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> {
+public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> implements AutoCloseable{
     private static final String TAG = "FontLogAsync";
 
     @Override
@@ -114,5 +114,8 @@ public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> {
         }
     }
 
-
+    @Override
+    public void close() throws Exception {
+        //new FontLogAsync().execute(new EntityLogMessage(TAG," From Close -  AutoCloseable  ", 'd'));
+    }
 }

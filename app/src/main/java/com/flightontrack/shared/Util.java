@@ -1,6 +1,5 @@
 package com.flightontrack.shared;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,14 +9,15 @@ import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.activity.SimpleSettingsActivity;
-import com.flightontrack.communication.ResponseP;
+import com.flightontrack.communication.HttpJsonClient;
+import com.flightontrack.communication.ResponseJsonObj;
+import com.flightontrack.entities.EntityProgressBarGetPsw;
+import com.flightontrack.entities.EntityRequestGetPsw;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
-import com.flightontrack.pilot.MyPhone;
-import com.flightontrack.pilot.Pilot;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 import static com.flightontrack.shared.Const.*;
@@ -104,44 +104,61 @@ public class Util {
     }
 
     public static void setCloudPsw(View view){
-        final ProgressDialog progressBar;
-        progressBar = new ProgressDialog(view.getContext());
-        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressBar.setMessage("Getting password");
-        progressBar.setIndeterminate(true);
-        progressBar.setCancelable(true);
-        progressBar.setMax(100);
-        progressBar.setProgress(100);
-        progressBar.show();
+//        final ProgressDialog progressBar;
+//        progressBar = new ProgressDialog(view.getContext());
+//        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        progressBar.setMessage("Getting password");
+//        progressBar.setIndeterminate(true);
+//        progressBar.setCancelable(true);
+//        progressBar.setMax(100);
+//        progressBar.setProgress(100);
+//        progressBar.show();
 
-        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw Started", 'd'));
-        RequestParams requestParams = new RequestParams();
-        requestParams.put("rcode", REQUEST_PSW);
-        requestParams.put("userid", Pilot.getUserID());
-        requestParams.put("phonenumber", MyPhone._myPhoneId);
-        requestParams.put("deviceid", MyPhone._myDeviceId);
-        new AsyncHttpClient().post(getTrackingURL() + ctxApp.getString(R.string.aspx_requestpage), requestParams, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
-                        ResponseP response = new ResponseP(new String(responseBody));
-                        if (response.responseType.equals(RESPONSE_TYPE_DATA_WITHLOAD) && response.responseTypeLoad.equals(RESPONSE_TYPE_DATA_PSW)) {
-                            //SimpleSettingsActivity.progressBar.isShowing();
-                            progressBar.dismiss();
-                            String psw = response.getValue(RESPONSE_TYPE_DATA_PSW);
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "ap="+psw, 'd'));
-                            setPsw(psw);
-                        }
-                        if (response.responseType.equals(RESPONSE_TYPE_NOTIF_WITHLOAD)) {
-                        }
-                    }
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw onFailure:", 'd'));
+        //new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloudPsw Started", 'd'));
+//        requestParams.put("rcode", REQUEST_PSW);
+//        requestParams.put("userid", Pilot.getUserID());
+//        requestParams.put("phonenumber", MyPhone._myPhoneId);
+//        requestParams.put("deviceid", MyPhone._myDeviceId);
+
+        try(
+                //EntityRequestGetPsw requestParams = new EntityRequestGetPsw();
+                FontLogAsync mylog = new FontLogAsync();
+                EntityProgressBarGetPsw progressBar = new EntityProgressBarGetPsw(view.getContext());
+                HttpJsonClient client = new HttpJsonClient(new EntityRequestGetPsw())
+                )
+        {
+            progressBar.show();
+            client.post(new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                    mylog.execute(new EntityLogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
+                    ResponseJsonObj response = new ResponseJsonObj(jsonObject);
+                    if (response.responsePsw!=null) {
                         progressBar.dismiss();
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "ap=" + response.responsePsw, 'd'));
+                        setPsw(response.responsePsw);
                     }
                 }
 
-        );
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                    mylog.execute(new EntityLogMessage(TAG, "getCloudPsw onFailure:", 'd'));
+                    progressBar.dismiss();
+                    Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
+                    //setPsw("FailedToGet");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String s, Throwable e) {
+                    Log.i(TAG, "onFailure: " + e.getMessage());
+                    mylog.execute(new EntityLogMessage(TAG, "getCloudPsw onFailure:", 'd'));
+                    progressBar.dismiss();
+                    Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
+                    //setPsw("FailedToGet");
+                }
+            }
+            );
+        }
+        catch (Exception e){}
     }
 }

@@ -29,7 +29,7 @@ public final class Props implements EventBus{
     public static SharedPreferences.Editor editor;
 
     public static class AppConfig {
-        public static String pAppRelease = "1.75";
+        public static String pAppRelease = "1.80";
         public static boolean pIsNFCEnabled =false;
         public static boolean pIsAppTypePublic=true;
         /// if false:   1. start healthcheckalarmreceiver

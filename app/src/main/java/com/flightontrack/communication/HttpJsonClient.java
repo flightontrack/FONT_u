@@ -3,6 +3,7 @@ package com.flightontrack.communication;
 import com.flightontrack.R;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.entities.EntityRequestCloseFlight;
+import com.flightontrack.entities.EntityRequestGetPsw;
 import com.flightontrack.entities.EntityRequestNewFlight;
 import com.flightontrack.entities.EntityRequestNewFlightOffline;
 import com.flightontrack.entities.EntityRequestPostLocation;
@@ -46,6 +47,13 @@ public class HttpJsonClient  extends AsyncHttpClient implements AutoCloseable{
     public HttpJsonClient(EntityRequestPostLocation entity){
         controllerMethod = "PostLocation";
         setMaxRetriesAndTimeout(2,2000);
+        requestParams = entity;
+        urlLink= url+controllerMethod;
+    }
+
+    public HttpJsonClient(EntityRequestGetPsw entity){
+        controllerMethod = "PostGetPPAsync";
+        setMaxRetriesAndTimeout(2,1000);
         requestParams = entity;
         urlLink= url+controllerMethod;
     }
