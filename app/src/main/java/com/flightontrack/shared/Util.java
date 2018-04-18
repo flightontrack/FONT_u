@@ -131,10 +131,10 @@ public class Util {
             client.post(new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                    //progressBar.dismiss();
                     mylog.execute(new EntityLogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
                     ResponseJsonObj response = new ResponseJsonObj(jsonObject);
                     if (response.responsePsw!=null) {
-                        progressBar.dismiss();
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "ap=" + response.responsePsw, 'd'));
                         setPsw(response.responsePsw);
                     }
@@ -143,7 +143,7 @@ public class Util {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
                     mylog.execute(new EntityLogMessage(TAG, "getCloudPsw onFailure:", 'd'));
-                    progressBar.dismiss();
+                    //progressBar.dismiss();
                     Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                     //setPsw("FailedToGet");
                 }
@@ -152,9 +152,14 @@ public class Util {
                 public void onFailure(int statusCode, Header[] headers, String s, Throwable e) {
                     Log.i(TAG, "onFailure: " + e.getMessage());
                     mylog.execute(new EntityLogMessage(TAG, "getCloudPsw onFailure:", 'd'));
-                    progressBar.dismiss();
                     Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
                     //setPsw("FailedToGet");
+
+                }
+
+                @Override
+                public void onFinish(){
+                    progressBar.dismiss();
                 }
             }
             );

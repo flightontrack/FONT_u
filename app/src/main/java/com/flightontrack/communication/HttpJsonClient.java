@@ -52,13 +52,14 @@ public class HttpJsonClient  extends AsyncHttpClient implements AutoCloseable{
     }
 
     public HttpJsonClient(EntityRequestGetPsw entity){
-        controllerMethod = "PostGetPPAsync";
+        controllerMethod = "PostGetPP";
         setMaxRetriesAndTimeout(2,1000);
         requestParams = entity;
         urlLink= url+controllerMethod;
     }
 
     public void post(AsyncHttpResponseHandler h) {
+        new FontLogAsync().execute(new EntityLogMessage(TAG,"URL:  "+urlLink, 'd'));
         post(urlLink,requestParams,h);
     }
 

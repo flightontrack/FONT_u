@@ -166,7 +166,7 @@
         <!--<item>http://192.168.1.3/PostngetWebApi/api/router</item>-->
         <item>96.230.122.177/postnget</item>
 
-        <item>http://10.0.2.2/postnget</item>
+        <item>10.0.2.2/PostngetWebApi</item>
         <!--<item>http://192.168.1.11/postnget</item>-->
 
     </string-array>
