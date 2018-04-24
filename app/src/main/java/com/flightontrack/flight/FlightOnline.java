@@ -167,7 +167,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + response, 'd'));
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e.getMessage(), 'd'));
                         if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
                             Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
                             EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)

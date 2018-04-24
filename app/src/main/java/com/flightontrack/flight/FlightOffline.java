@@ -134,7 +134,7 @@ public class FlightOffline implements EventBus{
 
                 ResponseJsonObj response = new ResponseJsonObj(jsonObject);
                 if (response.responseException != null) {
-                    new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
+                    new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_EXCEPTION: " + response.responseExceptionMsg, 'd'));
                     Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                     return;
                 }

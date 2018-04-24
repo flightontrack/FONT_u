@@ -16,6 +16,7 @@ public class ResponseJsonObj implements AutoCloseable{
     public String  responseNewFlightNum;
     public String  responseCommand;
     public String  responseException;
+    public String  responseExceptionMsg;
     public String  responseAckn;
     public String  responsePsw;
     //public int     iresponseCommand;
@@ -53,6 +54,9 @@ public class ResponseJsonObj implements AutoCloseable{
                     break;
                 case "Exception":
                     responseException = getValue(jsonObject,jkey);
+                    break;
+                case "ExceptionMsg":
+                    responseExceptionMsg = getValue(jsonObject,jkey);
                     break;
             }
         }
