@@ -50,7 +50,7 @@ public abstract class Const {
     public static final String FLIGHT_TIME_ZERO ="00:00";
 
     public static final int WAY_POINT_HARD_LIMIT = 1200;
-    public static final int LEG_COUNT_HARD_LIMIT = 15;
+    public static final int LEG_COUNT_HARD_LIMIT = 3;
     public static final int ELEVATIONCHECK_FLIGHT_TIME_SEC = 70; //20;
 
     public static final String PACKAGE_NAME= "com.flightontrack";

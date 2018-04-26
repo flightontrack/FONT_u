@@ -25,8 +25,8 @@ public class Route extends RouteBase implements EventBus{
             case OPEN_NEW_FLIGHT:
                 flightList.add(new FlightOnline(this));
                 break;
-            case SWITCH_TO_PENDING:
-                break;
+//            case SWITCH_TO_PENDING:
+//                break;
             case RESTART_NEW_FLIGHT:
                 if (Props.SessionProp.pIsMultileg && (_legCount < LEG_COUNT_HARD_LIMIT)) {
                     /// ignore request to close route
@@ -84,6 +84,15 @@ public void eventReceiver(EventMessage eventMessage){
                     break;
                 case FLIGHT_ONSPEEDLOW:
                     set_rAction(RACTION.RESTART_NEW_FLIGHT);
+                    break;
+                case SESSION_ONSUCCESS_COMMAND:
+                    switch (eventMessage.eventMessageValueString) {
+                        case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
+                            break;
+                        case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
+                            set_rAction(RACTION.RESTART_NEW_FLIGHT);
+                            break;
+                    }
                 break;
 
         }

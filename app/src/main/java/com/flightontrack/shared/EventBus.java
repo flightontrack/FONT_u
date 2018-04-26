@@ -92,6 +92,7 @@ public interface EventBus extends Events{
                         interfaceList.add(RouteBase.activeRoute); //initiate a new flight if multileg
                         break;
                     case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
+                        interfaceList.add(RouteBase.activeFlight); // stop active flight
                         interfaceList.add(RouteBase.activeRoute); //initiate a new flight if multileg
                         break;
                 }

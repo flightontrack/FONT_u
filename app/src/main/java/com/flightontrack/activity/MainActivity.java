@@ -130,9 +130,9 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             cardLayout1.setOnClickListener(v-> {
                 //@Override
                 //public void onClick(View view) {
-                    //new FontLogAsync().execute(new LogMessage(TAG, "Method1", 'd');
-                    Intent intent = new Intent(ctxApp, AircraftActivity.class);
-                    startActivity(intent);
+                //new FontLogAsync().execute(new LogMessage(TAG, "Method1", 'd');
+                Intent intent = new Intent(ctxApp, AircraftActivity.class);
+                startActivity(intent);
                 //}
 
             });
@@ -343,6 +343,10 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                     EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
                     break;
             }
+        });
+
+        chBoxIsMultiLeg.setOnCheckedChangeListener((compoundButton, b) -> {
+            EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_ONCLICK).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
         });
     }
 
@@ -561,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 //swithch to green
                 break;
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:
-                    setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                setTrackingButton(BUTTONREQUEST.BUTTON_STATE_YELLOW);
                 break;
             case CLOCK_MODECLOCK_ONLY:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);

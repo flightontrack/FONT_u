@@ -12,7 +12,7 @@ public class RouteBase implements EventBus{
 
     public enum RACTION {
         OPEN_NEW_FLIGHT,
-        SWITCH_TO_PENDING,
+        //SWITCH_TO_PENDING,
         RESTART_NEW_FLIGHT,
         REMOVE_FLIGHT_IF_CLOSED,
         ADD_OR_UPDATE_FLIGHT
