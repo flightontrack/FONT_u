@@ -116,20 +116,28 @@
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.google.android.gms:play-services-appindexing-8.4.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-fragment-25.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-annotations:25.0.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-ui-25.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-utils-25.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:cardview-v7-25.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:appcompat-v7-25.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:animated-vector-drawable-25.3.1" level="project" />
+    <orderEntry type="library" name="com.parse.bolts:bolts-android:1.4.0@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-base-8.4.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-media-compat-25.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-compat-25.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:cardview-v7-25.3.1" level="project" />
+    <orderEntry type="library" name="com.facebook.android:facebook-common-4.28.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-ui-25.3.1" level="project" />
+    <orderEntry type="library" name="com.android.support:appcompat-v7-25.3.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-compat-25.3.1" level="project" />
+    <orderEntry type="library" name="com.facebook.android:facebook-share-4.28.0" level="project" />
+    <orderEntry type="library" name="com.parse.bolts:bolts-tasks:1.4.0@jar" level="project" />
+    <orderEntry type="library" name="com.google.zxing:core:3.3.0@jar" level="project" />
+    <orderEntry type="library" name="com.parse.bolts:bolts-applinks:1.4.0@jar" level="project" />
     <orderEntry type="library" name="com.loopj.android:android-async-http:1.4.9@jar" level="project" />
     <orderEntry type="library" name="cz.msebera.android:httpclient:4.3.6@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:animated-vector-drawable-25.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-utils-25.3.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-vector-drawable-25.3.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-v4-25.3.1" level="project" />
+    <orderEntry type="library" name="com.facebook.android:facebook-core-4.28.0" level="project" />
+    <orderEntry type="library" name="com.android.support:customtabs-25.3.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-fragment-25.3.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-annotations:25.3.1@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-basement-8.4.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-vector-drawable-25.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-v4-25.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-media-compat-25.3.1" level="project" />
   </component>
 </module>

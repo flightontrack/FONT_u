@@ -6,6 +6,9 @@ import android.content.Intent;
 //import android.os.IBinder;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
+import com.flightontrack.communication.HttpJsonClient;
+import com.flightontrack.communication.ResponseJsonObj;
+import com.flightontrack.entities.EntityRequestHealthCheck;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
@@ -17,7 +20,10 @@ import com.flightontrack.communication.Response;
 import com.flightontrack.pilot.MyPhone;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -61,43 +67,48 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
 
     }
     void healthCheckComm(Context ctx) {
-        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight",'d'));
-        RequestParams requestParams = new RequestParams();
-        requestParams.put("rcode", REQUEST_IS_CLOCK_ON);
-        requestParams.put("isrestart", isRestart);
-        requestParams.put("phonenumber", MyPhone._myPhoneId);
-        requestParams.put("deviceid", MyPhone._myDeviceId);
-        requestParams.put("isClockOn", SvcLocationClock.isInstanceCreated());
-        //requestParams.put("flightid", activeRoute.activeFlight==null?FLIGHT_NUMBER_DEFAULT : activeRoute.activeFlight.flightNumber);
-        //requestParams.put("isdebug", Util.getIsDebug());
-        requestParams.put("isdebug", SessionProp.pIsDebug);
-        requestParams.put("battery", ReceiverBatteryLevel.getBattery());
+//        RequestParams requestParams = new RequestParams();
+//        requestParams.put("rcode", REQUEST_IS_CLOCK_ON);
+//        requestParams.put("isrestart", isRestart);
+//        requestParams.put("phonenumber", MyPhone._myPhoneId);
+//        requestParams.put("deviceid", MyPhone._myDeviceId);
+//        requestParams.put("isClockOn", SvcLocationClock.isInstanceCreated());
+//        //requestParams.put("flightid", activeRoute.activeFlight==null?FLIGHT_NUMBER_DEFAULT : activeRoute.activeFlight.flightNumber);
+//        //requestParams.put("isdebug", Util.getIsDebug());
+//        requestParams.put("isdebug", SessionProp.pIsDebug);
+//        requestParams.put("battery", ReceiverBatteryLevel.getBattery());
 
-        new AsyncHttpClient().post(Util.getTrackingURL() + ctx.getString(R.string.aspx_communication), requestParams, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "healthCheckComm OnSuccess", 'd'));
-                        //String responseText = new String(responseBody);
-                        Response response = new Response(new String(responseBody));
+        try (
+                FontLogAsync mylog = new FontLogAsync();
 
-                        if (response.responseAckn != null) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|HealthCheck: "+response.responseAckn,'d'));
+                HttpJsonClient client = new HttpJsonClient(new EntityRequestHealthCheck());
+        )
+        {
+            mylog.execute(new EntityLogMessage(TAG, "healthCheckComm", 'd'));
+            client.post(
+            new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                                mylog.execute(new EntityLogMessage(TAG, "healthCheckComm onSuccess", 'd'));
+                                ResponseJsonObj response = new ResponseJsonObj(jsonObject);
+
+                                if (response.isException= true) {
+                                    mylog.execute(new EntityLogMessage(TAG, "healthCheckComm onSuccess|Exception|" + response.responseException, 'd'));
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                                mylog.execute(new EntityLogMessage(TAG, "healthCheckComm onFailure", 'd'));
+                            }
+
+                            public void onFinish() {
+
+                            }
                         }
-                        if (response.responseNotif != null) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|HealthCheck|RESPONSE_TYPE_NOTIF:" +response.responseNotif,'d'));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure|HealthCheck: " ,'d'));
-
-                    }
-                    public void onFinish() {
-
-                    }
-                }
-        );
+            );
+        }
+        catch (Exception e){}
 
     }
 }

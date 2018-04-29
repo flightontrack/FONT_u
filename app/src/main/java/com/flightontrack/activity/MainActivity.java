@@ -318,11 +318,6 @@ public class MainActivity extends AppCompatActivity implements EventBus {
         client.disconnect();
     }
 
-    public void onCheckboxClicked(View view) {
-       //new FontLogAsync().execute(new LogMessage(TAG, "!!!!! CheckBox clicked !!!!!", 'd');
-        EventBus.distribute(new EventMessage(EVENT.MACT_MULTILEG_ONCLICK).setEventMessageValueBool(chBoxIsMultiLeg.isChecked()));
-    }
-
     void init_listeners() {
 
         trackingButton.setOnClickListener(view -> {
@@ -370,8 +365,8 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     }
 
     public void facebActivity() {
-//f        Intent intent = new Intent(this, FaceBookActivity.class);
-//f        startActivity(intent);
+        Intent intent = new Intent(this, FaceBookActivity.class);
+        startActivity(intent);
     }
 
     void helpPage() {

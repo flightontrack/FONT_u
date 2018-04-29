@@ -96,7 +96,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".FaceBookActivity"
+        <activity android:name=".activity.FaceBookActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize">
             <meta-data
@@ -137,16 +137,7 @@
                 <action android:name="android.intent.action.com.flightontrack.BROADCAST_HEALTHCHECK"/>
             </intent-filter>
         </receiver>
-        <service
-            android:name=".communication.SvcComm"
-            android:enabled="true"
-            android:exported="true"
-            android:stopWithTask="false"></service>
-        <service
-            android:name=".other.SvcBackground"
-            android:enabled="true"
-            android:exported="true"
-            android:stopWithTask="false"></service>
+
         <service
             android:name=".locationclock.SvcLocationClock"
             android:enabled="true"
@@ -155,12 +146,15 @@
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" /><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+            android:value="@string/facebook_app_id" />
+        <provider android:authorities="com.facebook.app.FacebookContentProvider{@string/facebook_app_id}"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
 
     </application>
 

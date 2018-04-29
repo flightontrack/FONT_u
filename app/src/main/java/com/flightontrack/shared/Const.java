@@ -10,12 +10,6 @@ public abstract class Const {
     public static final int REQUEST_PSW = 6;
     public static final int REQUEST_IS_CLOCK_ON = 7;
 
-    public static final String RESPONSE_TYPE_DATA_WITHLOAD = "0";
-    public static final String RESPONSE_TYPE_NOTIF_WITHLOAD = "2";
-    public static final String RESPONSE_TYPE_DATA_PSW = "aP";
-
-
-
     public static final String COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN = "TerminateFlightLowSpeed";
     public static final String COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED = "TerminateFlightMaxPointsReached";
     public static final int COMMAND_FLIGHT_STATE_PENDING = -7;
@@ -50,7 +44,7 @@ public abstract class Const {
     public static final String FLIGHT_TIME_ZERO ="00:00";
 
     public static final int WAY_POINT_HARD_LIMIT = 1200;
-    public static final int LEG_COUNT_HARD_LIMIT = 3;
+    public static final int LEG_COUNT_HARD_LIMIT = 15;
     public static final int ELEVATIONCHECK_FLIGHT_TIME_SEC = 70; //20;
 
     public static final String PACKAGE_NAME= "com.flightontrack";
@@ -75,34 +69,10 @@ public abstract class Const {
         NEG,
         CANCEL}
 
-    public enum RSTATUS {
-        PASSIVE,
-        ACTIVE}
-
-    public enum FSTATUS {
-        PASSIVE,
-        ACTIVE}
-
     public enum MODE {
         CLOCK_LOCATION,
         CLOCK_ONLY}
 
-//    public enum FACTION {
-//        REQUEST_FLIGHT,
-//        CHANGE_IN_PENDING,
-//        CHANGE_IN_WAIT_TO_CLOSEFLIGHT,
-//        CHANGE_IN_FLIGHT,
-//        CHANGESTATE_SPEED_BELOW_MIN,
-//        CHANGESTATE_COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED,
-//        GET_LOCATIONSERVICE,
-//        CLOSE_FLIGHT_IF_ZERO_LOCATIONS,
-//        TERMINATE_FLIGHT,
-//        CLOSED,
-//        CLOSED_FAILURE,
-//        FLIGHTTIME_UPDATE,
-//        REQUEST_FLIGHTNUMBER,
-//        ON_FLIGHTGET_FINISH,
-//        ON_SERVER_N0TIF}
 
     public enum BUTTONREQUEST{
         BUTTON_STATE_RED,

@@ -2,7 +2,6 @@ package com.flightontrack.flight;
 
 import android.content.Context;
 
-import com.flightontrack.R;
 import com.flightontrack.activity.MainActivity;
 
 //import static com.flightontrack.communication.SvcComm.commBatchSize;
@@ -12,8 +11,6 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 import com.flightontrack.communication.HttpJsonClient;
-import com.flightontrack.communication.LoopjAClient;
-import com.flightontrack.communication.Response;
 //import com.flightontrack.communication.SvcComm;
 import com.flightontrack.communication.ResponseJsonObj;
 import com.flightontrack.entities.EntityRequestPostLocation;
@@ -25,14 +22,12 @@ import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
 import com.flightontrack.ui.ShowAlertClass;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -132,7 +127,7 @@ public class Session implements EventBus{
         requestParams.put("elevcheck", l.irch == 1);
 
         //postLocation(k, requestParams);
-        postLocationNew(k, l);
+        postLocation(k, l);
     }
 
     static void delay(int millis) {
@@ -208,86 +203,7 @@ public class Session implements EventBus{
         }
     }
 
-    void postLocation(int dbId,RequestParams requestParams){
-        if (Util.isNetworkAvailable()) {
-            try {
-                final LoopjAClient aSyncClient = new LoopjAClient(dbId);
-                new FontLogAsync().execute(new EntityLogMessage(TAG,"Post: ID:"+dbId+ "requestParams: " + requestParams, 'd'));
-                aSyncClient.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        if (commBatchSize == COMM_BATCH_SIZE_MIN) {
-                            commBatchSize = COMM_BATCH_SIZE_MAX;
-                        }
-                        Response response = new Response(new String(responseBody));
-                        //Util.appendLog(TAG+ "onSuccess Got response : " + responseBody,'d');
-                        if (response.jsonErrorCount > 0) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :JSON ERROR COUNT :" + response.jsonErrorCount, 'd'));
-                            if (response.jsonErrorCount > MAX_JSON_ERROR) {
-                                /// raise this event as NOTIF
-                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));
-                            }
-                            return;
-                        }
-                        try {
-                            if (response.responseAckn != null) {
-                                sqlHelper.rowLocationDeleteOnId(aSyncClient.getID(), response.responseFlightNum);  /// TODO should be moved to Router
-                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess RESPONSE_TYPE_ACKN :flight:" + response.responseFlightNum + ":" + response.responseAckn+ ": id" +aSyncClient.getID(), 'd'));
-                            }
-                            if (response.responseNotif != null) {
-                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :RESPONSE_TYPE_NOTIF :" + response.responseNotif, 'd'));
-                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));
-                            }
-                            if (response.responseCommand != null) {
-                                new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : RESPONSE_TYPE_COMMAND : " + response.responseCommand, 'd'));
-                                if (response.responseCommand.equals(COMMAND_TERMINATEFLIGHT) && SessionProp.pIsRoad)
-                                    return;
-                                EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
-                                        .setEventMessageValueInt(response.iresponseCommand)
-                                        .setEventMessageValueString(response.responseFlightNum));
-//                                switch (response.iresponseCommand) {
-//                                    case COMMAND_TERMINATEFLIGHT:
-//                                          break;
-//                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
-//                                        break;
-//                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
-//                                        break;
-//                                    case COMMAND_FLIGHT_STATE_PENDING:
-//                                        break;
-//                                    case -1:
-//                                        break;
-//                                }
-                            }
-                            if (response.responseDataLoad != null) {
-                                new FontLogAsync().execute(new EntityLogMessage(TAG, "Data response : " + response.responseDataLoad, 'd'));
-                            }
-                        } catch (Exception e) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : EXCEPTION :" + e.getMessage(), 'e'));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + aSyncClient.getID(), 'd'));
-                        commBatchSize = COMM_BATCH_SIZE_MIN;
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        locRequestList.remove(aSyncClient.getID());
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFinish removed ID= " + aSyncClient.getID(), 'd'));
-                        sendNext();
-                    }
-                });
-            } catch (Exception e) {
-                new FontLogAsync().execute(new EntityLogMessage(TAG, "aSyncClient" + e.getMessage(), 'd'));
-                return;
-            }
-        }
-
-    }
-    void postLocationNew(int k,EntityLocation loc){
-        String TAG = "NEWFONT";
+    void postLocation(int k, EntityLocation loc){
         if (Util.isNetworkAvailable()) {
             try (
                     EntityRequestPostLocation entityRequestPostLocation = new EntityRequestPostLocation(loc);
@@ -356,7 +272,7 @@ public class Session implements EventBus{
                     }
                 });
             } catch (Exception e) {
-                new FontLogAsync().execute(new EntityLogMessage(TAG, "postLocationNew " + e.getMessage(), 'd'));
+                new FontLogAsync().execute(new EntityLogMessage(TAG, "postLocation " + e.getMessage(), 'd'));
                 return;
             }
         }

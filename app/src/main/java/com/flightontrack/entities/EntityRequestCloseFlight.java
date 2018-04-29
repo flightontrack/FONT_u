@@ -8,11 +8,6 @@ public class EntityRequestCloseFlight   extends RequestParams implements AutoClo
     final String TAG = "EntityRequestCloseFlight";
     final int rcode = Const.REQUEST_STOP_FLIGHT;
 
-//        public int rcode = Const.REQUEST_STOP_FLIGHT;
-//        public String flightid = flightId;
-//        public Boolean speedlowflag = true;
-//        public Boolean isLimitReached = false;
-//        public Boolean isdebug = false;
 
     public EntityRequestCloseFlight() {
         put("rcode", rcode);

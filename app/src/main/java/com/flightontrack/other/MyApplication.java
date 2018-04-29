@@ -2,6 +2,8 @@ package com.flightontrack.other;
 
 import android.app.Application;
 //f import com.facebook.FacebookSdk;
+import com.facebook.FacebookSdk;
+
 import static com.flightontrack.shared.Const.*;
 //import com.facebook.appevents.AppEventsLogger;
 
@@ -43,7 +45,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //f FacebookSdk.sdkInitialize(getApplicationContext());
+        //FacebookSdk.sdkInitialize(getApplicationContext());
         // The following line triggers the initialization of ACRA
 //        ACRA.init(this);
 //        ACRA.getErrorReporter().putCustomData("myKey", "myValue");
