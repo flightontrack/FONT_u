@@ -13,21 +13,13 @@ import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.activity.MainActivity;
-import com.flightontrack.R;
 import com.flightontrack.locationclock.SvcLocationClock;
-import com.flightontrack.shared.Util;
-import com.flightontrack.communication.Response;
-import com.flightontrack.pilot.MyPhone;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.AppConfig.pIsAppTypePublic;
 

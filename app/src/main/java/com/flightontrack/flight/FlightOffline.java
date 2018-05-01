@@ -5,30 +5,23 @@ import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.communication.HttpJsonClient;
-import com.flightontrack.communication.Response;
 import com.flightontrack.communication.ResponseJsonObj;
 import com.flightontrack.entities.EntityRequestCloseFlight;
-import com.flightontrack.entities.EntityRequestNewFlight;
 import com.flightontrack.entities.EntityRequestNewFlightOffline;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
-import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.flightontrack.flight.FlightOffline.FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 import static com.flightontrack.shared.Props.*;

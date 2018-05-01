@@ -259,7 +259,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_weight="1"
                 android:weightSum="10">
 
                 <TextView
@@ -267,16 +266,17 @@
                     style="@style/label_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="5.35"
+                    android:layout_weight="6"
                     android:inputType="text"
                     android:text="@string/label_cachedpoints" />
+
                 <TextView
                     android:id="@+id/txtCached"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:layout_height="wrap_content"
                     style="@style/label_text"
-                    />
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="left"
+                    android:layout_weight="2" />
 
 
             </LinearLayout>

@@ -82,7 +82,7 @@
     <string name="label_btnsave">Save Settings</string>
 
     <string name="instructions1">Scan aircraft NFC tag</string>
-    <string name="instructions2">Update the fields manually or turn the switch on to scan tag</string>
+    <string name="instructions2">Update fields manually or turn the switch on to scan tag</string>
 
     <!--messages-->
     <string name="alarm_has_now_started">Connected to cloud successfully</string>

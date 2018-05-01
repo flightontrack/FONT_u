@@ -24,6 +24,7 @@ public class HttpJsonClient  extends AsyncHttpClient implements AutoCloseable{
     String controllerMethod;
     public String urlLink;
     RequestParams requestParams;
+    public boolean isFailed = false;
 
     public HttpJsonClient(EntityRequestNewFlight entity){
         controllerMethod = "PostFlightRequest";

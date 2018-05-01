@@ -18,7 +18,7 @@ import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
-public class ShowAlertClass{
+public class ShowAlertClass implements AutoCloseable{
 
     //MainActivity ctxActivity;
     Context ctx;
@@ -56,15 +56,13 @@ public class ShowAlertClass{
         alert.show();
     }
     public void showNFCDisabledAlertToUser(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctxActivity);
         alertDialogBuilder.setMessage("NFC is disabled in your device")
                 .setCancelable(false)
                 .setPositiveButton("Goto Settings To Enable NFC",
-                        new DialogInterface.OnClickListener(){
-                            public void onClick(DialogInterface dialog, int id){
-                                Intent callNFCIntent = new Intent((android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)? Settings.ACTION_NFC_SETTINGS:Settings.ACTION_WIRELESS_SETTINGS);
-                                ctxActivity.startActivity(callNFCIntent);
-                            }
+                        (dialog, id) -> {
+                            Intent callNFCIntent = new Intent((android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)? Settings.ACTION_NFC_SETTINGS:Settings.ACTION_WIRELESS_SETTINGS);
+                            ctxActivity.startActivity(callNFCIntent);
                         });
         alertDialogBuilder.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener(){
@@ -211,5 +209,9 @@ public class ShowAlertClass{
                 .setMessage(alertMessage)
                 .setPositiveButton(R.string.fb_ok, null)
                 .show();
+    }
+
+    @Override
+    public void close() throws Exception {
     }
 }

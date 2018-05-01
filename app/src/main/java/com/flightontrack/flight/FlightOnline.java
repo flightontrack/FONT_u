@@ -7,9 +7,7 @@ import android.widget.Toast;
 
 import com.flightontrack.R;
 import com.flightontrack.communication.HttpJsonClient;
-import com.flightontrack.communication.Response;
 import com.flightontrack.communication.ResponseJsonObj;
-import com.flightontrack.entities.EntityRequestCloseFlight;
 import com.flightontrack.entities.EntityRequestNewFlight;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.log.FontLogAsync;
@@ -17,16 +15,12 @@ import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.mysql.DBSchema;
 import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
-import com.flightontrack.shared.Const;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.GetTime;
 import com.flightontrack.shared.Props;
 import com.flightontrack.shared.Util;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
@@ -140,7 +134,10 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
             .set("speed_thresh", String.valueOf(Math.round(SessionProp.pSpinnerMinSpeed)))
             .set("isdebug", String.valueOf(SessionProp.pIsDebug))
             .set("routeid", route.routeNumber.equals(ROUTE_NUMBER_DEFAULT)?null:route.routeNumber);
-            try(HttpJsonClient client = new HttpJsonClient(entityRequestNewFlight)) {
+            try(
+                    HttpJsonClient client = new HttpJsonClient(entityRequestNewFlight);
+                    FontLogAsync myLog = new FontLogAsync()
+            ) {
                 client.post(new JsonHttpResponseHandler() {
 
                     @Override
@@ -153,7 +150,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                         //Log.i("TAG", "onSuccessjsonObject: " + jsonObject);
                         ResponseJsonObj response = new ResponseJsonObj(jsonObject);
                         if (response.responseException != null) {
-                            new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
+                            myLog.execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
                             Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -166,8 +163,8 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure; startId= " + response, 'd'));
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e.getMessage(), 'd'));
+                        myLog.execute(new EntityLogMessage(TAG, "onFailure e: " + e.getMessage(), 'd'));
+                        //client.isFailed = true;
                         if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
                             Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
                             EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
@@ -178,15 +175,22 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String s, Throwable e) {
-                        Log.i(TAG, "onFailure: " + e.getMessage());
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e, 'd'));
+                        myLog.execute(new EntityLogMessage(TAG, "onFailure URL method not found status code: " + statusCode, 'd'));
+                        //client.isFailed = true;
+                        if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
+                            Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
+                            EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_COMPLETED)
+                                    .setEventMessageValueBool(isGetFlightCallSuccess)
+                                    .setEventMessageValueString(flightNumber));
+                        }
                     }
 
                     @Override
                     public void onRetry(int retryNo) {
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
                     }
-                });
+
+                  });
             }
             catch(Exception e) {
                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onException e: ", 'e'));

@@ -247,9 +247,12 @@ public class AircraftActivity extends Activity {
 
     public void setTagNFCState(Boolean tagstate) {
         if (tagstate && !nfcAdapter.isEnabled()) {
-            new ShowAlertClass(this).showNFCDisabledAlertToUser();
-            tagstate = false;
-            nfcSwitch.setChecked(tagstate);
+            try (ShowAlertClass showAlertClass=new ShowAlertClass(this)) {
+                showAlertClass.showNFCDisabledAlertToUser();
+                tagstate = false;
+                nfcSwitch.setChecked(tagstate);
+            }
+            catch(Exception e){}
         }
         Props.editor.putBoolean("nfctagstate", tagstate).commit();
         txtBlueText.setText(getTagNFCState() ? R.string.instructions1 : R.string.instructions2);
