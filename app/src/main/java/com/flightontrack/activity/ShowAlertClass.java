@@ -1,4 +1,4 @@
-package com.flightontrack.ui;
+package com.flightontrack.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;

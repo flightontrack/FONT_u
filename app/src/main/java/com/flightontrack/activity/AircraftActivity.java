@@ -21,7 +21,6 @@ import com.flightontrack.R;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.shared.Props;
-import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;

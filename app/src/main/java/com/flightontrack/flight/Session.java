@@ -21,7 +21,7 @@ import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
-import com.flightontrack.ui.ShowAlertClass;
+import com.flightontrack.activity.ShowAlertClass;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 

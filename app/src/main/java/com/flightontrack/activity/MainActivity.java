@@ -30,7 +30,6 @@ import com.flightontrack.other.AlarmManagerCtrl;
 import com.flightontrack.R;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
-import com.flightontrack.ui.ShowAlertClass;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.flightontrack.shared.Util;
 import com.flightontrack.flight.RouteBase;
