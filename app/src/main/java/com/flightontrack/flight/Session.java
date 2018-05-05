@@ -100,7 +100,7 @@ public class Session implements EventBus{
 
         isSendNextStarted = true;
         if (locRequestList.isEmpty()) {
-            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+//            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
             isSendNextStarted = false;
             return;
         }
@@ -162,23 +162,6 @@ public class Session implements EventBus{
             case GET_OFFLINE_FLIGHTS:
                 /// firsrt to check all temp flights in not ready to send state.
                 /// Get new flight and request flight number.
-//                Cursor flightsTemp = sqlHelper.getCursorTempFlights();
-//                try {
-//                    while (flightsTemp.moveToNext()) {
-//                        String fn = flightsTemp.getString(flightsTemp.getColumnIndexOrThrow(DBSchema.LOC_flightid));
-//                        //if (isFlightNumberInList(fn)) continue;
-//                        FontLog.appendLog(TAG + "Get flight number for " + fn, 'd');
-//                        if (Util.isNetworkAvailable()) new FlightOffline(fn).set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
-//                        else {
-//                            FontLog.appendLog(TAG + "Connectivity unavailable Can't get flight number", 'd');
-//                            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(false));
-//                        }
-//                    }
-//                }
-//                finally{
-//                    flightsTemp.close();
-//                    sqlHelper.dbw.close();
-//                }
 
                 for (String flightNumTemp:sqlHelper.getTempFlightList()){
                     new FontLogAsync().execute(new EntityLogMessage(TAG, "Get flightBase for " + flightNumTemp, 'd'));
@@ -213,6 +196,7 @@ public class Session implements EventBus{
                 client.post(new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
+                        //new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess test k= " + k, 'd'));
                         if (commBatchSize == COMM_BATCH_SIZE_MIN) {
                             commBatchSize = COMM_BATCH_SIZE_MAX;
                         }
@@ -237,20 +221,10 @@ public class Session implements EventBus{
                                     return;
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_COMMAND)
                                         .setEventMessageValueString(response.responseCommand));
-                                        //.setEventMessageValueString(response.responseCurrentFlightNum));
-//                                switch (response.iresponseCommand) {
-//                                    case COMMAND_TERMINATEFLIGHT:
-//                                          break;
-//                                    case COMMAND_STOP_FLIGHT_SPEED_BELOW_MIN:
-//                                        break;
-//                                    case COMMAND_STOP_FLIGHT_ON_LIMIT_REACHED:
-//                                        break;
-//                                    case COMMAND_FLIGHT_STATE_PENDING:
-//                                        break;
-//                                    case -1:
-//                                        break;
-//                                }
                             }
+                            locRequestList.remove(k);
+                            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+                            sendNext();
                         } catch (Exception e) {
                             new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess : EXCEPTION :" + e.getMessage(), 'e'));
                         }
@@ -262,13 +236,14 @@ public class Session implements EventBus{
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: "+e, 'd'));
                         locRequestList.clear();
                         commBatchSize = COMM_BATCH_SIZE_MIN;
+                        EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
                     }
 
                     @Override
                     public void onFinish() {
-                        locRequestList.remove(k);
-                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFinish locRequestList removed key= " + k, 'd'));
-                        sendNext();
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFinish For some reason is called before onSuccess key= " + k, 'd'));
+                        //EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
+                        //sendNext();
                     }
                 });
             } catch (Exception e) {

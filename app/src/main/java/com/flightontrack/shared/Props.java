@@ -72,8 +72,9 @@ public final class Props implements EventBus{
         //public static int dbLocationRecCountTemp = 0;
         public static int dbTempFlightRecCount = 0;
         public static BUTTONREQUEST trackingButtonState = BUTTONREQUEST.BUTTON_STATE_RED;
-        public static String        pTextRed;
-        public static String        pTextGreen;
+        //public static String        pTextRed;
+        //public static String        pTextGreen;
+        public static String        pTrackingButtonText;
 
         public static void save() {
             editor.putBoolean("pIsMultileg", pIsMultileg);
@@ -84,7 +85,8 @@ public final class Props implements EventBus{
             editor.putBoolean("pIsEmptyAcftOk", pIsEmptyAcftOk);
             editor.putInt("pSpinnerUrlsPos", pSpinnerUrlsPos);
             editor.putInt("pSpinnerTextToPos", pSpinnerTextToPos);
-            editor.putString("pTextRed", pTextRed);
+            //editor.putString("pTextRed", pTextRed);
+            editor.putString("pTrackingButtonText", pTrackingButtonText);
             editor.putBoolean("pIsOnReboot", pIsOnReboot);
             editor.commit();
         }
@@ -97,7 +99,8 @@ public final class Props implements EventBus{
             //pIntervalLocationUpdateSec=sharedPreferences.getInt("pIntervalLocationUpdateSec", MIN_TIME_BW_GPS_UPDATES_SEC);
             pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
             pSpinnerTextToPos=sharedPreferences.getInt("pSpinnerTextToPos", 0);
-            pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
+            //pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
+            pTrackingButtonText = sharedPreferences.getString("pTrackingButtonText", ctxApp.getString(R.string.start_flight));
             pIsOnReboot=sharedPreferences.getBoolean("pIsOnReboot", false);
             pIsStartedOnReboot =sharedPreferences.getBoolean("pIsStartedOnReboot", false);
         }

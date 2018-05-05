@@ -62,7 +62,7 @@ public class FlightOffline implements EventBus{
         flightState = fs;
         switch(fs){
             case GETTINGFLIGHT:
-                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
+                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
                 getNewFlightID();
                 break;
             case STOPPED:

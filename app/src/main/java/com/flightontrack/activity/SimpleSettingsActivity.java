@@ -32,6 +32,7 @@ import static com.flightontrack.shared.Props.SessionProp.sqlHelper;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener,EventBus {
 
+    final String TAG = "SimpleSettingsActivity";
     TextView txtUser;
     public static TextView txtPsw;
     public static TextView txtBuild;

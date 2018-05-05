@@ -78,31 +78,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
         return mainactivityInstance != null;
     }
 
-    static String setTextGreen() {
-        SessionProp.pTextGreen = "Flight: " + (RouteBase.activeFlight.flightNumber) + '\n' +
-                "Point: " + RouteBase.activeFlight._wayPointsCount +
-                ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString + '\n'
-                + "Alt: " + RouteBase.activeFlight.lastAltitudeFt + " ft";
-        return SessionProp.pTextGreen;
-    }
 
-    static String setTextRed() {
-        String fText = SessionProp.pTextRed;
-        String fTime = "";
-        String flightN = FLIGHT_NUMBER_DEFAULT;
-
-        if (RouteBase.activeRoute == null) {
-            new FontLogAsync().execute(new EntityLogMessage(TAG, "setTextRed: activeRoute == null", 'd'));
-        } else {
-            if (RouteBase.activeFlight != null) {
-                flightN = RouteBase.activeFlight.flightNumber;
-                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString;
-            }
-            fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
-        }
-        SessionProp.pTextRed = fText + fTime;
-        return SessionProp.pTextRed;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -509,42 +485,86 @@ public class MainActivity extends AppCompatActivity implements EventBus {
 
     void setTrackingButton(BUTTONREQUEST request) {
         //Util.appendLog(TAG+"trackingButtonState request:" +request,'d');
+        trackingButton.setText(getButtonText(request));
         switch (request) {
             case BUTTON_STATE_RED:
                 trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                trackingButton.setText(setTextRed());
+                //trackingButton.setText(setTextRedFlightStopped());
                 break;
             case BUTTON_STATE_YELLOW:
                 trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                trackingButton.setText("Flight " + (RouteBase.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff));
-                //editor.putInt("trackingButtonState", BUTTON_STATE_YELLOW);
                 break;
             case BUTTON_STATE_GREEN:
                 trackingButton.setBackgroundResource(R.drawable.bttn_status_green);
-                trackingButton.setText(setTextGreen());
-                //editor.putInt("trackingButtonState", BUTTON_STATE_GREEN);
+                //trackingButton.setText(setTextGreen());
                 break;
             case BUTTON_STATE_GETFLIGHTID:
                 trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
-                trackingButton.setText(ctxApp.getString(R.string.tracking_gettingflight));
+                //trackingButton.setText(ctxApp.getString(R.string.tracking_gettingflight));
                 break;
-            case BUTTON_STATE_STOPPING:
-                //appendLog(LOGTAG+"BUTTON_STATE_STOPPING");
-                trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
-                //MainActivity.trackingButton.setText("Flight " + (Flight.get_ActiveFlightID()) + ctx.getString(R.string.tracking_stopping));
-                break;
+//            case BUTTON_STATE_STOPPING:
+//                //appendLog(LOGTAG+"BUTTON_STATE_STOPPING");
+//                trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
+//                //MainActivity.trackingButton.setText("Flight " + (Flight.get_ActiveFlightID()) + ctx.getString(R.string.tracking_stopping));
+//                break;
             default:
                 trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
                 // MainActivity.trackingButton.setText("Flight " + (Flight.get_ActiveFlightID()) + ctx.getString(R.string.tracking_is_off));
         }
-        trackingButtonState = request;
+        if (request!=BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID)trackingButtonState = request;
+    }
+
+    static String setTextGreen() {
+        return "Flight: " + (RouteBase.activeFlight.flightNumber) + '\n' +
+                "Point: " + RouteBase.activeFlight._wayPointsCount +
+                ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString + '\n'
+                + "Alt: " + RouteBase.activeFlight.lastAltitudeFt + " ft";
+        //return SessionProp.pTextGreen;
+    }
+
+    static String setTextRedFlightStopped() {
+        //String fText = SessionProp.pTextRed;
+        String fText;
+        String fTime = "";
+        String flightN = FLIGHT_NUMBER_DEFAULT;
+
+        if (RouteBase.activeRoute == null) {
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "setTextRedFlightStopped: activeRoute == null", 'd'));
+            fText = SessionProp.pTrackingButtonText;
+        } else {
+            if (RouteBase.activeFlight != null) {
+                flightN = RouteBase.activeFlight.flightNumber;
+                fTime = ctxApp.getString(R.string.tracking_flight_time) + SPACE + RouteBase.activeFlight.flightTimeString;
+            }
+            fText = "Flight " + flightN + '\n' + "Stopped"; // + '\n';
+        }
+        //SessionProp.pTextRed = fText + fTime;
+        return fText + fTime;
+    }
+
+    static String getButtonText(BUTTONREQUEST request) {
+        switch (request) {
+            case BUTTON_STATE_RED:
+                SessionProp.pTrackingButtonText=setTextRedFlightStopped();
+                break;
+            case BUTTON_STATE_YELLOW:
+                SessionProp.pTrackingButtonText="Flight " + (RouteBase.activeFlight.flightNumber) + ctxApp.getString(R.string.tracking_ready_to_takeoff);
+                break;
+            case BUTTON_STATE_GREEN:
+                SessionProp.pTrackingButtonText=setTextGreen();
+                break;
+            case BUTTON_STATE_GETFLIGHTID:
+                SessionProp.pTrackingButtonText=ctxApp.getString(R.string.tracking_gettingflight);
+                break;
+        }
+        return SessionProp.pTrackingButtonText;
     }
 
     @Override
     public void eventReceiver(EventMessage eventMessage) {
         EVENT ev = eventMessage.event;
         new FontLogAsync().execute(new EntityLogMessage(TAG, "eventReceiver : " + ev, 'd'));
-        txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
+        //txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
         switch (ev) {
             case PROP_CHANGED_MULTILEG:
                 chBoxIsMultiLeg.setChecked(eventMessage.eventMessageValueBool);
@@ -572,6 +592,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
+                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_GREEN);
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
@@ -579,6 +600,9 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 break;
             case ROUTE_NOACTIVEROUTE:
                 setTrackingButton(BUTTONREQUEST.BUTTON_STATE_RED);
+                break;
+            case SESSION_ONSENDCACHECOMPLETED:
+                txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
                 break;
         }
     }

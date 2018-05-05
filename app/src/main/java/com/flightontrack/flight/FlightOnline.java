@@ -189,7 +189,10 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                     public void onRetry(int retryNo) {
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
                     }
-
+                    @Override
+                    public void onFinish() {
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onFinish", 'd'));
+                    }
                   });
             }
             catch(Exception e) {
@@ -404,8 +407,11 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
     }
 
     public void set_flightState(FLIGHT_STATE fs) {
-        FlightOnline.super.set_flightState(fs);
+        super.set_flightState(fs);
         switch (fs) {
+            case GETTINGFLIGHT:
+                EventBus.distribute(new EventMessage(EVENT.FLIGHT_GETNEWFLIGHT_STARTED));
+                break;
             case READY_TOSAVELOCATIONS:
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_STATECHANGEDTO_READYTOSAVE).setEventMessageValueString(flightNumber));
                 //raiseEventGetFlightComleted();

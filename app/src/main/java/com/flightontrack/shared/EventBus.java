@@ -15,7 +15,7 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public interface EventBus extends Events{
-    String TAG = "Bus";
+    final String TAG = "Bus";
 
     static void distribute(EventMessage eventMessage){
         ArrayList<EventBus> interfaceList = new ArrayList();
@@ -150,6 +150,7 @@ public interface EventBus extends Events{
                 break;
             case SESSION_ONSENDCACHECOMPLETED:
                 if (SimpleSettingsActivity.simpleSettingsActivityInstance!=null) interfaceList.add(SimpleSettingsActivity.simpleSettingsActivityInstance);
+                interfaceList.add(mainactivityInstance);
                 //interfaceList.add(Session.getInstance()); /// if still location left send
                 break;
         }
