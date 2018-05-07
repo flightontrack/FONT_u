@@ -29,7 +29,7 @@ public interface EventBus extends Events{
                 break;
             case MACT_BIGBUTTON_ONCLICK_STOP:
                 interfaceList.add(Props.getInstance());
-                interfaceList.add(RouteBase.activeRoute.activeFlight); // close flight of set the pending flight to fail
+                interfaceList.add(RouteBase.activeFlight); // close flight of set the pending flight to fail
                 //interfaceList.add(Session.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
                 break;
@@ -145,7 +145,7 @@ public interface EventBus extends Events{
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_REMOTENUMBER_RECEIVED:
-                interfaceList.add(RouteBase.getInstance()); /// add the base flight to flightlist if it is not in
+                interfaceList.add(RouteBase.getInstance()); /// add the offline flights to flightlist if it is not in
                 interfaceList.add(Session.getInstance());   /// start send locations for the flights with replaced flight number
                 break;
             case SESSION_ONSENDCACHECOMPLETED:

@@ -39,9 +39,8 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public class FlightOnline extends FlightOffline implements GetTime, EventBus {
-    static final String TAG = "Flight";
+    static final String TAG = "FlightOnline";
 
-    public boolean isGetFlightNumber = true;
     public String flightTimeString;
     public int lastAltitudeFt;
     public int _wayPointsCount;
@@ -406,7 +405,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                 .setEventMessageValueString(flightNumber));
     }
 
-    public void set_flightState(FLIGHT_STATE fs) {
+    public FlightOnline set_flightState(FLIGHT_STATE fs) {
         super.set_flightState(fs);
         switch (fs) {
             case GETTINGFLIGHT:
@@ -414,19 +413,18 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                 break;
             case READY_TOSAVELOCATIONS:
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_STATECHANGEDTO_READYTOSAVE).setEventMessageValueString(flightNumber));
-                //raiseEventGetFlightComleted();
                 break;
             case INFLIGHT_SPEEDABOVEMIN:
                 _flightStartTimeGMT = getTimeGMT();
                 EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDABOVEMIN).setEventMessageValueString(flightNumber));
                 break;
             case STOPPED:
-                //EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDLOW).setEventMessageValueString(flightNumber));
                 if (sqlHelper.getLocationFlightCount(flightNumber) == 0) {
                     set_flightState(FLIGHT_STATE.READY_TOBECLOSED);
                 }
                 break;
         }
+        return this;
     }
 
     public void set_flightState(FLIGHT_STATE fs, String descr) {
