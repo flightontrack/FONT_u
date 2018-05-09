@@ -1,4 +1,4 @@
-package com.flightontrack.activity;
+package com.flightontrack.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,8 +9,6 @@ import android.provider.Settings;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.activity.AircraftActivity;
-import com.flightontrack.activity.MainActivity;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 

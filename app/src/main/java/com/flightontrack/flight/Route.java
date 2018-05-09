@@ -8,7 +8,6 @@ import com.flightontrack.shared.Props;
 
 import static com.flightontrack.shared.Const.*;
 
-
 public class Route extends RouteBase implements EventBus{
     private final String TAG = "Route";
 

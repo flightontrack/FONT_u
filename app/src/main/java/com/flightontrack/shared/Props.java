@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.flightontrack.R;
-import com.flightontrack.activity.MainActivity;
+import com.flightontrack.ui.MainActivity;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.mysql.SQLHelper;

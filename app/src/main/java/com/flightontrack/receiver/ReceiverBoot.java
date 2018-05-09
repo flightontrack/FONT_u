@@ -9,7 +9,7 @@ import android.content.Intent;
 //import android.os.IBinder;
 import android.util.Log;
 
-import com.flightontrack.activity.MainActivity;
+import com.flightontrack.ui.MainActivity;
 import com.flightontrack.shared.Props;
 
 import static com.flightontrack.shared.Const.*;

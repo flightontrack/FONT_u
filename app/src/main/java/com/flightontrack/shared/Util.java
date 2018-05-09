@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.flightontrack.R;
-import com.flightontrack.activity.SimpleSettingsActivity;
+import com.flightontrack.ui.SimpleSettingsActivity;
 import com.flightontrack.communication.HttpJsonClient;
 import com.flightontrack.communication.ResponseJsonObj;
 import com.flightontrack.entities.EntityProgressBarGetPsw;

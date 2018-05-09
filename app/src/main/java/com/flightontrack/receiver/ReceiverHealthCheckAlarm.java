@@ -12,7 +12,7 @@ import com.flightontrack.entities.EntityRequestHealthCheck;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
-import com.flightontrack.activity.MainActivity;
+import com.flightontrack.ui.MainActivity;
 import com.flightontrack.locationclock.SvcLocationClock;
 import com.loopj.android.http.JsonHttpResponseHandler;
 

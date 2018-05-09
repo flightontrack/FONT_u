@@ -1,5 +1,6 @@
 package com.flightontrack.shared;
-import com.flightontrack.activity.SimpleSettingsActivity;
+import com.flightontrack.ui.BigButton;
+import com.flightontrack.ui.SimpleSettingsActivity;
 import com.flightontrack.flight.FlightOffline;
 import com.flightontrack.flight.Route;
 import com.flightontrack.flight.RouteBase;
@@ -37,7 +38,8 @@ public interface EventBus extends Events{
                 interfaceList.add(mainactivityInstance);
                 break;
             case FLIGHT_GETNEWFLIGHT_STARTED:
-                interfaceList.add(mainactivityInstance);
+                //interfaceList.add(mainactivityInstance);
+                interfaceList.add(BigButton.getInstance());
                 break;
             case FLIGHT_GETNEWFLIGHT_COMPLETED:
                 if(!eventMessage.eventMessageValueBool){
@@ -51,6 +53,7 @@ public interface EventBus extends Events{
                 break;
             case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
                 interfaceList.add(mainactivityInstance);
+                interfaceList.add(BigButton.getInstance());
                 break;
             case FLIGHT_CLOSEFLIGHT_COMPLETED:
                 interfaceList.add(RouteBase.getInstance()); /// remove flight
@@ -70,7 +73,7 @@ public interface EventBus extends Events{
                 break;
             case ROUTE_NOACTIVEROUTE:
                 if (SvcLocationClock.getInstance()!=null) interfaceList.add(SvcLocationClock.getInstance());
-                else interfaceList.add(mainactivityInstance);
+                else interfaceList.add(BigButton.getInstance()); //interfaceList.add(mainactivityInstance);
                 break;
             case ROUTE_ONRESTART:
                 interfaceList.add(SvcLocationClock.getInstance());
@@ -78,6 +81,7 @@ public interface EventBus extends Events{
             case SESSION_ONSUCCESS_EXCEPTION:
                 interfaceList.add(Props.getInstance());
                 interfaceList.add(SvcLocationClock.getInstance());
+                interfaceList.add(mainactivityInstance);
                 break;
             case SESSION_ONSUCCESS_COMMAND:
                 //interfaceList.add(Route.get_FlightInstanceByNumber(eventMessage.eventMessageValueString));
@@ -106,7 +110,8 @@ public interface EventBus extends Events{
                 interfaceList.add(Props.getInstance());
                 break;
             case CLOCK_MODECLOCK_ONLY:
-                interfaceList.add(mainactivityInstance);
+                //interfaceList.add(mainactivityInstance);
+                interfaceList.add(BigButton.getInstance());
                 interfaceList.add(RouteBase.getInstance());
                 break;
             case CLOCK_SERVICESELFSTOPPED:
@@ -142,7 +147,8 @@ public interface EventBus extends Events{
             case FLIGHT_STATECHANGEDTO_READYTOSAVE:
                 interfaceList.add(RouteBase.activeRoute); // set route number
                 interfaceList.add(new SvcLocationClock()); //start clock service in location mode
-                interfaceList.add(mainactivityInstance);
+                //interfaceList.add(mainactivityInstance);
+                interfaceList.add(BigButton.getInstance());
                 break;
             case FLIGHT_REMOTENUMBER_RECEIVED:
                 interfaceList.add(RouteBase.getInstance()); /// add the offline flights to flightlist if it is not in

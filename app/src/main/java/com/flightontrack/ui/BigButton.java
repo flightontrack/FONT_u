@@ -1,46 +1,55 @@
-package com.flightontrack.activity;
-
-import android.widget.Button;
+package com.flightontrack.ui;
 
 import com.flightontrack.R;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.flight.RouteBase;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.shared.Const;
+import com.flightontrack.shared.EventBus;
+import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Props;
 
 import static com.flightontrack.shared.Const.FLIGHT_NUMBER_DEFAULT;
 import static com.flightontrack.shared.Const.SPACE;
 import static com.flightontrack.shared.Props.SessionProp.trackingButtonState;
 import static com.flightontrack.shared.Props.ctxApp;
+import static com.flightontrack.shared.Props.mainactivityInstance;
 
-/**
- * Created by hotvk on 5/5/2018.
- */
 
-public class BigButton {
+public class BigButton implements EventBus {
     static final String TAG = "BigButton";
-    public Button trackingButton;
+    public static BigButton bigButtonInstance = null;
 
-    void setTrackingButton(Const.BUTTONREQUEST request) {
-        trackingButton.setText(getButtonText(request));
+    public static BigButton getInstance() {
+        if(bigButtonInstance == null) {
+            bigButtonInstance = new BigButton();
+        }
+        return bigButtonInstance;
+    }
+
+    static void setTrackingButton(Const.BUTTONREQUEST request) {
+        int backgroundResource;
         switch (request) {
             case BUTTON_STATE_RED:
-                trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
+                backgroundResource = R.drawable.bttn_status_red;
                 break;
             case BUTTON_STATE_YELLOW:
-                trackingButton.setBackgroundResource(R.drawable.bttn_status_yellow);
+                backgroundResource = R.drawable.bttn_status_yellow;
                 break;
             case BUTTON_STATE_GREEN:
-                trackingButton.setBackgroundResource(R.drawable.bttn_status_green);
+                backgroundResource = R.drawable.bttn_status_green;
                 break;
             case BUTTON_STATE_GETFLIGHTID:
-                trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
+                backgroundResource = R.drawable.bttn_status_red;
                 break;
             default:
-                trackingButton.setBackgroundResource(R.drawable.bttn_status_red);
+                backgroundResource = R.drawable.bttn_status_red;
+
         }
         if (request!= Const.BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID)trackingButtonState = request;
+        mainactivityInstance.trackingButton.setText(getButtonText(request));
+        mainactivityInstance.trackingButton.setBackgroundResource(backgroundResource);
+
     }
 
     static String setTextGreen() {
@@ -85,4 +94,41 @@ public class BigButton {
         }
         return Props.SessionProp.pTrackingButtonText;
     }
+
+    @Override
+    public void eventReceiver(EventMessage eventMessage) {
+        EVENT ev = eventMessage.event;
+        new FontLogAsync().execute(new EntityLogMessage(TAG, "eventReceiver : " + ev, 'd'));
+        //txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
+        switch (ev) {
+            case FLIGHT_GETNEWFLIGHT_STARTED:
+                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID);
+                break;
+//            case SESSION_ONSUCCESS_EXCEPTION:;
+//                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_RED);
+//                break;
+            case FLIGHT_STATECHANGEDTO_READYTOSAVE:
+                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_YELLOW);
+                break;
+            case CLOCK_MODECLOCK_ONLY:
+                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_RED);
+                break;
+//            case CLOCK_SERVICESTARTED_MODELOCATION:
+//                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_YELLOW);
+//                break;
+//            case CLOCK_SERVICESELFSTOPPED:
+//                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_RED);
+//                break;
+            case FLIGHT_FLIGHTTIME_UPDATE_COMPLETED:
+                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_GREEN);
+                break;
+            case FLIGHT_CLOSEFLIGHT_COMPLETED:
+                /// swithch to red
+                break;
+            case ROUTE_NOACTIVEROUTE:
+                setTrackingButton(Const.BUTTONREQUEST.BUTTON_STATE_RED);
+                break;
+        }
+    }
+
 }

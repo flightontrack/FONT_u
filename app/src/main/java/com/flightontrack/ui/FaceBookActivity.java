@@ -1,24 +1,20 @@
-package com.flightontrack.activity;
+package com.flightontrack.ui;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import com.flightontrack.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
-import com.facebook.share.model.ShareLinkContent;
 
 public class FaceBookActivity extends FragmentActivity{
     private CallbackManager callbackManager;

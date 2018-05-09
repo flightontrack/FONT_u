@@ -1,4 +1,4 @@
-package com.flightontrack.activity;
+package com.flightontrack.ui;
 
 import android.Manifest;
 import android.app.Activity;

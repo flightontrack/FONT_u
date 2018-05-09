@@ -20,7 +20,7 @@ import com.flightontrack.other.PhoneListener;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.GetTime;
-import com.flightontrack.activity.MainActivity;
+import com.flightontrack.ui.MainActivity;
 import com.flightontrack.shared.Props;
 
 import static com.flightontrack.shared.Const.*;

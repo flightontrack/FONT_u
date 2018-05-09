@@ -2,7 +2,7 @@ package com.flightontrack.flight;
 
 import android.content.Context;
 
-import com.flightontrack.activity.MainActivity;
+import com.flightontrack.ui.MainActivity;
 
 //import static com.flightontrack.communication.SvcComm.commBatchSize;
 import static com.flightontrack.flight.FlightOffline.*;
@@ -21,7 +21,7 @@ import com.flightontrack.mysql.SQLHelper;
 import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Util;
-import com.flightontrack.activity.ShowAlertClass;
+import com.flightontrack.ui.ShowAlertClass;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -126,7 +126,6 @@ public class Session implements EventBus{
         requestParams.put("date", l.dt);
         requestParams.put("elevcheck", l.irch == 1);
 
-        //postLocation(k, requestParams);
         postLocation(k, l);
     }
 
@@ -293,12 +292,6 @@ public class Session implements EventBus{
                     set_Action(SACTION.GET_OFFLINE_FLIGHTS); /// check to see if any other flights need to be added to the flightList
                 }
                 break;
-//            case SESSION_ONSENDCACHECOMPLETED:
-//                /// if still something to send
-//                if (dbLocationRecCountNormal > 0) {
-//                    set_Action(SACTION.SEND_CACHED_LOCATIONS);
-//                }
-//                break;
             case FLIGHT_REMOTENUMBER_RECEIVED:
                 startLocationRequest(eventMessage.eventMessageValueString);
                 break;

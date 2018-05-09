@@ -80,7 +80,6 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
         _wayPointsCount = pointsCount;
         if (pointsCount >= Util.getWayPointLimit()) {
             EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONPOINTSLIMITREACHED));
-            //route.set_rAction(RACTION.CLOSE_POINTS_LIMIT_REACHED);
         }
     }
 
@@ -198,126 +197,6 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onException e: ", 'e'));
             }
         }
-//        new FontLogAsync().execute(new EntityLogMessage(TAG, "Flight - getNewFlightID:  " + flightNumber, 'd'));
-//        RequestParams requestParams = new RequestParams();
-//
-//        requestParams.put("rcode", Const.REQUEST_FLIGHT_NUMBER);
-//        requestParams.put("phonenumber", MyPhone._myPhoneId); // Util.getMyPhoneID());
-//        requestParams.put("username", Pilot.getPilotUserName());
-//        requestParams.put("userid", Pilot.getUserID());
-//        requestParams.put("deviceid", MyPhone._myDeviceId);
-//        requestParams.put("aid", MyPhone.getMyAndroidID());
-//        requestParams.put("versioncode", String.valueOf(MyPhone.versionCode));
-//        requestParams.put("AcftNum", Util.getAcftNum(4));
-//        requestParams.put("AcftTagId", Util.getAcftNum(5));
-//        requestParams.put("AcftName", Util.getAcftNum(6));
-//        requestParams.put("isFlyingPattern", Props.SessionProp.pIsMultileg);
-//        requestParams.put("freq", Integer.toString(SessionProp.pIntervalLocationUpdateSec));
-//        long speed_thresh = Math.round(SessionProp.pSpinnerMinSpeed);
-//        requestParams.put("speed_thresh", String.valueOf(speed_thresh));
-//        requestParams.put("isdebug", SessionProp.pIsDebug);
-//        if (route.routeNumber != ROUTE_NUMBER_DEFAULT) requestParams.put("routeid", route.routeNumber);
-//        isGetFlightNumber = false;
-////        requestParams.setUseJsonStreamer(true);
-//        AsyncHttpClient client = new AsyncHttpClient();
-//        client.setMaxRetriesAndTimeout(2, 2000);
-//        client.post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
-//                    @Override
-//                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//                        //String responseText = new String(responseBody);
-//                        Response response = new Response(new String(responseBody));
-//                        //char responseType = response.responseType;
-//
-//                        if (response.responseException != null) {
-//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
-//                            Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
-//                            return;
-//                        }
-//                        if (response.responseFlightNum != null) {
-//
-//                            isGetFlightCallSuccess = true;
-//                            route._legCount++;
-//
-//                            set_flightNumber(response.responseFlightNum);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-//                        //new FontLogAsync().execute(new LogMessage(TAG, "getNewFlightID onFailure:" + flightRequestCounter, 'd');
-//                        //if (mainactivityInstance!=null) Toast.makeText(mainactivityInstance, R.string.reachability_error, Toast.LENGTH_LONG).show();
-//                        //if (!isTempFlightNum) if (mainactivityInstance != null) {
-//                        if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
-//                            Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
-//                            raiseEventGetFlightComleted();
-//                        }
-//
-//                        //set_flightState(FSTATE.LOCAL);
-////                        if (flightNumber == null) {
-//////                            try {
-//////                                String dt = URLEncoder.encode(getDateTimeNow(), "UTF-8");
-//////                                //flightNumber = sqlHelper.getNewTempFlightNum(flightNumber, route.routeNumber, dt);
-//////                            } catch (UnsupportedEncodingException e1) {
-//////                                e1.printStackTrace();
-//////                            }
-////                        }
-//                        //if(SvcLocationClock.isInstanceCreated()) ctxApp.stopService(new Intent(ctxApp, SvcLocationClock.class));
-//                    }
-//
-//                    @Override
-//                    public void onFinish() {
-//                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFinish: FlightNumber: " + flightNumber, 'd'));
-//                        isGettingFlight = false;
-//                    }
-//
-//                    @Override
-//                    public void onRetry(int retryNo) {
-//                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getNewFlightID onRetry:" + retryNo, 'd'));
-//                    }
-//                }
-//        );
-//        client = null;
-//        requestParams = null;
-//    }
-
-//    void getCloseFlight() {
-//        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight: " + flightNumber, 'd'));
-//        RequestParams requestParams = new RequestParams();
-//        requestParams.put("rcode", REQUEST_STOP_FLIGHT);
-//        requestParams.put("speedlowflag", isSpeedAboveMin);
-//        requestParams.put("isLimitReached", isLimitReached);
-//        requestParams.put("flightid", flightNumber);
-//        //requestParams.put("isdebug", Util.getIsDebug());
-//        requestParams.put("isdebug", SessionProp.pIsDebug);
-//
-//        new AsyncHttpClient().post(Util.getTrackingURL() + ctxApp.getString(R.string.aspx_rootpage), requestParams, new AsyncHttpResponseHandler() {
-//                    @Override
-//                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight OnSuccess", 'd'));
-//                        //String responseText = new String(responseBody);
-//                        Response response = new Response(new String(responseBody));
-//
-//                        if (response.responseAckn != null) {
-//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|Flight closed: " + flightNumber, 'd'));
-//                        }
-//                        if (response.responseNotif != null) {
-//                            new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess|RESPONSE_TYPE_NOTIF:" + response.responseNotif, 'd'));
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-//                        new FontLogAsync().execute(new EntityLogMessage(TAG, "getCloseFlight onFailure: " + flightNumber, 'd'));
-//
-//                    }
-//
-//                    public void onFinish() {
-//                        set_flightState(FLIGHT_STATE.CLOSED);
-//                    }
-//                }
-//        );
-//        requestParams = null;
-//    }
 
     public void saveLocCheckSpeed(final Location location) {
 
