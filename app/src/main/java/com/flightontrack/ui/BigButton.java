@@ -9,12 +9,10 @@ import com.flightontrack.shared.EventBus;
 import com.flightontrack.shared.EventMessage;
 import com.flightontrack.shared.Props;
 
-import static com.flightontrack.shared.Const.FLIGHT_NUMBER_DEFAULT;
-import static com.flightontrack.shared.Const.SPACE;
+import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.SessionProp.trackingButtonState;
 import static com.flightontrack.shared.Props.ctxApp;
 import static com.flightontrack.shared.Props.mainactivityInstance;
-
 
 public class BigButton implements EventBus {
     static final String TAG = "BigButton";
@@ -28,28 +26,33 @@ public class BigButton implements EventBus {
     }
 
     static void setTrackingButton(Const.BUTTONREQUEST request) {
-        int backgroundResource;
-        switch (request) {
-            case BUTTON_STATE_RED:
-                backgroundResource = R.drawable.bttn_status_red;
-                break;
-            case BUTTON_STATE_YELLOW:
-                backgroundResource = R.drawable.bttn_status_yellow;
-                break;
-            case BUTTON_STATE_GREEN:
-                backgroundResource = R.drawable.bttn_status_green;
-                break;
-            case BUTTON_STATE_GETFLIGHTID:
-                backgroundResource = R.drawable.bttn_status_red;
-                break;
-            default:
-                backgroundResource = R.drawable.bttn_status_red;
-
-        }
-        if (request!= Const.BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID)trackingButtonState = request;
+        //int backgroundResource;
+        if (request!= BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID)trackingButtonState = request;
+        int backgroundResource =
+                request == BUTTONREQUEST.BUTTON_STATE_RED?R.drawable.bttn_status_red:
+                request == BUTTONREQUEST.BUTTON_STATE_YELLOW?R.drawable.bttn_status_yellow:
+                request == BUTTONREQUEST.BUTTON_STATE_GREEN?R.drawable.bttn_status_green:R.drawable.bttn_status_red;
         mainactivityInstance.trackingButton.setText(getButtonText(request));
         mainactivityInstance.trackingButton.setBackgroundResource(backgroundResource);
 
+        //(request == BUTTONREQUEST.BUTTON_STATE_GETFLIGHTID)?R.drawable.bttn_status_red:
+//        switch (request) {
+//            case BUTTON_STATE_RED:
+//                backgroundResource = R.drawable.bttn_status_red;
+//                break;
+//            case BUTTON_STATE_YELLOW:
+//                backgroundResource = R.drawable.bttn_status_yellow;
+//                break;
+//            case BUTTON_STATE_GREEN:
+//                backgroundResource = R.drawable.bttn_status_green;
+//                break;
+//            case BUTTON_STATE_GETFLIGHTID:
+//                backgroundResource = R.drawable.bttn_status_red;
+//                break;
+//            default:
+//                backgroundResource = R.drawable.bttn_status_red;
+//
+//        }
     }
 
     static String setTextGreen() {

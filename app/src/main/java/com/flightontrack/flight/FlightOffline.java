@@ -48,7 +48,7 @@ public class FlightOffline implements EventBus{
     public FLIGHTNUMBER_SRC flightNumStatus = FLIGHTNUMBER_SRC.REMOTE_DEFAULT;
     boolean isSpeedAboveMin = false;
     boolean isLimitReached  = false;
-    boolean isJunkFlight = false;
+    //boolean isJunkFlight = false;
 
     public FlightOffline(){}
 
@@ -173,8 +173,8 @@ public class FlightOffline implements EventBus{
                 .set("flightid", flightNumber)
                 .set("isdebug", SessionProp.pIsDebug)
                 .set("speedlowflag", !isSpeedAboveMin)
-                .set("isLimitReached", isLimitReached)
-                .set("isJunkFlight", isJunkFlight);
+                .set("isLimitReached", isLimitReached);
+                //.set("isJunkFlight", isJunkFlight);
         try (
                 HttpJsonClient client= new HttpJsonClient(entityRequestCloseFlight)
         )

@@ -372,7 +372,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                 new FontLogAsync().execute(new EntityLogMessage(TAG, "server_command int: " + server_command, 'd'));
                 switch (server_command) {
                     case COMMAND_TERMINATEFLIGHT:
-                        isJunkFlight = true;
+                        //isJunkFlight = true;
                         Toast.makeText(mainactivityInstance, R.string.driving, Toast.LENGTH_LONG).show();
                         set_flightState(FLIGHT_STATE.STOPPED, "Terminate flight server command");
                         //set_fAction(FACTION.TERMINATE_FLIGHT);
