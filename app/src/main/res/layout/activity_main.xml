@@ -27,7 +27,7 @@
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
             android:theme="@style/ToolbarTheme"
-            app:navigationIcon="@drawable/ic_launcher"
+            app:navigationIcon="@drawable/ic_launcher_96"
             app:popupTheme="@style/ToolbarPopupTheme">
 
         </android.support.v7.widget.Toolbar>

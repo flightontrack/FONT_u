@@ -32,7 +32,7 @@
         app:showAsAction="always"
         />
     <item android:id="@+id/action_email"
-        android:icon="@drawable/ic_action_email_dark"
+        android:icon="@drawable/ic_action_email_48"
         android:title="@string/action_email"
         android:layout_weight="1"
         android:orderInCategory="6"

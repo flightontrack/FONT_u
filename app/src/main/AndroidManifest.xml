@@ -39,7 +39,7 @@
     <application
         android:name=".other.MyApplication"
         android:label="@string/app_label"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_launcher_96"
         android:allowBackup="true"
         android:theme="@style/AppTheme"
     >
