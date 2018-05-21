@@ -2,6 +2,7 @@ package com.flightontrack.ui;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.flightontrack.flight.RouteBase;
 
 public class FaceBookActivity extends FragmentActivity{
     private CallbackManager callbackManager;
@@ -120,8 +122,10 @@ public class FaceBookActivity extends FragmentActivity{
         //Profile profile = Profile.getCurrentProfile();
         ShareLinkContent linkContent = new ShareLinkContent.Builder()
                 //.setContentTitle("My Flight " +Route.activeFlight.flightNumber)
-                .setContentDescription("Watch my flight on the link below")
-                //.setContentUrl(Uri.parse("http://FLIGHTONTRACK.azurewebsites.net/Flight/DisplayMyFlightMovingMap/"+Route.activeFlight.flightNumber+"?FlightOrRoute=Flight"))
+                //.setContentDescription("Watch my flight on the link below")
+                .setQuote("Watch my flight on the link below")
+                //.setContentUrl(Uri.parse("http://flightontrack-test.azurewebsites.net/Flight/DisplayMyFlightMovingMap/"+ RouteBase.activeFlight.flightNumber+"?FlightOrRoute=Route"))
+                .setContentUrl(Uri.parse("http://flightontrack-test.azurewebsites.net"))
                 .build();
         if (canPresentShareDialog) {
             shareDialog.show(linkContent);
