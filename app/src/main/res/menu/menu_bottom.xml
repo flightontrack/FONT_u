@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.MainActivity" >
     <item android:id="@+id/action_aircraft"
-        android:icon="@drawable/ic_acft_48"
+        android:icon="@drawable/ic_acft_48_1"
         android:title="@string/action_aircraft"
         android:background="@android:color/transparent"
         android:layout_weight="1"

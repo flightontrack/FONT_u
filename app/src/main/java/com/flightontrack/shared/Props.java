@@ -142,7 +142,7 @@ public final class Props implements EventBus{
             editor.remove("pSpinnerUrlsPos").commit();
             editor.remove("pSpinnerTextToPos").commit();
             editor.remove("pSpinnerMinSpeedPos").commit();
-            editor.remove("pTextRed").commit();
+            editor.remove("pTrackingButtonText").commit();
             pIsRoad = false;
             pIsDebug = false;
         }
