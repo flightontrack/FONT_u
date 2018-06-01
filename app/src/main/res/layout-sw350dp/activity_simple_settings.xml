@@ -87,12 +87,18 @@ android:weightSum="100">
             android:layout_width="wrap_content"
             />
         <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:layout_height="wrap_content"
+            style="@style/label_text"
+            />
+        <TextView
             android:id="@+id/txtWebsitePsw"
             android:layout_height="wrap_content"
             style="@style/label_text"
             android:visibility="gone"
             android:layout_width="0dp"
-            android:layout_weight="5.5"
+            android:layout_weight="6.5"
             />
     </LinearLayout>
     <LinearLayout

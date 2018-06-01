@@ -38,7 +38,7 @@ public final class Props implements EventBus{
             ///             4. app starts on reboot
         public static boolean pAutostart=!pIsAppTypePublic&&SessionProp.pIsStartedOnReboot;
         public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
-        public static boolean pIsRelease =true;
+        public static boolean pIsRelease =false;
 
         /// these properties updated dynamically in run time
         public static String pMainActivityLayout = "full";
