@@ -38,6 +38,7 @@ public final class Props implements EventBus{
             ///             4. app starts on reboot
         public static boolean pAutostart=!pIsAppTypePublic&&SessionProp.pIsStartedOnReboot;
         public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
+        public static boolean pIsRelease =true;
 
         /// these properties updated dynamically in run time
         public static String pMainActivityLayout = "full";
@@ -97,7 +98,7 @@ public final class Props implements EventBus{
             set_pIntervalLocationUpdateSecPos(sharedPreferences.getInt("pIntervalSelectedItem", DEFAULT_INTERVAL_SELECTED_ITEM));
             pIsEmptyAcftOk=sharedPreferences.getBoolean("pIsEmptyAcftOk", false);
             //pIntervalLocationUpdateSec=sharedPreferences.getInt("pIntervalLocationUpdateSec", MIN_TIME_BW_GPS_UPDATES_SEC);
-            pSpinnerUrlsPos=sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
+            pSpinnerUrlsPos=pIsRelease?DEFAULT_URL_SPINNER_POS:sharedPreferences.getInt("pSpinnerUrlsPos", DEFAULT_URL_SPINNER_POS);
             pSpinnerTextToPos=sharedPreferences.getInt("pSpinnerTextToPos", 0);
             //pTextRed = sharedPreferences.getString("pTextRed", ctxApp.getString(R.string.start_flight));
             pTrackingButtonText = sharedPreferences.getString("pTrackingButtonText", ctxApp.getString(R.string.start_flight));

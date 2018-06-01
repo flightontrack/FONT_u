@@ -33,7 +33,10 @@ public class Util {
         String[] spinnerUrls = ctxApp.getResources().getStringArray(R.array.url_array);
         return "http://"+spinnerUrls[SessionProp.pSpinnerUrlsPos].trim();
     }
-
+    public static String getWebserverURL() {
+        String url = ctxApp.getString(R.string.app_webserver_azure);
+        return "http://"+url;
+    }
     public static int getWayPointLimit() {
         return sharedPreferences.getInt("wayPointLimit", WAY_POINT_HARD_LIMIT);
     }
@@ -132,7 +135,7 @@ public class Util {
                 @Override
                 public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
                     //progressBar.dismiss();
-                    mylog.execute(new EntityLogMessage(TAG, "getCloudPsw OnSuccess", 'd'));
+                    mylog.execute(new EntityLogMessage(TAG, "setCloudPsw OnSuccess", 'd'));
                     ResponseJsonObj response = new ResponseJsonObj(jsonObject);
                     if (response.responsePsw!=null) {
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "ap=" + response.responsePsw, 'd'));

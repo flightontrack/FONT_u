@@ -18,6 +18,7 @@
 
     <!--url-->
     <string name="app_webserver">flightontrack.com</string>
+    <string name="app_webserver_azure">flightontrack.azurewebsites.net</string>
     <string name="email_support">support@flightontrack.com</string>
     <string name="email_crash">support@flightontrack.com</string>
     <string name="aspx_rootpage">/Router.aspx</string>
@@ -26,7 +27,7 @@
     <string name="aspx_communication">/Communication.aspx</string>
 
     <!--hints-->
-    <string name="default_acft_N">N</string>
+    <string name="default_acft_N"></string>
     <string name="default_acft_Make"></string>
     <string name="default_acft_Model"></string>
     <string name="default_acft_Series"></string>
@@ -82,7 +83,7 @@
     <string name="label_btnsave">Save Settings</string>
 
     <string name="instructions1">Scan aircraft NFC tag</string>
-    <string name="instructions2">Update fields manually or turn the switch on to scan tag</string>
+    <string name="instructions2">Update fields manually or turn the NFC switch on to scan tag</string>
 
     <!--messages-->
     <string name="alarm_has_now_started">Connected to cloud successfully</string>
@@ -170,7 +171,9 @@
         <!--<item>http://192.168.1.11/postnget</item>-->
 
     </string-array>
-
+    <string-array name="url_array_release">
+        <item>postnget.azurewebsites.net</item>
+    </string-array>
     <!--multiline-->
     <string name="multilines">Line1Line1\nLine2Line2</string>
 

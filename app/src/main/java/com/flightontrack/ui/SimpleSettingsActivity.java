@@ -28,6 +28,7 @@ import com.flightontrack.pilot.Pilot;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
+import static com.flightontrack.shared.Props.AppConfig.pIsRelease;
 import static com.flightontrack.shared.Props.SessionProp.sqlHelper;
 
 public class SimpleSettingsActivity extends Activity implements AdapterView.OnItemSelectedListener,EventBus {
@@ -115,7 +116,7 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         txtPsw.setText(Util.getPsw());
         //chBoxIsDebug.setChecked(Util.getIsDebug());
         spinnerUrls = (Spinner) findViewById(R.id.spinnerUrlId);
-        ArrayAdapter<CharSequence> adapterUrl = ArrayAdapter.createFromResource(this,R.array.url_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapterUrl = ArrayAdapter.createFromResource(this,pIsRelease?R.array.url_array_release:R.array.url_array, android.R.layout.simple_spinner_item);
         adapterUrl.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrls.setAdapter(adapterUrl);
         spinnerUrls.setOnItemSelectedListener(this);

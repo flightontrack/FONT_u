@@ -90,10 +90,10 @@ public class AircraftActivity extends Activity {
             nfcSwitch = (Switch) findViewById(R.id.switch_nfc);
             txtBlueText = (TextView) findViewById(R.id.txtBlueText);
             nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-            txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
-            txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
-            txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
-            txtAcftTagId = (TextView) findViewById(R.id.txtAcftTagId);
+//            txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
+//            txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
+//            txtAcftSeries = (TextView) findViewById(R.id.txtAcftSeries);
+//            txtAcftTagId = (TextView) findViewById(R.id.txtAcftTagId);
             setAcft(getAcft());
         }
         setAcft_nonfc(getAcft());
@@ -122,10 +122,10 @@ public class AircraftActivity extends Activity {
                 json.put("AcftName", txtAcftName.getText().toString());
                 setAcft_nonfc(json);
                 if (Props.AppConfig.pIsNFCcapable) {
-                    json.put("AcftMake", txtAcftMake.getText().toString());
-                    json.put("AcftModel", txtAcftModel.getText().toString());
-                    json.put("AcftSeries", txtAcftSeries.getText().toString());
-                    json.put("AcftTagId", txtAcftTagId.getText().toString());
+//                    json.put("AcftMake", txtAcftMake.getText().toString());
+//                    json.put("AcftModel", txtAcftModel.getText().toString());
+//                    json.put("AcftSeries", txtAcftSeries.getText().toString());
+//                    json.put("AcftTagId", txtAcftTagId.getText().toString());
                     setAcft(json);
                 }
             } catch (JSONException e) {
@@ -195,11 +195,11 @@ public class AircraftActivity extends Activity {
             Props.editor.putString("AcftName", AcftName.trim());
             Props.editor.commit();
 
-            txtAcftMake.setText(AcftMake);
-            txtAcftModel.setText(AcftModel);
-            txtAcftSeries.setText(AcftSeries);
+            //txtAcftMake.setText(AcftMake);
+            //txtAcftModel.setText(AcftModel);
+            //txtAcftSeries.setText(AcftSeries);
             txtAcftRegNum.setText(AcftRegNum);
-            txtAcftTagId.setText(AcftTagId);
+            //txtAcftTagId.setText(AcftTagId);
             txtAcftName.setText(AcftName);
 
         } catch (JSONException e) {
