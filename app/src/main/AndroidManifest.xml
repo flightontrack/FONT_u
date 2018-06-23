@@ -57,8 +57,9 @@
 
         </activity>
         <activity android:name=".ui.PermissionActivity" />
-
-
+        <activity android:name=".ui.SimpleSettingsActivity" android:label="@string/action_settings" android:parentActivityName=".ui.MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".ui.MainActivity"/>
+        </activity>
         <activity
             android:name=".ui.HelpPageActivity"
             android:label="@string/action_help"
@@ -67,10 +68,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.flightontrack.ui.MainActivity" />
         </activity>
+
         <activity
-            android:name=".ui.SimpleSettingsActivity"
-            android:label="@string/action_settings"
-            android:parentActivityName=".ui.MainActivity">
+            android:name=".ui.PrivacyPolicyActivity"
+            android:label="@string/action_privpolicy"
+            android:parentActivityName=".ui.PrivacyPolicyActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.flightontrack.ui.MainActivity" />

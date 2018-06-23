@@ -45,4 +45,11 @@
         android:orderInCategory="6"
         app:showAsAction="never"
         />
+    <item android:id="@+id/privpolicy"
+        android:icon="@drawable/ic_action_settings"
+        android:title="@string/action_privpolicy"
+        android:layout_weight="1"
+        android:orderInCategory="6"
+        app:showAsAction="never"
+        />
 </menu>

@@ -11,6 +11,7 @@
     <string name="action_aircraft">Aircraft</string>
     <string name="action_logbook">LogBook</string>
     <string name="action_facebook">Share on FB</string>
+    <string name="action_privpolicy">Privacy Policy</string>
 
     <!--activityTitle-->
     <string name="activity_aircraft_title">Aircraft</string>

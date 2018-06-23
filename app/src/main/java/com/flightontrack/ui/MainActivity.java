@@ -212,6 +212,9 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             case R.id.action_aircraft:
                 acftActivity();
                 return true;
+            case R.id.privpolicy:
+                privacyPolicy();
+                return true;
             case R.id.action_facebook:
                 if (!(RouteBase.activeFlight == null)) facebActivity();
                 else
@@ -346,6 +349,14 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     void helpPage() {
         try {
             Intent intent = new Intent(ctxApp, HelpPageActivity.class);
+            startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Toast.makeText(ctxApp, "Can't reach help webpage.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    void privacyPolicy() {
+        try {
+            Intent intent = new Intent(ctxApp, PrivacyPolicyActivity.class);
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
             Toast.makeText(ctxApp, "Can't reach help webpage.", Toast.LENGTH_SHORT).show();
