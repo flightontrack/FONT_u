@@ -15,7 +15,7 @@
             android:elevation="4dp"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:navigationIcon="@drawable/ic_launcher_light">
+            app:navigationIcon="@drawable/ic_launcher_96">
 
         </android.support.v7.widget.Toolbar>
     </LinearLayout>

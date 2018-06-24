@@ -1,18 +1,24 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     //buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.flightontrack"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
 //        versionCode 1
 //        versionName "1.1"
     }
     buildTypes {
         release {
+//            runProguard false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
 //            runProguard false
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -25,26 +31,39 @@ android {
     }
 }
 repositories {
-     // for releases
+    // for releases
     mavenCentral()
+    //maven { url 'https://maven.fabric.io/public' }
     google()
 }
-sourceSets{
-    main{
+sourceSets {
+    main {
         java {
             //exclude '**/FaceBookActivity.java'
         }
     }
 }
 dependencies {
+    //implementation 'com.google.firebase:firebase-crash:16.0.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.3'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.loopj.android:android-async-http:1.4.9'
     //provided 'com.facebook.android:facebook-android-sdk:[4,5)'
     //    compile 'ch.acra:acra:4.8.5'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.facebook.android:facebook-share:4.28.0'
     //compile 'com.android.support:widget-v7+'
     //compile files('libs/facebook-android-sdk-4.11.0')
-    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
+    //compile 'com.google.firebase:firebase-appindexing:16.0.1'
+    //classpath 'io.fabric.tools:gradle:1.+'
 }
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+apply plugin: 'com.google.gms.google-services'

@@ -29,7 +29,7 @@ public final class Props implements EventBus{
     public static SharedPreferences.Editor editor;
 
     public static class AppConfig {
-        public static String pAppRelease = "1.80";
+        public static String pAppRelease = "1.81";
         public static boolean pIsNFCEnabled =true;
         public static boolean pIsAppTypePublic=true;
         /// if false:   1. start healthcheckalarmreceiver
@@ -38,7 +38,7 @@ public final class Props implements EventBus{
             ///             4. app starts on reboot
         public static boolean pAutostart=!pIsAppTypePublic&&SessionProp.pIsStartedOnReboot;
         public static String pAppReleaseSuffix = pIsAppTypePublic?"p":"c";
-        public static boolean pIsRelease =false;
+        public static boolean pIsRelease =true;
 
         /// these properties updated dynamically in run time
         public static String pMainActivityLayout = "full";

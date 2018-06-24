@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
@@ -37,10 +38,12 @@ import com.flightontrack.pilot.MyPhone;
 import com.flightontrack.pilot.Pilot;
 import com.flightontrack.receiver.ReceiverHealthCheckAlarm;
 import com.flightontrack.receiver.ReceiverBatteryLevel;
-import com.google.android.gms.appindexing.Action;
+//import com.google.android.gms.appindexing.Action;
 //import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
+//import com.google.android.gms.appindexing.Thing;
 //import com.google.android.gms.common.api.GoogleApiClient;
+
+import io.fabric.sdk.android.Fabric;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
@@ -81,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Fabric.with(this, new Crashlytics());
         try {
             //Log.d(TAG, "MainActivityThread:" + Thread.currentThread().getId());
             initProp(getApplicationContext(), this);
@@ -315,6 +319,8 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                     EventBus.distribute(new EventMessage(EVENT.MACT_BIGBUTTON_ONCLICK_STOP));
                     break;
             }
+            //Crashlytics.getInstance().crash(); // Force a crash
+            //throw new NullPointerException();
         });
 
         chBoxIsMultiLeg.setOnCheckedChangeListener((compoundButton, b) -> {
