@@ -76,7 +76,7 @@ public void eventReceiver(EventMessage eventMessage){
     new FontLogAsync().execute(new EntityLogMessage(TAG, routeNumber+" :eventReceiver:"+ev+":eventString:"+eventMessage.eventMessageValueString, 'd'));
     switch(ev){
                 case FLIGHT_STATECHANGEDTO_READYTOSAVE:
-                    if (routeNumber == ROUTE_NUMBER_DEFAULT) routeNumber =eventMessage.eventMessageValueString;
+                    if (routeNumber.equals(ROUTE_NUMBER_DEFAULT)) routeNumber =eventMessage.eventMessageValueString;
                     break;
                 case MACT_BIGBUTTON_ONCLICK_START:
                     set_rAction(RACTION.OPEN_NEW_FLIGHT);

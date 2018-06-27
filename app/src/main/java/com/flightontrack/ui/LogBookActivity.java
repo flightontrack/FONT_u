@@ -27,7 +27,7 @@ public class LogBookActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_book);
 
-        myWebView = (WebView) findViewById(R.id.logbookwebview);
+        myWebView = findViewById(R.id.logbookwebview);
         myWebView.setInitialScale(0);
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);

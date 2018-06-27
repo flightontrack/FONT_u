@@ -71,7 +71,7 @@ public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> imp
         if (!dir.exists()) {
             dir.mkdir();
         }
-        File logFile = new File(dir, "FONTLog_"+_myPhoneId+".txt");
+        File logFile = new File(dir, "FONTLog_"+_myPhoneId+"_"+android.os.Process.myPid()+".txt");
         try {
             if (!logFile.exists()) {
                 logFile.createNewFile();

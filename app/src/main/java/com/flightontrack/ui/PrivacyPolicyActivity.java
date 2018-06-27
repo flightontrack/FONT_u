@@ -15,7 +15,7 @@ public class PrivacyPolicyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_privpol_page);
-        WebView myWebView = (WebView) findViewById(R.id.privpolwebview);
+        WebView myWebView = findViewById(R.id.privpolwebview);
         myWebView.loadUrl("file:///android_asset/privacypolicy.html");
     }
 

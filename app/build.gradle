@@ -3,7 +3,6 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 26
-    //buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.flightontrack"
@@ -16,6 +15,7 @@ android {
         release {
 //            runProguard false
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -46,13 +46,13 @@ sourceSets {
 dependencies {
     //implementation 'com.google.firebase:firebase-crash:16.0.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.3'
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.loopj.android:android-async-http:1.4.9'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.loopj.android:android-async-http:1.4.9'
     //provided 'com.facebook.android:facebook-android-sdk:[4,5)'
     //    compile 'ch.acra:acra:4.8.5'
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support:cardview-v7:26.1.0'
-    compile 'com.facebook.android:facebook-share:4.28.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation 'com.facebook.android:facebook-share:4.32.0'
     //compile 'com.android.support:widget-v7+'
     //compile files('libs/facebook-android-sdk-4.11.0')
     //compile 'com.google.firebase:firebase-appindexing:16.0.1'

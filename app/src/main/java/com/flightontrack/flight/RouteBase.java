@@ -39,7 +39,7 @@ public class RouteBase implements EventBus{
                 return f;
             }
         }
-        return RouteBase.activeRoute.activeFlight;
+        return activeFlight;
     }
     public static boolean isFlightNumberInList(String flightNumber){
         for (FlightOffline f : flightList) {

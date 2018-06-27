@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             AppConfig.pMainActivityLayout = findViewById(R.id.TagView).getTag().toString();
             if (AppConfig.pMainActivityLayout.equals("full")) {
                 //AppConfig.pIsOnRebootCheckBoxEnabled = true;
-                toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
-                amvMenu = (ActionMenuView) toolbarBottom.findViewById(R.id.amvMenu);
+                toolbarBottom = findViewById(R.id.toolbar_bottom);
+                amvMenu = toolbarBottom.findViewById(R.id.amvMenu);
                 amvMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
@@ -114,16 +114,16 @@ public class MainActivity extends AppCompatActivity implements EventBus {
                 //}
 
             });
-            toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
+            toolbarTop = findViewById(R.id.toolbar_top);
             setSupportActionBar(toolbarTop);
             getSupportActionBar().setTitle(getString(R.string.app_label) + " " + AppConfig.pAppRelease + AppConfig.pAppReleaseSuffix);
-            txtAcftNum = (TextView) findViewById(R.id.txtAcftNum);
-            txtUserName = (TextView) findViewById(R.id.txtUserName);
-            chBoxIsMultiLeg = (CheckBox) findViewById(R.id.patternCheckBox);
-            spinnerUpdFreq = (Spinner) findViewById(R.id.spinnerId);
-            spinnerMinSpeed = (Spinner) findViewById(R.id.spinnerMinSpeedId);
-            trackingButton = (Button) findViewById(R.id.btnTracking);
-            txtCached = (TextView) findViewById((R.id.txtCached));
+            txtAcftNum = findViewById(R.id.txtAcftNum);
+            txtUserName = findViewById(R.id.txtUserName);
+            chBoxIsMultiLeg = findViewById(R.id.patternCheckBox);
+            spinnerUpdFreq = findViewById(R.id.spinnerId);
+            spinnerMinSpeed = findViewById(R.id.spinnerMinSpeedId);
+            trackingButton = findViewById(R.id.btnTracking);
+            txtCached = findViewById((R.id.txtCached));
 
             AppConfig.get();
             AppConfig.pIsNFCcapable = AppConfig.pIsNFCEnabled && isNFCcapable();
@@ -390,13 +390,13 @@ public class MainActivity extends AppCompatActivity implements EventBus {
 
         emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Flight On Track issue");
-        String emailText = "APP_BUILD : " + myPhone.getVersionCode() + '\n' +
+        String emailText = "APP_BUILD : " + MyPhone.getVersionCode() + '\n' +
                 "ANDROID_VERSION : " + myPhone.getMyAndroidVersion() + '\n' +
                 "PHONE_MODEL : " +
                 //Util.deviceMmnufacturer.toUpperCase()+'\n'+
                 //Util.deviceBrand.toUpperCase()+'\n'+
-                myPhone.deviceModel.toUpperCase() + ' ' +
-                myPhone.deviceProduct.toUpperCase() + '\n' +
+                MyPhone.deviceModel.toUpperCase() + ' ' +
+                MyPhone.deviceProduct.toUpperCase() + '\n' +
                 "USER : " + Pilot.getUserID() + '\n';
 
         emailIntent.putExtra(Intent.EXTRA_TEXT, emailText + '\n' + getString(R.string.email_commment) + '\n');

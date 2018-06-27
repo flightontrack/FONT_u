@@ -1,10 +1,16 @@
 package com.flightontrack.other;
 
 import android.app.Application;
+import android.os.Environment;
 //f import com.facebook.FacebookSdk;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 
+import java.io.File;
+import java.io.IOException;
+
 import static com.flightontrack.shared.Const.*;
+import static com.flightontrack.shared.Props.AppConfig.pIsRelease;
 //import com.facebook.appevents.AppEventsLogger;
 
 //import org.acra.*;
@@ -38,38 +44,45 @@ import static com.flightontrack.shared.Const.*;
 //        resToastText = R.string.crash_toast_text,
 //        logcatArguments = { "-t", "100", "-v", "long", "FLIGHT_ON_TRACK:V", "*:W" })
 public class MyApplication extends Application {
-    public static boolean productionRelease = false;
-    //public static APPTYPE fontAppType = APPTYPE.PRIVATE;
-    //public static APPTYPE fontAppType = APPTYPE.PUBLIC;
-    //public static boolean productionRelease = true;
+    private static Thread.UncaughtExceptionHandler defaultHandler;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        //FacebookSdk.sdkInitialize(getApplicationContext());
-        // The following line triggers the initialization of ACRA
-//        ACRA.init(this);
-//        ACRA.getErrorReporter().putCustomData("myKey", "myValue");
-        //startLogcat();
+        if (pIsRelease) return;
+        if (defaultHandler == null) {
+            defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+        }
+        // Setup handler for uncaught exceptions.
+        Thread.setDefaultUncaughtExceptionHandler ((thread, e) -> {
+            e.printStackTrace();
+            startLogcat();
+            Crashlytics.logException(e);
+            defaultHandler.uncaughtException(thread, e); //this will show crash dialog.
+            System.exit(1); // kill off the crashed app
+        });
     }
-//    public static void startLogcat() {
-//        if (productionRelease) return;
-//        int pid= android.os.Process.myPid();
-//        try {
-//            //clean logcat first
-//            String cmd_clean = "logcat -c";
-//            Runtime.getRuntime().exec(cmd_clean);
-//            File sdcard = Environment.getExternalStorageDirectory();
-//            File dir = new File(sdcard.getAbsolutePath() + "/FONT_LogFiles/Logcat");
-//            //create a dir if not exist
-//            if (!dir.exists()) {
-//                dir.mkdir();
-//            }
-//            //start logcat *:W with file rotation
-//            String targetLogcatFile = sdcard.getAbsolutePath() + "/FONT_LogFiles/Logcat/"+"LogcatWE_"+pid+".log";
-//            String cmd_logcatstart = "logcat -f " +targetLogcatFile+" -r 100 -n 10 -v threadtime *:W";
-//            Runtime.getRuntime().exec(cmd_logcatstart);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public static void startLogcat() {
+        //if (productionRelease) return;
+        int pid= android.os.Process.myPid();
+        try {
+            //clean logcat first
+            String cmd_clean = "logcat -c";
+            Runtime.getRuntime().exec(cmd_clean);
+            File sdcard = Environment.getExternalStorageDirectory();
+            File dir = new File(sdcard.getAbsolutePath() + "/FONT_LogFiles/Logcat");
+            //create a dir if not exist
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            //start logcat *:W with file rotation
+            String targetLogcatFile = sdcard.getAbsolutePath() + "/FONT_LogFiles/Logcat/"+"LogcatWE_"+pid+".txt";
+            String cmd_logcatstart = "logcat -f " +targetLogcatFile+" -r 100 -n 10 -v threadtime *:W";
+            //"logcat -d -v time"
+            //getRuntime().exec("logcat >> /sdcard/logcat.log");
+            Runtime.getRuntime().exec(cmd_logcatstart);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -55,9 +55,9 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
         super.onCreate(savedInstanceState);
         simpleSettingsActivityInstance=this;
         setContentView(R.layout.activity_simple_settings);
-        txtBuild= (TextView) findViewById((R.id.txtBuild));
+        txtBuild= findViewById((R.id.txtBuild));
         txtBuild.setText((getString(R.string.app_label)+" "+ AppConfig.pAppRelease+ AppConfig.pAppReleaseSuffix));
-        resetButton = (Button) findViewById(R.id.btnReset);
+        resetButton = findViewById(R.id.btnReset);
         resetButton.setOnClickListener(view -> {
             SessionProp.resetSessionProp();
             updateUI();
@@ -66,14 +66,14 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             getPswButton.setText(R.string.label_btnpsw_get);
             //MainActivity.spinnerMinSpeed.setSelection(Util.getSpinnerSpeedPos());
         });
-        clearCacheButton = (Button) findViewById(R.id.btnClearCache);
+        clearCacheButton = findViewById(R.id.btnClearCache);
         clearCacheButton.setOnClickListener(view -> EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONCLEARCACHE_CLICKED)));
-        sendCacheButton = (Button) findViewById(R.id.btnSendCache);
+        sendCacheButton = findViewById(R.id.btnSendCache);
         sendCacheButton.setOnClickListener(view -> {
             progressBar.show();
             EventBus.distribute(new EventMessage(EVENT.SETTINGACT_BUTTONSENDCACHE_CLICKED));
         });
-        getPswButton = (Button) findViewById(R.id.btnGetPsw);
+        getPswButton = findViewById(R.id.btnGetPsw);
         getPswButton.setOnClickListener(view -> {
             if (Util.getPsw()==null) {
                 Util.setCloudPsw(view);
@@ -81,14 +81,14 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             txtPsw.setVisibility(View.VISIBLE);
         });
         if(!AppConfig.pIsAppTypePublic) {
-            chBoxIsOnReboot = (CheckBox) findViewById(R.id.isOnRebootCheckBox);
+            chBoxIsOnReboot = findViewById(R.id.isOnRebootCheckBox);
             if (null!=chBoxIsOnReboot) {
                 chBoxIsOnReboot.setChecked(SessionProp.pIsOnReboot);
                 chBoxIsOnReboot.setOnCheckedChangeListener((compoundButton, b) -> {
                     SessionProp.pIsOnReboot = b;
                 });
             }
-            spinnerTextTo = (Spinner) findViewById(R.id.spinnerTextTo);
+            spinnerTextTo = findViewById(R.id.spinnerTextTo);
             ArrayAdapter<CharSequence> adapterTextTo = ArrayAdapter.createFromResource(this,R.array.textto_array, android.R.layout.simple_spinner_item);
             adapterTextTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerTextTo.setAdapter(adapterTextTo);
@@ -98,29 +98,29 @@ public class SimpleSettingsActivity extends Activity implements AdapterView.OnIt
             findViewById(R.id.layoutTextTo).setVisibility(View.INVISIBLE);
             findViewById(R.id.layoutStartOnReboot).setVisibility(View.INVISIBLE);
         }
-        chBoxIsDebug = (CheckBox) findViewById(R.id.isDebugCheckBoxCheckBox);
+        chBoxIsDebug = findViewById(R.id.isDebugCheckBoxCheckBox);
         //chBoxIsDebug.setChecked(SessionProp.pIsDebug);
         chBoxIsDebug.setOnCheckedChangeListener((compoundButton, b) -> {
             if(b) set_writePermissions();
             SessionProp.pIsDebug=b;
         });
-        chBoxIsRoad = (CheckBox) findViewById(R.id.isRoadCheckBox);
+        chBoxIsRoad = findViewById(R.id.isRoadCheckBox);
         //chBoxIsRoad.setChecked(SessionProp.pIsRoad);
         chBoxIsRoad.setOnCheckedChangeListener((compoundButton, b) -> {
             SessionProp.pIsRoad=b;
             //Route.set_isRoad(b);
         });
-        txtUser= (TextView) findViewById((R.id.txtWebsiteUser));
+        txtUser= findViewById((R.id.txtWebsiteUser));
         txtUser.setText(Pilot.getUserID());
-        txtPsw= (TextView) findViewById((R.id.txtWebsitePsw));
+        txtPsw= findViewById((R.id.txtWebsitePsw));
         txtPsw.setText(Util.getPsw());
         //chBoxIsDebug.setChecked(Util.getIsDebug());
-        spinnerUrls = (Spinner) findViewById(R.id.spinnerUrlId);
+        spinnerUrls = findViewById(R.id.spinnerUrlId);
         ArrayAdapter<CharSequence> adapterUrl = ArrayAdapter.createFromResource(this,pIsRelease?R.array.url_array_release:R.array.url_array, android.R.layout.simple_spinner_item);
         adapterUrl.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrls.setAdapter(adapterUrl);
         spinnerUrls.setOnItemSelectedListener(this);
-        txtCached= (TextView) findViewById((R.id.txtCached));
+        txtCached= findViewById((R.id.txtCached));
         txtCached.setText(String.valueOf(sqlHelper.getLocationTableCountTotal()));
 
         progressBar = new ProgressDialog(this);

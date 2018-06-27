@@ -71,27 +71,26 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
 //        requestParams.put("battery", ReceiverBatteryLevel.getBattery());
 
         try (
-                FontLogAsync mylog = new FontLogAsync();
-
-                HttpJsonClient client = new HttpJsonClient(new EntityRequestHealthCheck());
+                //FontLogAsync mylog = new FontLogAsync();
+                HttpJsonClient client = new HttpJsonClient(new EntityRequestHealthCheck())
         )
         {
-            mylog.execute(new EntityLogMessage(TAG, "healthCheckComm", 'd'));
+            new FontLogAsync().execute(new EntityLogMessage(TAG, "healthCheckComm", 'd'));
             client.post(
             new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int code, Header[] headers, JSONObject jsonObject) {
-                                mylog.execute(new EntityLogMessage(TAG, "healthCheckComm onSuccess", 'd'));
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "healthCheckComm onSuccess", 'd'));
                                 ResponseJsonObj response = new ResponseJsonObj(jsonObject);
 
                                 if (response.isException= true) {
-                                    mylog.execute(new EntityLogMessage(TAG, "healthCheckComm onSuccess|Exception|" + response.responseException, 'd'));
+                                    new FontLogAsync().execute(new EntityLogMessage(TAG, "healthCheckComm onSuccess|Exception|" + response.responseException, 'd'));
                                 }
                             }
 
                             @Override
                             public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                                mylog.execute(new EntityLogMessage(TAG, "healthCheckComm onFailure", 'd'));
+                                new FontLogAsync().execute(new EntityLogMessage(TAG, "healthCheckComm onFailure", 'd'));
                             }
 
                             public void onFinish() {

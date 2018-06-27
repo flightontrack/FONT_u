@@ -16,7 +16,7 @@ import static com.flightontrack.shared.Props.*;
 import static com.flightontrack.shared.Props.SessionProp.*;
 
 public interface EventBus extends Events{
-    final String TAG = "Bus";
+    String TAG = "Bus";
 
     static void distribute(EventMessage eventMessage){
         ArrayList<EventBus> interfaceList = new ArrayList();

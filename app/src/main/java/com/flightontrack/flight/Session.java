@@ -202,7 +202,7 @@ public class Session implements EventBus{
                             commBatchSize = COMM_BATCH_SIZE_MAX;
                         }
 
-                        try (ResponseJsonObj response = new ResponseJsonObj(jsonObject);) {
+                        try (ResponseJsonObj response = new ResponseJsonObj(jsonObject)) {
                             if (response.isException) {
                                 new FontLogAsync().execute(new EntityLogMessage(TAG, "onSuccess :isException", 'd'));
                                 EventBus.distribute(new EventMessage(EVENT.SESSION_ONSUCCESS_EXCEPTION));

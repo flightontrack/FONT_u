@@ -59,7 +59,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
         route = r;
         flightTimeString = FLIGHT_TIME_ZERO;
         isElevationCheckDone = false;
-        r.activeFlight = this;
+        RouteBase.activeFlight = this;
         set_flightState(FLIGHT_STATE.GETTINGFLIGHT);
     }
 
@@ -134,7 +134,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
             .set("routeid", route.routeNumber.equals(ROUTE_NUMBER_DEFAULT)?null:route.routeNumber);
             try(
                     HttpJsonClient client = new HttpJsonClient(entityRequestNewFlight);
-                    FontLogAsync myLog = new FontLogAsync()
+                    //FontLogAsync myLog = new FontLogAsync()
             ) {
                 client.post(new JsonHttpResponseHandler() {
 
@@ -148,7 +148,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                         //Log.i("TAG", "onSuccessjsonObject: " + jsonObject);
                         ResponseJsonObj response = new ResponseJsonObj(jsonObject);
                         if (response.responseException != null) {
-                            myLog.execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
+                            new FontLogAsync().execute(new EntityLogMessage(TAG, "RESPONSE_TYPE_NOTIF: " + response.responseException, 'd'));
                             Toast.makeText(mainactivityInstance, R.string.cloud_error, Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -161,7 +161,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                        myLog.execute(new EntityLogMessage(TAG, "onFailure e: " + e.getMessage(), 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: " + e.getMessage(), 'd'));
                         //client.isFailed = true;
                         if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
                             Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
@@ -173,7 +173,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String s, Throwable e) {
-                        myLog.execute(new EntityLogMessage(TAG, "onFailure URL method not found status code: " + statusCode, 'd'));
+                        new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure URL method not found status code: " + statusCode, 'd'));
                         //client.isFailed = true;
                         if (flightNumStatus == REMOTE_DEFAULT) if (mainactivityInstance != null) {
                             Toast.makeText(mainactivityInstance, R.string.temp_flight_alloc, Toast.LENGTH_LONG).show();
@@ -346,7 +346,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
     public void onClock(EventMessage eventMessage) {
 
         new FontLogAsync().execute(new EntityLogMessage(TAG, flightNumber + "onClock", 'd'));
-        if (route.activeFlight == this
+        if (RouteBase.activeFlight == this
                 && (flightState == FLIGHT_STATE.READY_TOSAVELOCATIONS || flightState == FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN)
                 && eventMessage.eventMessageValueLocation != null) {
             //                    String s = Arrays.toString(Thread.currentThread().getStackTrace());

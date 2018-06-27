@@ -77,18 +77,18 @@ public class AircraftActivity extends Activity {
     @Override
     public void onResume() {
         new FontLogAsync().execute(new EntityLogMessage(TAG, "AircraftActivity onResume", 'd'));
-        txtUserName = (TextView) findViewById(R.id.txtUserName);
+        txtUserName = findViewById(R.id.txtUserName);
         txtUserName.setText(Pilot.getPilotUserName());
-        txtAcftName = (EditText) findViewById(R.id.txtAcftName);
-        txtAcftRegNum = (EditText) findViewById(R.id.txtAcftRegNum);
+        txtAcftName = findViewById(R.id.txtAcftName);
+        txtAcftRegNum = findViewById(R.id.txtAcftRegNum);
 
-        doneButton = (Button) findViewById(R.id.btn_acft_done);
-        cancelButton = (Button) findViewById(R.id.btn_acft_cancel);
-        clearButton = (Button) findViewById(R.id.btn_acft_clear);
+        doneButton = findViewById(R.id.btn_acft_done);
+        cancelButton = findViewById(R.id.btn_acft_cancel);
+        clearButton = findViewById(R.id.btn_acft_clear);
 
         if (Props.AppConfig.pIsNFCcapable) {
-            nfcSwitch = (Switch) findViewById(R.id.switch_nfc);
-            txtBlueText = (TextView) findViewById(R.id.txtBlueText);
+            nfcSwitch = findViewById(R.id.switch_nfc);
+            txtBlueText = findViewById(R.id.txtBlueText);
             nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 //            txtAcftMake = (TextView) findViewById(R.id.txtAcftMake);
 //            txtAcftModel = (TextView) findViewById(R.id.txtAcftModel);
