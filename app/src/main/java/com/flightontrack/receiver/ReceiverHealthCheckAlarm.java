@@ -58,7 +58,7 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
         }
 
     }
-    void healthCheckComm(Context ctx) {
+    void healthCheckComm(Context ctx)  throws Exception {
 //        RequestParams requestParams = new RequestParams();
 //        requestParams.put("rcode", REQUEST_IS_CLOCK_ON);
 //        requestParams.put("isrestart", isRestart);
@@ -99,7 +99,9 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
                         }
             );
         }
-        catch (Exception e){}
+        catch (Exception e){
+            throw e;
+        }
 
     }
 }
