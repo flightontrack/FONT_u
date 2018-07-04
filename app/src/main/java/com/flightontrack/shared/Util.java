@@ -106,7 +106,7 @@ public class Util {
         return isNetworkAvailable ;
     }
 
-    public static void setCloudPsw(View view)  throws Exception {
+    public static void setCloudPsw(View view){
 //        final ProgressDialog progressBar;
 //        progressBar = new ProgressDialog(view.getContext());
 //        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -168,7 +168,7 @@ public class Util {
             );
         }
         catch (Exception e){
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 }
