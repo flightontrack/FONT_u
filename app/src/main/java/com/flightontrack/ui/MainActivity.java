@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
     ActionMenuView amvMenu;
     View cardLayout1;
     ReceiverHealthCheckAlarm alarmReceiver;
+    ReceiverBatteryLevel receiverBatteryLevel;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -139,12 +140,12 @@ public class MainActivity extends AppCompatActivity implements EventBus {
 //            }
 
             if (!AppConfig.pIsAppTypePublic) {
-                IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
+                //IntentFilter filter = new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER);
                 alarmReceiver = new ReceiverHealthCheckAlarm();
-                registerReceiver(alarmReceiver, filter);
+                registerReceiver(alarmReceiver, new IntentFilter(HEALTHCHECK_BROADCAST_RECEIVER_FILTER));
                 AlarmManagerCtrl.initAlarm();
                 AlarmManagerCtrl.setAlarm();
-                ReceiverBatteryLevel receiverBatteryLevel = new ReceiverBatteryLevel();
+                receiverBatteryLevel = new ReceiverBatteryLevel();
                 registerReceiver(receiverBatteryLevel, new IntentFilter("android.intent.action.BATTERY_LOW"));
             }
             updFreqSpinnerSetup();
@@ -261,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
         }
+        ctxApp = null;
     }
 
     @Override
@@ -461,7 +463,11 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             unregisterReceiver(alarmReceiver);
             alarmReceiver = null;
         }
-        ctxApp = null;
+        if (receiverBatteryLevel != null) {
+            unregisterReceiver(receiverBatteryLevel);
+            receiverBatteryLevel = null;
+        }
+        //ctxApp = null;
         txtUserName = null;
         txtAcftNum = null;
         spinnerUpdFreq = null;
