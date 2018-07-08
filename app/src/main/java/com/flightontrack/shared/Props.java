@@ -67,6 +67,7 @@ public final class Props implements EventBus{
         public static int[]        pUpdateIntervalSec= {3, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800};
         public static boolean       pIsOnReboot=!pIsAppTypePublic;
         public static boolean       pIsStartedOnReboot =false;
+        public static boolean pIsActivityFinished =false;
 
         public static SQLHelper sqlHelper;
         public static int dbLocationRecCountNormal = 0;
@@ -89,7 +90,9 @@ public final class Props implements EventBus{
             //editor.putString("pTextRed", pTextRed);
             editor.putString("pTrackingButtonText", pTrackingButtonText);
             editor.putBoolean("pIsOnReboot", pIsOnReboot);
+            editor.putBoolean("pIsActivityFinished", pIsActivityFinished);
             editor.commit();
+            editor.remove("pIsActivityFinished").commit();
         }
 
         public static void get() {
@@ -104,6 +107,7 @@ public final class Props implements EventBus{
             pTrackingButtonText = sharedPreferences.getString("pTrackingButtonText", ctxApp.getString(R.string.start_flight));
             pIsOnReboot=sharedPreferences.getBoolean("pIsOnReboot", false);
             pIsStartedOnReboot =sharedPreferences.getBoolean("pIsStartedOnReboot", false);
+            pIsActivityFinished =sharedPreferences.getBoolean("pIsActivityFinished", false);
         }
 
         public static void set_isMultileg(boolean isMultileg) {
@@ -131,7 +135,9 @@ public final class Props implements EventBus{
         public static void clearOnDestroy() {
             editor.remove("pIsMultileg").commit();
             editor.remove("pIsEmptyAcftOk").commit();
-            editor.remove("pTextRed").commit();
+            //editor.remove("pTextRed").commit();
+            editor.remove("pTrackingButtonText").commit();
+            editor.putBoolean("pIsActivityFinished", true).commit();
             pIsRoad = false;
             pIsDebug = false;
         }

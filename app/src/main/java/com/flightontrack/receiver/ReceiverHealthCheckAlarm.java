@@ -59,19 +59,8 @@ public class ReceiverHealthCheckAlarm extends WakefulBroadcastReceiver {
 
     }
     void healthCheckComm(Context ctx){
-//        RequestParams requestParams = new RequestParams();
-//        requestParams.put("rcode", REQUEST_IS_CLOCK_ON);
-//        requestParams.put("isrestart", isRestart);
-//        requestParams.put("phonenumber", MyPhone._myPhoneId);
-//        requestParams.put("deviceid", MyPhone._myDeviceId);
-//        requestParams.put("isClockOn", SvcLocationClock.isInstanceCreated());
-//        //requestParams.put("flightid", activeRoute.activeFlight==null?FLIGHT_NUMBER_DEFAULT : activeRoute.activeFlight.flightNumber);
-//        //requestParams.put("isdebug", Util.getIsDebug());
-//        requestParams.put("isdebug", SessionProp.pIsDebug);
-//        requestParams.put("battery", ReceiverBatteryLevel.getBattery());
 
         try (
-                //FontLogAsync mylog = new FontLogAsync();
                 HttpJsonClient client = new HttpJsonClient(new EntityRequestHealthCheck())
         )
         {

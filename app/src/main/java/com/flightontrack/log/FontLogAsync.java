@@ -77,7 +77,8 @@ public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> imp
                 logFile.createNewFile();
             }
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append(timeStr +af+ text + LINE_SEPARATOR);
+            String strAppend = timeStr +af+ text + LINE_SEPARATOR;
+            buf.append(strAppend);
             buf.close();
         }
         catch (IOException e) {

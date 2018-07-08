@@ -120,9 +120,10 @@ public interface EventBus extends Events{
                 break;
             case CLOCK_ONTICK:
                 onClockList.add(RouteBase.getInstance()); /// delete closed flights from flightlist
-                for (FlightOffline f : Route.flightList) {
-                    onClockList.add(f);                   /// check if any of them need to be replace temp flight num                     /// check if any of them need to be closed
-                }
+//                for (FlightOffline f : Route.flightList) {
+//                    onClockList.add(f);                   /// check if any of them need to be replace temp flight num                     /// check if any of them need to be closed
+//                }
+                onClockList.addAll(Route.flightList);
                 onClockList.add(Session.getInstance());   /// start communication service
                 break;
             case ALERT_SENTPOINTS:

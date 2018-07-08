@@ -24,7 +24,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.flightontrack.log.FontLogAsync;
 import com.flightontrack.entities.EntityLogMessage;
 import com.flightontrack.other.AlarmManagerCtrl;
@@ -42,8 +41,6 @@ import com.flightontrack.receiver.ReceiverBatteryLevel;
 //import com.google.android.gms.appindexing.AppIndex;
 //import com.google.android.gms.appindexing.Thing;
 //import com.google.android.gms.common.api.GoogleApiClient;
-
-import io.fabric.sdk.android.Fabric;
 
 import static com.flightontrack.shared.Const.*;
 import static com.flightontrack.shared.Props.*;
@@ -128,6 +125,12 @@ public class MainActivity extends AppCompatActivity implements EventBus {
             AppConfig.get();
             AppConfig.pIsNFCcapable = AppConfig.pIsNFCEnabled && isNFCcapable();
             SessionProp.get();
+            if (!SessionProp.pIsActivityFinished) {
+                /// if previous session crashed reset session prop
+                clearOnDestroy();
+                SessionProp.get();
+            }
+
 
 //            if (!getApplicationContext().toString().equals(Util.getCurrAppContext())) {
 //                new FontLogAsync().execute(new LogMessage(TAG, "New App Context", 'd');
