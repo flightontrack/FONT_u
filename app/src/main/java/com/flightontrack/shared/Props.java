@@ -31,7 +31,7 @@ public final class Props implements EventBus{
     public static class AppConfig {
         public static String pAppRelease = "1.81";
         public static boolean pIsNFCEnabled =false;
-        public static boolean pIsAppTypePublic=false;
+        public static boolean pIsAppTypePublic=true;
         /// if false:   1. start healthcheckalarmreceiver
             ///             2. aicraft activity layout has no nfc
             ///             3. autostart (request flight) is true

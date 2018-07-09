@@ -45,7 +45,7 @@ public class Session implements EventBus{
     }
     static Session sessionInstance = null;
     public static Integer commBatchSize = COMM_BATCH_SIZE_MAX;
-    boolean isSendNextStarted = false;
+    //boolean isSendNextStarted = false;
     //static EnumMap<EVENT,SACTION> eventReaction = new EnumMap<>(EVENT.class);
     Map<Integer,EntityLocation> locRequestList = new HashMap<Integer,EntityLocation>();
     EVENT ev;
@@ -86,7 +86,11 @@ public class Session implements EventBus{
         for (EntityLocation l : locList) {
             addLocToRequestList(l);
         }
-        if(!isSendNextStarted)  sendNext();
+//        if(!isSendNextStarted)  {
+//            isSendNextStarted = true;
+//            sendNext();
+//        }
+        sendNext();
     }
     void startLocationRequest(String flightNum) {
 
@@ -94,14 +98,21 @@ public class Session implements EventBus{
         for (EntityLocation l : locList) {
             addLocToRequestList(l);
         }
-        if(!isSendNextStarted)  sendNext();
+//        if(!isSendNextStarted)  {
+//            sendNext();
+//        }
+//        else {
+//            //temp patch - in case of if isSendNextStarted did not reset
+//            new FontLogAsync().execute(new EntityLogMessage(TAG, " isSendNextStarted : " + isSendNextStarted, 'd'));
+//            if (locRequestList.entrySet().size() >5) sendNext();
+//        }
+        sendNext();
     }
     void sendNext(){
 
-        isSendNextStarted = true;
         if (locRequestList.isEmpty()) {
 //            EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
-            isSendNextStarted = false;
+            //isSendNextStarted = false;
             return;
         }
         for (Map.Entry<Integer, EntityLocation> e : locRequestList.entrySet()){
@@ -237,7 +248,7 @@ public class Session implements EventBus{
                         new FontLogAsync().execute(new EntityLogMessage(TAG, "onFailure e: "+e, 'd'));
                         locRequestList.clear();
                         commBatchSize = COMM_BATCH_SIZE_MIN;
-                        isSendNextStarted = false;
+                        //isSendNextStarted = false;
                         EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
                     }
 
@@ -281,7 +292,7 @@ public class Session implements EventBus{
                 break;
             case SETTINGACT_BUTTONSENDCACHE_CLICKED:
                 commBatchSize = COMM_BATCH_SIZE_MAX;
-                isSendNextStarted = false;
+                //isSendNextStarted = false;
                 if (sqlHelper.getLocationTableCountTotal() ==0){
                     EventBus.distribute(new EventMessage(EVENT.SESSION_ONSENDCACHECOMPLETED).setEventMessageValueBool(true));
                     break;

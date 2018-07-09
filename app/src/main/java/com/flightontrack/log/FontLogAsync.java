@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import static com.flightontrack.pilot.MyPhone._myPhoneId;
@@ -57,7 +58,10 @@ public class FontLogAsync extends AsyncTask<EntityLogMessage, Void, Boolean> imp
     }
     void appendCustomLog(String text){
         String timeStr = "[" + getDateTimeNow() + "]";
-        String af = String.format("%1$-10s", " af:"+RouteBase.activeFlight.flightNumber+" afs:"+RouteBase.activeFlight.flightState+": ") ;
+        String af = " no active flight";
+        if (RouteBase.activeFlight !=null) {
+            af = String.format("%1$-10s", " af:" + RouteBase.activeFlight.flightNumber + " afs:" + RouteBase.activeFlight.flightState + ": ");
+        }
         String LINE_SEPARATOR = System.getProperty("line.separator");
         File sdcard=null;
         try {

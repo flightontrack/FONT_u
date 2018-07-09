@@ -201,19 +201,15 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
     public void saveLocCheckSpeed(final Location location) {
 
         float speedCurrent = location.getSpeed();
-        new FontLogAsync().execute(new EntityLogMessage(TAG, "saveLocCheckSpeed: reported speed: " + speedCurrent, 'd'));
+        //new FontLogAsync().execute(new EntityLogMessage(TAG, "saveLocCheckSpeed: reported speed: " + speedCurrent, 'd'));
         set_speedCurrent(speedCurrent);
 
         isSpeedAboveMin = isDoubleSpeedAboveMin();
-        //switch (lastAction) {
         switch (flightState) {
             case READY_TOSAVELOCATIONS:
                 if (isSpeedAboveMin) set_flightState(FLIGHT_STATE.INFLIGHT_SPEEDABOVEMIN);
                 break;
-//            case CHANGE_IN_PENDING:
-//                if (isSpeedAboveMin) set_fAction(FACTION.CHANGE_IN_FLIGHT);
-//                break;
-            //case CHANGE_IN_FLIGHT:
+
             case INFLIGHT_SPEEDABOVEMIN:
                 if (!isElevationCheckDone) {
                     if (_flightTimeSec >= ELEVATIONCHECK_FLIGHT_TIME_SEC)
@@ -221,11 +217,8 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
                     saveLocation(location, isElevationCheckDone);
                 } else saveLocation(location, false);
 
-                //set_fAction(FACTION.FLIGHTTIME_UPDATE);
                 set_flightTimeSec();
-                //if (!isSpeedAboveMin) route.set_rAction(RACTION.RESTART_NEW_FLIGHT);
                 if (!isSpeedAboveMin) {
-                    //set_fAction(FACTION.CLOSE_FLIGHT_IF_ZERO_LOCATIONS);
                     set_flightState(FLIGHT_STATE.STOPPED);
                     EventBus.distribute(new EventMessage(EVENT.FLIGHT_ONSPEEDLOW).setEventMessageValueString(flightNumber));
                 }
@@ -234,9 +227,7 @@ public class FlightOnline extends FlightOffline implements GetTime, EventBus {
     }
 
     private void saveLocation(Location location, boolean iselevecheck) {
-        //Util.appendLog(TAG + "_____Timer 3 - saveLocation", 'd');
         try {
-            //int p = activeRoute.activeFlight._wayPointsCount+1;
             int p = _wayPointsCount + 1;
             ContentValues values = new ContentValues();
             values.put(DBSchema.COLUMN_NAME_COL1, REQUEST_LOCATION_UPDATE); //rcode
